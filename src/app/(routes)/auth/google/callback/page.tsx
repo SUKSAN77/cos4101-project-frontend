@@ -16,7 +16,9 @@ export default function Page() {
 				called.current = true;
 				if (code) {
 					const response = await fetch(
-						`http://localhost:8000/api/v1/auth/google/callback?code=${code}`,
+						`http://localhost:8000/api/v1/auth/google/callback?code=${code}`,{
+							credentials: 'include',
+						}
 					);
 					console.log(response);
 				}
