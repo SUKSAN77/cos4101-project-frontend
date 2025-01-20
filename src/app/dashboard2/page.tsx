@@ -415,7 +415,7 @@ export const Dashboard = () => {
           <h1 className="text-2xl text-center font-bold text-primary">
             ระบบจัดการครุภัณฑ์
           </h1>
-          <Button className="text-secondary">เพิ่มครุภัณฑ์</Button>
+          <Button className="text-secondary">เพิ่มครุภัณฑ์ใหม่</Button>
         </div>
         <div className="flex gap-2">
           <div className="w-full mb-5">
