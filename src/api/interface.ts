@@ -25,9 +25,9 @@ export interface Equipment {
   acquisitionMethod: string;
   disposalDate: string | null;
   createdBy: string | null;
-  creator: Creator;
+  creator: Creator | null;
   roomId: string | null;
-  room: Room;
+  room: Room | null;
 }
 
 export interface Pagination {
