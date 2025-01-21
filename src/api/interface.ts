@@ -5,6 +5,13 @@ export interface Creator {
   lastName: string;
 }
 
+export interface Deleter {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+}
+
 export interface Room {
   id: string;
   roomNumber: string;
@@ -28,6 +35,7 @@ export interface Equipment {
   creator: Creator | null;
   roomId: string | null;
   room: Room | null;
+  // deleter: Deleter | null;
 }
 
 export interface Pagination {
