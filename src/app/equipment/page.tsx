@@ -507,6 +507,7 @@ export default function EquipmentPage() {
   ]); // State to manage new equipment items
   const [currentPage, setCurrentPage] = useState(1); // State to manage current page
   const [selectedEquipment, setSelectedEquipment] = useState(null); // State to manage selected equipment for details view
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false); // State to manage edit dialog visibility
 
   const itemsPerPage = 15;
   const filteredEquipment = mockEquipment.filter(
@@ -584,6 +585,26 @@ export default function EquipmentPage() {
     setSelectedEquipment(null);
   };
 
+  const handleEditEquipment = (equipment) => {
+    setSelectedEquipment(equipment);
+    setIsEditDialogOpen(true);
+  };
+
+  const handleSaveEdit = () => {
+    // Logic to save edited equipment
+    setIsEditDialogOpen(false);
+    setSelectedEquipment(null);
+  };
+
+  const handleEditChange = (field, value) => {
+    setSelectedEquipment({ ...selectedEquipment, [field]: value });
+  };
+
+  const handleCloseEditDialog = () => {
+    setIsEditDialogOpen(false);
+    setSelectedEquipment(null);
+  };
+
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -655,7 +676,11 @@ export default function EquipmentPage() {
                           >
                             View details
                           </DropdownMenuItem>
-                          <DropdownMenuItem>Edit</DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => handleEditEquipment(item)}
+                          >
+                            Edit
+                          </DropdownMenuItem>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem>Delete</DropdownMenuItem>
                         </DropdownMenuContent>
@@ -813,6 +838,65 @@ export default function EquipmentPage() {
               <Button variant="ghost" onClick={handleCloseDetailsDialog}>
                 Close
               </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
+      {isEditDialogOpen && selectedEquipment && (
+        <Dialog open={true} onOpenChange={handleCloseEditDialog}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>แก้ไขครุภัณฑ์</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-2">
+              <Input
+                placeholder="ชื่อครุภัณฑ์"
+                value={selectedEquipment.name}
+                onChange={(e) => handleEditChange("name", e.target.value)}
+                className="mb-2"
+              />
+              <Input
+                placeholder="เลขครุภัณฑ์"
+                value={selectedEquipment.serialNumber}
+                onChange={(e) => handleEditChange("serialNumber", e.target.value)}
+                className="mb-2"
+              />
+              <Input
+                placeholder="สถานะ"
+                value={selectedEquipment.status}
+                onChange={(e) => handleEditChange("status", e.target.value)}
+                className="mb-2"
+              />
+              <Input
+                placeholder="หมวดหมู่"
+                value={selectedEquipment.acquisitionMethod}
+                onChange={(e) => handleEditChange("acquisitionMethod", e.target.value)}
+                className="mb-2"
+              />
+              <Input
+                placeholder="ห้อง"
+                value={selectedEquipment.room ? selectedEquipment.room.roomNumber : ""}
+                onChange={(e) => handleEditChange("room", e.target.value)}
+                className="mb-2"
+              />
+              <Input
+                placeholder="ราคา"
+                value={selectedEquipment.price}
+                onChange={(e) => handleEditChange("price", e.target.value)}
+                className="mb-2"
+              />
+              <Input
+                placeholder="หมายเหตุ"
+                value={selectedEquipment.notes}
+                onChange={(e) => handleEditChange("notes", e.target.value)}
+                className="mb-2"
+              />
+            </div>
+            <DialogFooter>
+              <Button variant="ghost" onClick={handleCloseEditDialog}>
+                Cancel
+              </Button>
+              <Button onClick={handleSaveEdit}>Save</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
