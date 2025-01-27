@@ -33,6 +33,7 @@ import {
   DialogFooter,
   DialogTitle,
 } from "@/components/ui/dialog"; // Import Dialog components
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion"; // Import Accordion components
 
 // Mock data for equipment
 const mockEquipment = [
@@ -537,41 +538,48 @@ export default function EquipmentPage() {
           <DialogHeader>
             <DialogTitle>เพิ่มครุภัณฑ์</DialogTitle>
           </DialogHeader>
-          <div>
-            {newEquipment.map((item, index) => (
-              <div key={index} className="mb-4">
-                <Input
-                  placeholder="ชื่อครุภัณฑ์"
-                  value={item.name}
-                  onChange={(e) => handleNewEquipmentChange(index, "name", e.target.value)}
-                  className="mb-2"
-                />
-                <Input
-                  placeholder="เลขครุภัณฑ์"
-                  value={item.serialNumber}
-                  onChange={(e) => handleNewEquipmentChange(index, "serialNumber", e.target.value)}
-                  className="mb-2"
-                />
-                <Input
-                  placeholder="สถานะ"
-                  value={item.status}
-                  onChange={(e) => handleNewEquipmentChange(index, "status", e.target.value)}
-                  className="mb-2"
-                />
-                <Input
-                  placeholder="หมวดหมู่"
-                  value={item.acquisitionMethod}
-                  onChange={(e) => handleNewEquipmentChange(index, "acquisitionMethod", e.target.value)}
-                  className="mb-2"
-                />
-                <Input
-                  placeholder="ห้อง"
-                  value={item.room}
-                  onChange={(e) => handleNewEquipmentChange(index, "room", e.target.value)}
-                  className="mb-2"
-                />
-              </div>
-            ))}
+          <div className="max-h-96 overflow-y-auto">
+            <Accordion type="single" collapsible>
+              {newEquipment.map((item, index) => (
+                <AccordionItem key={index} value={`item-${index}`}>
+                  <AccordionTrigger>ครุภัณฑ์ {index + 1}</AccordionTrigger>
+                  <AccordionContent>
+                    <div className="mb-4">
+                      <Input
+                        placeholder="ชื่อครุภัณฑ์"
+                        value={item.name}
+                        onChange={(e) => handleNewEquipmentChange(index, "name", e.target.value)}
+                        className="mb-2"
+                      />
+                      <Input
+                        placeholder="เลขครุภัณฑ์"
+                        value={item.serialNumber}
+                        onChange={(e) => handleNewEquipmentChange(index, "serialNumber", e.target.value)}
+                        className="mb-2"
+                      />
+                      <Input
+                        placeholder="สถานะ"
+                        value={item.status}
+                        onChange={(e) => handleNewEquipmentChange(index, "status", e.target.value)}
+                        className="mb-2"
+                      />
+                      <Input
+                        placeholder="หมวดหมู่"
+                        value={item.acquisitionMethod}
+                        onChange={(e) => handleNewEquipmentChange(index, "acquisitionMethod", e.target.value)}
+                        className="mb-2"
+                      />
+                      <Input
+                        placeholder="ห้อง"
+                        value={item.room}
+                        onChange={(e) => handleNewEquipmentChange(index, "room", e.target.value)}
+                        className="mb-2"
+                      />
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
             <Button onClick={handleAddNewEquipmentField}>Add Another</Button>
           </div>
           <DialogFooter>
