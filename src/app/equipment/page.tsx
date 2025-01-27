@@ -1,9 +1,41 @@
 "use client";
-// import { useEquipments } from "@/hook/api";
-import React from "react";
-import { Input } from "@/components/ui/input";
+
+import { useState } from "react";
+import { AppSidebar } from "@/components/app-sidebar";
+import {
+  SidebarInset,
+  SidebarProvider,
+  SidebarTrigger,
+} from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
-const equipments = [
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { MoreHorizontal, Plus } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogFooter,
+  DialogTitle,
+} from "@/components/ui/dialog"; // Import Dialog components
+
+// Mock data for equipment
+const mockEquipment = [
   {
     id: "01947e23-223d-79f2-b7da-deb63f88447d",
     name: "Hat",
@@ -399,109 +431,157 @@ const equipments = [
   },
 ];
 
-export const Dashboard = () => {
-  // const { equipments, loading, error, page, setPage, limit, setLimit } = useEquipments();
-
-  // if (false) return <div>กำลังโหลด...</div>;
-  // if (false) return <div>เกิดข้อผิดพลาด: {error.message}</div>;
-
-  const [limit, setLimit] = React.useState(15);
-  const [page, setPage] = React.useState(1);
-
-  return (
-    <div className="flex flex-col">
-      <div className="px-10 py-5">
-        <div className="flex justify-between my-5">
-          <h1 className="text-2xl text-center font-bold text-primary">
-            ระบบจัดการครุภัณฑ์
-          </h1>
-          <Button className="text-secondary h-12">เพิ่มครุภัณฑ์ใหม่</Button>
-        </div>
-        <div className="flex gap-2">
-          <div className="w-full mb-5">
-            <label htmlFor="">ค้นหา</label>
-            <Input placeholder="ค้นหาครุภัณฑ์" />
-          </div>
-          <div className="flex flex-col justify-center mb-5">
-            <label htmlFor="">ค้นหาตาม</label>
-            <select
-              value={limit}
-              onChange={(e) => setLimit(Number(e.target.value))}
-              className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
-            >
-              <option value="">ทั้งหมด</option>
-              <option value="">ชื่อครุภัณฑ์</option>
-              <option value="">หมายเลขครุภัณฑ์</option>
-              <option value="">สถานที่ตั้ง</option>
-              <option value="">สถานะการใช้งาน</option>
-            </select>
-          </div>
-        </div>
-        <div className="w-full flex justify-around my-5">
-          <div>
-            <label>ภาพรวมทั้งหมด</label>
-            <div className="w-80 h-80 bg-slate-400 rounded-md border-red-400 border"></div>
-          </div>
-          <div>
-            <label>กิจกรรมล่าสุด</label>
-            <div className="w-80 h-80 bg-slate-400 rounded-md border-red-400 border"></div>
-          </div>
-        </div>
-        {/* ตารางแสดงข้อมูล */}
-        <table className="min-w-full border">
-          <thead>
-            <tr>
-              <th className="border p-2">รหัสครุภัณฑ์</th>
-              <th className="border p-2">ชื่ออุปกรณ์</th>
-              <th className="border p-2">รายละเอียด</th>
-              <th className="border p-2">สถานะ</th>
-            </tr>
-          </thead>
-          <tbody>
-            {equipments?.map((equipment) => (
-              <tr key={equipment.id}>
-                <td className="border p-2">{equipment.serialNumber}</td>
-                <td className="border p-2">{equipment.name}</td>
-                <td className="border p-2">{equipment.description}</td>
-                <td className="border p-2">{equipment.status}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-
-        {/* Pagination */}
-        <div className="mt-4 flex items-center gap-4">
-          <select
-            value={limit}
-            onChange={(e) => setLimit(Number(e.target.value))}
-            className="border p-2"
-          >
-            <option value={5}>5 รายการ</option>
-            <option value={10}>10 รายการ</option>
-            <option value={20}>20 รายการ</option>
-          </select>
-
-          <div className="flex gap-2">
-            <button
-              onClick={() => setPage(page - 1)}
-              disabled={page === 1}
-              className="px-4 py-2 border disabled:opacity-50"
-            >
-              ก่อนหน้า
-            </button>
-            <span className="px-4 py-2">หน้า {page}</span>
-            <button
-              onClick={() => setPage(page + 1)}
-              disabled={equipments?.length < limit}
-              className="px-4 py-2 border disabled:opacity-50"
-            >
-              ถัดไป
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+const statusMap = {
+  Active: "Available",
+  Inactive: "In Use",
+  Maintenance: "Under Maintenance",
 };
 
-export default Dashboard;
+export default function EquipmentPage() {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isDialogOpen, setIsDialogOpen] = useState(false); // State to manage dialog visibility
+  const [newEquipment, setNewEquipment] = useState([{ name: "", serialNumber: "", status: "", acquisitionMethod: "", room: "" }]); // State to manage new equipment items
+
+  const filteredEquipment = mockEquipment.filter(
+    (item) =>
+      item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.serialNumber.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const handleAddEquipment = () => {
+    // Logic to handle adding new equipment
+    setIsDialogOpen(false);
+  };
+
+  const handleAddNewEquipmentField = () => {
+    setNewEquipment([...newEquipment, { name: "", serialNumber: "", status: "", acquisitionMethod: "", room: "" }]);
+  };
+
+  const handleNewEquipmentChange = (index, field, value) => {
+    const updatedEquipment = newEquipment.map((item, i) => 
+      i === index ? { ...item, [field]: value } : item
+    );
+    setNewEquipment(updatedEquipment);
+  };
+
+  return (
+    <SidebarProvider>
+      <AppSidebar />
+      <SidebarInset>
+        <header className="flex h-16 shrink-0 items-center justify-between gap-2 border-b px-4">
+          <div className="flex items-center gap-2">
+            <SidebarTrigger className="-ml-1" />
+            <h1 className="text-2xl font-semibold">Equipment Management</h1>
+          </div>
+          <Button onClick={() => setIsDialogOpen(true)}>
+            <Plus className="mr-2 h-4 w-4" /> เพิ่มครุภัณฑ์
+          </Button>
+        </header>
+        <main className="flex-1 p-4 md:p-6">
+          <div className="mb-4">
+            <Input
+              placeholder="Search equipment..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="max-w-sm"
+            />
+          </div>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                {/* <TableHead>ID</TableHead> */}
+                <TableHead>ชื่อ</TableHead>
+                <TableHead>เลขครุภัณฑ์</TableHead>
+                <TableHead>สถานะ</TableHead>
+                <TableHead>หมวดหมู่</TableHead>
+                <TableHead>ห้อง</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredEquipment.map((item) => (
+                <TableRow key={item.id}>
+                  {/* <TableCell className="font-medium">{item.id}</TableCell> */}
+                  <TableCell>{item.name}</TableCell>
+                  <TableCell>{item.serialNumber}</TableCell>
+                  <TableCell>{statusMap[item.status]}</TableCell>
+                  <TableCell>{item.acquisitionMethod}</TableCell>
+                  <TableCell>
+                    {item.room ? item.room.roomNumber : "N/A"}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0">
+                          <span className="sr-only">Open menu</span>
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        <DropdownMenuItem>View details</DropdownMenuItem>
+                        <DropdownMenuItem>Edit</DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem>Delete</DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </main>
+      </SidebarInset>
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>เพิ่มครุภัณฑ์</DialogTitle>
+          </DialogHeader>
+          <div>
+            {newEquipment.map((item, index) => (
+              <div key={index} className="mb-4">
+                <Input
+                  placeholder="ชื่อครุภัณฑ์"
+                  value={item.name}
+                  onChange={(e) => handleNewEquipmentChange(index, "name", e.target.value)}
+                  className="mb-2"
+                />
+                <Input
+                  placeholder="เลขครุภัณฑ์"
+                  value={item.serialNumber}
+                  onChange={(e) => handleNewEquipmentChange(index, "serialNumber", e.target.value)}
+                  className="mb-2"
+                />
+                <Input
+                  placeholder="สถานะ"
+                  value={item.status}
+                  onChange={(e) => handleNewEquipmentChange(index, "status", e.target.value)}
+                  className="mb-2"
+                />
+                <Input
+                  placeholder="หมวดหมู่"
+                  value={item.acquisitionMethod}
+                  onChange={(e) => handleNewEquipmentChange(index, "acquisitionMethod", e.target.value)}
+                  className="mb-2"
+                />
+                <Input
+                  placeholder="ห้อง"
+                  value={item.room}
+                  onChange={(e) => handleNewEquipmentChange(index, "room", e.target.value)}
+                  className="mb-2"
+                />
+              </div>
+            ))}
+            <Button onClick={handleAddNewEquipmentField}>Add Another</Button>
+          </div>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setIsDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleAddEquipment}>Add</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </SidebarProvider>
+  );
+}
