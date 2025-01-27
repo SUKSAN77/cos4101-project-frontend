@@ -452,6 +452,7 @@ export default function EquipmentPage() {
   const handleAddEquipment = () => {
     // Logic to handle adding new equipment
     setIsDialogOpen(false);
+    resetNewEquipment();
   };
 
   const handleAddNewEquipmentField = () => {
@@ -463,6 +464,15 @@ export default function EquipmentPage() {
       i === index ? { ...item, [field]: value } : item
     );
     setNewEquipment(updatedEquipment);
+  };
+
+  const resetNewEquipment = () => {
+    setNewEquipment([{ name: "", serialNumber: "", status: "", acquisitionMethod: "", room: "" }]);
+  };
+
+  const handleCloseDialog = () => {
+    setIsDialogOpen(false);
+    resetNewEquipment();
   };
 
   return (
@@ -533,7 +543,7 @@ export default function EquipmentPage() {
           </Table>
         </main>
       </SidebarInset>
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+      <Dialog open={isDialogOpen} onOpenChange={handleCloseDialog}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>เพิ่มครุภัณฑ์</DialogTitle>
@@ -583,7 +593,7 @@ export default function EquipmentPage() {
             <Button onClick={handleAddNewEquipmentField}>Add Another</Button>
           </div>
           <DialogFooter>
-            <Button variant="ghost" onClick={() => setIsDialogOpen(false)}>
+            <Button variant="ghost" onClick={handleCloseDialog}>
               Cancel
             </Button>
             <Button onClick={handleAddEquipment}>Add</Button>
