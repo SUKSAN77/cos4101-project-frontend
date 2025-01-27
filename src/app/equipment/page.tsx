@@ -25,7 +25,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, Plus } from "lucide-react";
+import {
+  MoreHorizontal,
+  Plus,
+  Tag,
+  Hash,
+  CheckCircle,
+  List,
+  Home,
+} from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -33,7 +41,12 @@ import {
   DialogFooter,
   DialogTitle,
 } from "@/components/ui/dialog"; // Import Dialog components
-import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion"; // Import Accordion components
+import {
+  Accordion,
+  AccordionItem,
+  AccordionTrigger,
+  AccordionContent,
+} from "@/components/ui/accordion"; // Import Accordion components
 
 // Mock data for equipment
 const mockEquipment = [
@@ -489,8 +502,11 @@ const statusMap = {
 export default function EquipmentPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false); // State to manage dialog visibility
-  const [newEquipment, setNewEquipment] = useState([{ name: "", serialNumber: "", status: "", acquisitionMethod: "", room: "" }]); // State to manage new equipment items
+  const [newEquipment, setNewEquipment] = useState([
+    { name: "", serialNumber: "", status: "", acquisitionMethod: "", room: "" },
+  ]); // State to manage new equipment items
   const [currentPage, setCurrentPage] = useState(1); // State to manage current page
+  const [selectedEquipment, setSelectedEquipment] = useState(null); // State to manage selected equipment for details view
 
   const itemsPerPage = 15;
   const filteredEquipment = mockEquipment.filter(
@@ -512,18 +528,35 @@ export default function EquipmentPage() {
   };
 
   const handleAddNewEquipmentField = () => {
-    setNewEquipment([...newEquipment, { name: "", serialNumber: "", status: "", acquisitionMethod: "", room: "" }]);
+    setNewEquipment([
+      ...newEquipment,
+      {
+        name: "",
+        serialNumber: "",
+        status: "",
+        acquisitionMethod: "",
+        room: "",
+      },
+    ]);
   };
 
   const handleNewEquipmentChange = (index, field, value) => {
-    const updatedEquipment = newEquipment.map((item, i) => 
+    const updatedEquipment = newEquipment.map((item, i) =>
       i === index ? { ...item, [field]: value } : item
     );
     setNewEquipment(updatedEquipment);
   };
 
   const resetNewEquipment = () => {
-    setNewEquipment([{ name: "", serialNumber: "", status: "", acquisitionMethod: "", room: "" }]);
+    setNewEquipment([
+      {
+        name: "",
+        serialNumber: "",
+        status: "",
+        acquisitionMethod: "",
+        room: "",
+      },
+    ]);
   };
 
   const handleCloseDialog = () => {
@@ -543,6 +576,14 @@ export default function EquipmentPage() {
     }
   };
 
+  const handleViewDetails = (equipment) => {
+    setSelectedEquipment(equipment);
+  };
+
+  const handleCloseDetailsDialog = () => {
+    setSelectedEquipment(null);
+  };
+
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -556,71 +597,90 @@ export default function EquipmentPage() {
             <Plus className="mr-2 h-4 w-4" /> เพิ่มครุภัณฑ์
           </Button>
         </header>
-        <main className="flex-1 p-4 md:p-6">
-          <div className="mb-4">
-            <Input
-              placeholder="Search equipment..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="max-w-sm"
-            />
-          </div>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                {/* <TableHead>ID</TableHead> */}
-                <TableHead>ชื่อ</TableHead>
-                <TableHead>เลขครุภัณฑ์</TableHead>
-                <TableHead>สถานะ</TableHead>
-                <TableHead>หมวดหมู่</TableHead>
-                <TableHead>ห้อง</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {paginatedEquipment.map((item) => (
-                <TableRow key={item.id}>
-                  {/* <TableCell className="font-medium">{item.id}</TableCell> */}
-                  <TableCell>{item.name}</TableCell>
-                  <TableCell>{item.serialNumber}</TableCell>
-                  <TableCell>{statusMap[item.status]}</TableCell>
-                  <TableCell>{item.acquisitionMethod}</TableCell>
-                  <TableCell>
-                    {item.room ? item.room.roomNumber : "N/A"}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                          <span className="sr-only">Open menu</span>
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem>View details</DropdownMenuItem>
-                        <DropdownMenuItem>Edit</DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem>Delete</DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
+        <div className="flex">
+          <main className="flex-1 p-4 md:p-6">
+            <div className="mb-4">
+              <Input
+                placeholder="Search equipment..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="max-w-sm"
+              />
+            </div>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  {/* <TableHead>ID</TableHead> */}
+                  <TableHead>
+                    <Tag className="mr-2 h-4 w-4" /> ชื่อ
+                  </TableHead>
+                  <TableHead>
+                    <Hash className="mr-2 h-4 w-4" /> เลขครุภัณฑ์
+                  </TableHead>
+                  <TableHead>
+                    <CheckCircle className="mr-2 h-4 w-4" /> สถานะ
+                  </TableHead>
+                  <TableHead>
+                    <List className="mr-2 h-4 w-4" /> หมวดหมู่
+                  </TableHead>
+                  <TableHead>
+                    <Home className="mr-2 h-4 w-4" /> ห้อง
+                  </TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-          <div className="flex justify-between mt-4">
-            <Button onClick={handlePreviousPage} disabled={currentPage === 1}>
-              Previous
-            </Button>
-            <span>
-              Page {currentPage} of {totalPages}
-            </span>
-            <Button onClick={handleNextPage} disabled={currentPage === totalPages}>
-              Next
-            </Button>
-          </div>
-        </main>
+              </TableHeader>
+              <TableBody>
+                {paginatedEquipment.map((item) => (
+                  <TableRow key={item.id}>
+                    {/* <TableCell className="font-medium">{item.id}</TableCell> */}
+                    <TableCell>{item.name}</TableCell>
+                    <TableCell>{item.serialNumber}</TableCell>
+                    <TableCell>{statusMap[item.status]}</TableCell>
+                    <TableCell>{item.acquisitionMethod}</TableCell>
+                    <TableCell>
+                      {item.room ? item.room.roomNumber : "N/A"}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" className="h-8 w-8 p-0">
+                            <span className="sr-only">Open menu</span>
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                          <DropdownMenuItem
+                            onClick={() => handleViewDetails(item)}
+                          >
+                            View details
+                          </DropdownMenuItem>
+                          <DropdownMenuItem>Edit</DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem>Delete</DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+            <div className="flex justify-between mt-4">
+              <Button onClick={handlePreviousPage} disabled={currentPage === 1}>
+                Previous
+              </Button>
+              <span>
+                Page {currentPage} of {totalPages}
+              </span>
+              <Button
+                onClick={handleNextPage}
+                disabled={currentPage === totalPages}
+              >
+                Next
+              </Button>
+            </div>
+          </main>
+        </div>
       </SidebarInset>
       <Dialog open={isDialogOpen} onOpenChange={handleCloseDialog}>
         <DialogContent>
@@ -637,31 +697,61 @@ export default function EquipmentPage() {
                       <Input
                         placeholder="ชื่อครุภัณฑ์"
                         value={item.name}
-                        onChange={(e) => handleNewEquipmentChange(index, "name", e.target.value)}
+                        onChange={(e) =>
+                          handleNewEquipmentChange(
+                            index,
+                            "name",
+                            e.target.value
+                          )
+                        }
                         className="mb-2"
                       />
                       <Input
                         placeholder="เลขครุภัณฑ์"
                         value={item.serialNumber}
-                        onChange={(e) => handleNewEquipmentChange(index, "serialNumber", e.target.value)}
+                        onChange={(e) =>
+                          handleNewEquipmentChange(
+                            index,
+                            "serialNumber",
+                            e.target.value
+                          )
+                        }
                         className="mb-2"
                       />
                       <Input
                         placeholder="สถานะ"
                         value={item.status}
-                        onChange={(e) => handleNewEquipmentChange(index, "status", e.target.value)}
+                        onChange={(e) =>
+                          handleNewEquipmentChange(
+                            index,
+                            "status",
+                            e.target.value
+                          )
+                        }
                         className="mb-2"
                       />
                       <Input
                         placeholder="หมวดหมู่"
                         value={item.acquisitionMethod}
-                        onChange={(e) => handleNewEquipmentChange(index, "acquisitionMethod", e.target.value)}
+                        onChange={(e) =>
+                          handleNewEquipmentChange(
+                            index,
+                            "acquisitionMethod",
+                            e.target.value
+                          )
+                        }
                         className="mb-2"
                       />
                       <Input
                         placeholder="ห้อง"
                         value={item.room}
-                        onChange={(e) => handleNewEquipmentChange(index, "room", e.target.value)}
+                        onChange={(e) =>
+                          handleNewEquipmentChange(
+                            index,
+                            "room",
+                            e.target.value
+                          )
+                        }
                         className="mb-2"
                       />
                     </div>
@@ -679,6 +769,54 @@ export default function EquipmentPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      {selectedEquipment && (
+        <Dialog open={true} onOpenChange={handleCloseDetailsDialog}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>รายละเอียดครุภัณฑ์</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-2">
+              <p>
+                <strong>ชื่อ:</strong> {selectedEquipment.name}
+              </p>
+              <p>
+                <strong>เลขครุภัณฑ์:</strong> {selectedEquipment.serialNumber}
+              </p>
+              <p>
+                <strong>สถานะ:</strong> {statusMap[selectedEquipment.status]}
+              </p>
+              <p>
+                <strong>หมวดหมู่:</strong> {selectedEquipment.acquisitionMethod}
+              </p>
+              <p>
+                <strong>ห้อง:</strong>{" "}
+                {selectedEquipment.room
+                  ? selectedEquipment.room.roomNumber
+                  : "N/A"}
+              </p>
+              <p>
+                <strong>ราคา:</strong> {selectedEquipment.price}
+              </p>
+              <p>
+                <strong>วันที่สร้าง:</strong>{" "}
+                {new Date(selectedEquipment.createdAt).toLocaleDateString()}
+              </p>
+              <p>
+                <strong>วันที่อัพเดท:</strong>{" "}
+                {new Date(selectedEquipment.updatedAt).toLocaleDateString()}
+              </p>
+              <p>
+                <strong>หมายเหตุ:</strong> {selectedEquipment.notes}
+              </p>
+            </div>
+            <DialogFooter>
+              <Button variant="ghost" onClick={handleCloseDetailsDialog}>
+                Close
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
     </SidebarProvider>
   );
 }
