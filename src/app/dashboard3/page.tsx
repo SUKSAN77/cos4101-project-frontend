@@ -13,10 +13,10 @@ import {
 } from "@/components/ui/sidebar";
 import { Box, Users, Home, Tag } from "lucide-react";
 
-import type { Metadata } from "next";
-export const metadata: Metadata = {
-  title: "Dashboard",
-};
+// import type { Metadata } from "next";
+// export const metadata: Metadata = {
+//   title: "Dashboard",
+// };
 
 export default function DashboardPage() {
   return (
