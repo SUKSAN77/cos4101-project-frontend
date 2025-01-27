@@ -356,6 +356,54 @@ const mockEquipment = [
     },
   },
   {
+    id: "01947e3a-f3e9-7073-ae3d-2a2a7f4a34565",
+    name: "Fish",
+    description: "",
+    lifetime: 0,
+    price: "741.29",
+    serialNumber: "6c5fded8-df2e-48a8-b32f-04adf2fbfe37",
+    status: "Active",
+    acquisitionMethod: "ตกลงราคา",
+    disposalDate: "2025-01-19T11:02:49.645Z",
+    notes: "{{$$randomLoremSentence}}",
+    createdAt: "2025-01-19T11:03:00.329Z",
+    updatedAt: "2025-01-19T11:03:00.329Z",
+    deletedAt: null,
+    createdBy: "01947e1a-d31a-7293-95bf-0a8f01c2d5f6",
+    roomId: null,
+    room: null,
+    creator: {
+      id: "01947e1a-d31a-7293-95bf-0a8f01c2d5f6",
+      email: "stacia.customer1@gmail.com",
+      firstName: null,
+      lastName: null,
+    },
+  },
+  {
+    id: "01947e3a-f3e9-7073-ae3d-2a2a7f4a34897",
+    name: "Fish",
+    description: "",
+    lifetime: 0,
+    price: "741.29",
+    serialNumber: "6c5fded8-df2e-48a8-b32f-04adf2fbfe37",
+    status: "Active",
+    acquisitionMethod: "ตกลงราคา",
+    disposalDate: "2025-01-19T11:02:49.645Z",
+    notes: "{{$$randomLoremSentence}}",
+    createdAt: "2025-01-19T11:03:00.329Z",
+    updatedAt: "2025-01-19T11:03:00.329Z",
+    deletedAt: null,
+    createdBy: "01947e1a-d31a-7293-95bf-0a8f01c2d5f6",
+    roomId: null,
+    room: null,
+    creator: {
+      id: "01947e1a-d31a-7293-95bf-0a8f01c2d5f6",
+      email: "stacia.customer1@gmail.com",
+      firstName: null,
+      lastName: null,
+    },
+  },
+  {
     id: "01947e3a-f5d3-7590-adf9-64d3f71a2729",
     name: "Chips",
     description: "",
@@ -442,11 +490,19 @@ export default function EquipmentPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false); // State to manage dialog visibility
   const [newEquipment, setNewEquipment] = useState([{ name: "", serialNumber: "", status: "", acquisitionMethod: "", room: "" }]); // State to manage new equipment items
+  const [currentPage, setCurrentPage] = useState(1); // State to manage current page
 
+  const itemsPerPage = 15;
   const filteredEquipment = mockEquipment.filter(
     (item) =>
       item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.serialNumber.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const totalPages = Math.ceil(filteredEquipment.length / itemsPerPage);
+  const paginatedEquipment = filteredEquipment.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
   );
 
   const handleAddEquipment = () => {
@@ -473,6 +529,18 @@ export default function EquipmentPage() {
   const handleCloseDialog = () => {
     setIsDialogOpen(false);
     resetNewEquipment();
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
   };
 
   return (
@@ -510,7 +578,7 @@ export default function EquipmentPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredEquipment.map((item) => (
+              {paginatedEquipment.map((item) => (
                 <TableRow key={item.id}>
                   {/* <TableCell className="font-medium">{item.id}</TableCell> */}
                   <TableCell>{item.name}</TableCell>
@@ -541,6 +609,17 @@ export default function EquipmentPage() {
               ))}
             </TableBody>
           </Table>
+          <div className="flex justify-between mt-4">
+            <Button onClick={handlePreviousPage} disabled={currentPage === 1}>
+              Previous
+            </Button>
+            <span>
+              Page {currentPage} of {totalPages}
+            </span>
+            <Button onClick={handleNextPage} disabled={currentPage === totalPages}>
+              Next
+            </Button>
+          </div>
         </main>
       </SidebarInset>
       <Dialog open={isDialogOpen} onOpenChange={handleCloseDialog}>
