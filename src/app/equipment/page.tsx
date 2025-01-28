@@ -609,111 +609,140 @@ export default function EquipmentPage() {
     <SidebarProvider>
       <AppSidebar />
       <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center justify-between gap-2 border-b px-4">
-          <div className="flex items-center gap-2">
-            <SidebarTrigger className="-ml-1" />
-            <h1 className="text-2xl font-semibold">Equipment Management</h1>
+        {/* ปรับ header ให้มี padding และสีพื้นหลังที่ชัดเจนขึ้น */}
+        <header className="flex h-16 shrink-0 items-center justify-between gap-4 border-b bg-white/95 px-6 shadow-sm">
+          <div className="flex items-center gap-4">
+            <SidebarTrigger className="-ml-2" />
+            <h1 className="text-2xl font-semibold tracking-tight">Equipment Management</h1>
           </div>
-          <Button onClick={() => setIsDialogOpen(true)}>
-            <Plus className="mr-2 h-4 w-4" /> เพิ่มครุภัณฑ์
+          <Button className="gap-2 shadow-sm hover:shadow-md transition-all">
+            <Plus className="h-4 w-4" /> เพิ่มครุภัณฑ์
           </Button>
         </header>
         <div className="flex">
-          <main className="flex-1 p-4 md:p-6">
-            <div className="mb-4">
-              <Input
-                placeholder="Search equipment..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="max-w-sm"
-              />
+          <main className="flex-1 p-6 space-y-6">
+            {/* ปรับ search section ให้มีการจัดวางที่ดีขึ้น */}
+            <div className="flex items-center justify-between">
+              <div className="flex-1 max-w-sm">
+                <Input
+                  placeholder="ค้นหาครุภัณฑ์..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full shadow-sm"
+                />
+              </div>
             </div>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  {/* <TableHead>ID</TableHead> */}
-                  <TableHead>
-                    <Tag className="mr-2 h-4 w-4" /> ชื่อ
-                  </TableHead>
-                  <TableHead>
-                    <Hash className="mr-2 h-4 w-4" /> เลขครุภัณฑ์
-                  </TableHead>
-                  <TableHead>
-                    <CheckCircle className="mr-2 h-4 w-4" /> สถานะ
-                  </TableHead>
-                  <TableHead>
-                    <List className="mr-2 h-4 w-4" /> หมวดหมู่
-                  </TableHead>
-                  <TableHead>
-                    <Home className="mr-2 h-4 w-4" /> ห้อง
-                  </TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {paginatedEquipment.map((item) => (
-                  <TableRow key={item.id}>
-                    {/* <TableCell className="font-medium">{item.id}</TableCell> */}
-                    <TableCell>{item.name}</TableCell>
-                    <TableCell>{item.serialNumber}</TableCell>
-                    <TableCell>{statusMap[item.status]}</TableCell>
-                    <TableCell>{item.acquisitionMethod}</TableCell>
-                    <TableCell>
-                      {item.room ? item.room.roomNumber : "N/A"}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Open menu</span>
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                          <DropdownMenuItem
-                            onClick={() => handleViewDetails(item)}
-                          >
-                            View details
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => handleEditEquipment(item)}
-                          >
-                            Edit
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem>Delete</DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
+            {/* ปรับ Table ให้มี shadow และ rounded corners */}
+            <div className="rounded-lg border bg-white shadow-sm">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-gray-50/50">
+                    <TableHead className="whitespace-nowrap font-semibold">
+                      <div className="flex items-center gap-2">
+                        <Tag className="h-4 w-4 text-blue-500" /> 
+                        <span>ชื่อ</span>
+                      </div>
+                    </TableHead>
+                    <TableHead className="whitespace-nowrap font-semibold">
+                      <div className="flex items-center gap-2">
+                        <Hash className="h-4 w-4 text-blue-500" />
+                        <span>เลขครุภัณฑ์</span>
+                      </div>
+                    </TableHead>
+                    <TableHead className="whitespace-nowrap font-semibold">
+                      <div className="flex items-center gap-2">
+                        <CheckCircle className="h-4 w-4 text-blue-500" />
+                        <span>สถานะ</span>
+                      </div>
+                    </TableHead>
+                    <TableHead className="whitespace-nowrap font-semibold">
+                      <div className="flex items-center gap-2">
+                        <List className="h-4 w-4 text-blue-500" />
+                        <span>หมวดหมู่</span>
+                      </div>
+                    </TableHead>
+                    <TableHead className="whitespace-nowrap font-semibold">
+                      <div className="flex items-center gap-2">
+                        <Home className="h-4 w-4 text-blue-500" />
+                        <span>ห้อง</span>
+                      </div>
+                    </TableHead>
+                    <TableHead className="text-right whitespace-nowrap font-semibold">Actions</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-            <div className="flex justify-between mt-4">
-              <Button onClick={handlePreviousPage} disabled={currentPage === 1}>
-                Previous
-              </Button>
-              <span>
-                Page {currentPage} of {totalPages}
-              </span>
-              <Button
-                onClick={handleNextPage}
-                disabled={currentPage === totalPages}
+                </TableHeader>
+                <TableBody>
+                  {paginatedEquipment.map((item) => (
+                    <TableRow key={item.id} className="hover:bg-gray-50/50">
+                      <TableCell>{item.name}</TableCell>
+                      <TableCell>{item.serialNumber}</TableCell>
+                      <TableCell>{statusMap[item.status]}</TableCell>
+                      <TableCell>{item.acquisitionMethod}</TableCell>
+                      <TableCell>
+                        {item.room ? item.room.roomNumber : "N/A"}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" className="h-8 w-8 p-0">
+                              <span className="sr-only">Open menu</span>
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                            <DropdownMenuItem
+                              onClick={() => handleViewDetails(item)}
+                            >
+                              View details
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => handleEditEquipment(item)}
+                            >
+                              Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem>Delete</DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+            {/* ปรับ pagination ให้สวยงามขึ้น */}
+            <div className="flex items-center justify-between py-4">
+              <Button 
+                onClick={handlePreviousPage} 
+                disabled={currentPage === 1}
+                variant="outline"
+                className="gap-2"
               >
-                Next
+                ← ก่อนหน้า
+              </Button>
+              <span className="text-sm text-gray-600">
+                หน้า {currentPage} จาก {totalPages}
+              </span>
+              <Button 
+                onClick={handleNextPage} 
+                disabled={currentPage === totalPages}
+                variant="outline"
+                className="gap-2"
+              >
+                ถัดไป →
               </Button>
             </div>
           </main>
         </div>
       </SidebarInset>
+      {/* ปรับ Dialog ให้สวยงามขึ้น */}
       <Dialog open={isDialogOpen} onOpenChange={handleCloseDialog}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-[500px] w-[95vw] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>เพิ่มครุภัณฑ์</DialogTitle>
+            <DialogTitle className="text-xl font-semibold">เพิ่มครุภัณฑ์</DialogTitle>
           </DialogHeader>
-          <div className="max-h-96 overflow-y-auto">
-            <Accordion type="single" collapsible>
+          <div className="max-h-[60vh] overflow-y-auto pr-2">
+            <Accordion type="single" collapsible className="space-y-4">
               {newEquipment.map((item, index) => (
                 <AccordionItem key={index} value={`item-${index}`}>
                   <AccordionTrigger>ครุภัณฑ์ {index + 1}</AccordionTrigger>
@@ -784,59 +813,76 @@ export default function EquipmentPage() {
                 </AccordionItem>
               ))}
             </Accordion>
-            <Button onClick={handleAddNewEquipmentField}>Add Another</Button>
-          </div>
-          <DialogFooter>
-            <Button variant="ghost" onClick={handleCloseDialog}>
-              Cancel
+            <Button 
+              onClick={handleAddNewEquipmentField}
+              variant="outline" 
+              className="mt-4 w-full gap-2"
+            >
+              <Plus className="h-4 w-4" /> เพิ่มรายการใหม่
             </Button>
-            <Button onClick={handleAddEquipment}>Add</Button>
+          </div>
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={handleCloseDialog}>
+              ยกเลิก
+            </Button>
+            <Button onClick={handleAddEquipment}>
+              บันทึก
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      {selectedEquipment && (
+      {selectedEquipment && !isEditDialogOpen && (
         <Dialog open={true} onOpenChange={handleCloseDetailsDialog}>
-          <DialogContent>
+          <DialogContent className="sm:max-w-[500px] w-[95vw] max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>รายละเอียดครุภัณฑ์</DialogTitle>
+              <DialogTitle className="text-xl font-semibold">รายละเอียดครุภัณฑ์</DialogTitle>
             </DialogHeader>
-            <div className="space-y-2">
-              <p>
-                <strong>ชื่อ:</strong> {selectedEquipment.name}
-              </p>
-              <p>
-                <strong>เลขครุภัณฑ์:</strong> {selectedEquipment.serialNumber}
-              </p>
-              <p>
-                <strong>สถานะ:</strong> {statusMap[selectedEquipment.status]}
-              </p>
-              <p>
-                <strong>หมวดหมู่:</strong> {selectedEquipment.acquisitionMethod}
-              </p>
-              <p>
-                <strong>ห้อง:</strong>{" "}
-                {selectedEquipment.room
-                  ? selectedEquipment.room.roomNumber
-                  : "N/A"}
-              </p>
-              <p>
-                <strong>ราคา:</strong> {selectedEquipment.price}
-              </p>
-              <p>
-                <strong>วันที่สร้าง:</strong>{" "}
-                {new Date(selectedEquipment.createdAt).toLocaleDateString()}
-              </p>
-              <p>
-                <strong>วันที่อัพเดท:</strong>{" "}
-                {new Date(selectedEquipment.updatedAt).toLocaleDateString()}
-              </p>
-              <p>
-                <strong>หมายเหตุ:</strong> {selectedEquipment.notes}
-              </p>
+            <div className="space-y-4 py-4">
+              <div className="grid gap-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">ชื่อ</label>
+                  <p className="text-gray-900 p-2 bg-gray-50 rounded-md">{selectedEquipment.name}</p>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">เลขครุภัณฑ์</label>
+                  <p className="text-gray-900 p-2 bg-gray-50 rounded-md">{selectedEquipment.serialNumber}</p>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">สถานะ</label>
+                  <p className="text-gray-900 p-2 bg-gray-50 rounded-md">{statusMap[selectedEquipment.status]}</p>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">หมวดหมู่</label>
+                  <p className="text-gray-900 p-2 bg-gray-50 rounded-md">{selectedEquipment.acquisitionMethod}</p>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">ห้อง</label>
+                  <p className="text-gray-900 p-2 bg-gray-50 rounded-md">
+                    {selectedEquipment.room ? selectedEquipment.room.roomNumber : "N/A"}
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">ราคา</label>
+                  <p className="text-gray-900 p-2 bg-gray-50 rounded-md">{selectedEquipment.price}</p>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">หมายเหตุ</label>
+                  <p className="text-gray-900 p-2 bg-gray-50 rounded-md">{selectedEquipment.notes}</p>
+                </div>
+              </div>
             </div>
-            <DialogFooter>
-              <Button variant="ghost" onClick={handleCloseDetailsDialog}>
-                Close
+            <DialogFooter className="gap-2">
+              <Button variant="outline" onClick={handleCloseDetailsDialog}>
+                ปิด
+              </Button>
+              <Button 
+                onClick={() => {
+                  handleCloseDetailsDialog();
+                  handleEditEquipment(selectedEquipment);
+                }}
+                className="bg-blue-500 hover:bg-blue-600"
+              >
+                แก้ไข
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -844,59 +890,84 @@ export default function EquipmentPage() {
       )}
       {isEditDialogOpen && selectedEquipment && (
         <Dialog open={true} onOpenChange={handleCloseEditDialog}>
-          <DialogContent>
+          <DialogContent className="sm:max-w-[500px] w-[95vw] max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>แก้ไขครุภัณฑ์</DialogTitle>
+              <DialogTitle className="text-xl font-semibold">แก้ไขครุภัณฑ์</DialogTitle>
             </DialogHeader>
-            <div className="space-y-2">
-              <Input
-                placeholder="ชื่อครุภัณฑ์"
-                value={selectedEquipment.name}
-                onChange={(e) => handleEditChange("name", e.target.value)}
-                className="mb-2"
-              />
-              <Input
-                placeholder="เลขครุภัณฑ์"
-                value={selectedEquipment.serialNumber}
-                onChange={(e) => handleEditChange("serialNumber", e.target.value)}
-                className="mb-2"
-              />
-              <Input
-                placeholder="สถานะ"
-                value={selectedEquipment.status}
-                onChange={(e) => handleEditChange("status", e.target.value)}
-                className="mb-2"
-              />
-              <Input
-                placeholder="หมวดหมู่"
-                value={selectedEquipment.acquisitionMethod}
-                onChange={(e) => handleEditChange("acquisitionMethod", e.target.value)}
-                className="mb-2"
-              />
-              <Input
-                placeholder="ห้อง"
-                value={selectedEquipment.room ? selectedEquipment.room.roomNumber : ""}
-                onChange={(e) => handleEditChange("room", e.target.value)}
-                className="mb-2"
-              />
-              <Input
-                placeholder="ราคา"
-                value={selectedEquipment.price}
-                onChange={(e) => handleEditChange("price", e.target.value)}
-                className="mb-2"
-              />
-              <Input
-                placeholder="หมายเหตุ"
-                value={selectedEquipment.notes}
-                onChange={(e) => handleEditChange("notes", e.target.value)}
-                className="mb-2"
-              />
+            <div className="space-y-4 py-4">
+              <div className="grid gap-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">ชื่อครุภัณฑ์</label>
+                  <Input
+                    placeholder="ชื่อครุภัณฑ์"
+                    value={selectedEquipment.name}
+                    onChange={(e) => handleEditChange("name", e.target.value)}
+                    className="w-full"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">เลขครุภัณฑ์</label>
+                  <Input
+                    placeholder="เลขครุภัณฑ์"
+                    value={selectedEquipment.serialNumber}
+                    onChange={(e) => handleEditChange("serialNumber", e.target.value)}
+                    className="w-full"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">สถานะ</label>
+                  <Input
+                    placeholder="สถานะ"
+                    value={selectedEquipment.status}
+                    onChange={(e) => handleEditChange("status", e.target.value)}
+                    className="w-full"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">หมวดหมู่</label>
+                  <Input
+                    placeholder="หมวดหมู่"
+                    value={selectedEquipment.acquisitionMethod}
+                    onChange={(e) => handleEditChange("acquisitionMethod", e.target.value)}
+                    className="w-full"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">ห้อง</label>
+                  <Input
+                    placeholder="ห้อง"
+                    value={selectedEquipment.room ? selectedEquipment.room.roomNumber : ""}
+                    onChange={(e) => handleEditChange("room", e.target.value)}
+                    className="w-full"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">ราคา</label>
+                  <Input
+                    placeholder="ราคา"
+                    value={selectedEquipment.price}
+                    onChange={(e) => handleEditChange("price", e.target.value)}
+                    className="w-full"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">หมายเหตุ</label>
+                  <Input
+                    placeholder="หมายเหตุ"
+                    value={selectedEquipment.notes}
+                    onChange={(e) => handleEditChange("notes", e.target.value)}
+                    className="w-full"
+                  />
+                </div>
+              </div>
             </div>
-            <DialogFooter>
-              <Button variant="ghost" onClick={handleCloseEditDialog}>
-                Cancel
+            <DialogFooter className="gap-2">
+              <Button variant="outline" onClick={handleCloseEditDialog}>
+                ยกเลิก
               </Button>
-              <Button onClick={handleSaveEdit}>Save</Button>
+              <Button onClick={handleSaveEdit} className="bg-blue-500 hover:bg-blue-600">
+                บันทึกการแก้ไข
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
