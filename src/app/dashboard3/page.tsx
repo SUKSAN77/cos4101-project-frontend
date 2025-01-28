@@ -1,4 +1,5 @@
 import { AppSidebar } from "@/components/app-sidebar";
+import CardDashboard from "@/components/CardDashboard";
 import {
   Card,
   CardContent,
@@ -29,20 +30,9 @@ export default function DashboardPage() {
         </header>
         <main className="flex-1 p-4 md:p-6">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Total Equipment
-                </CardTitle>
-                <Box className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">1,234</div>
-                <p className="text-xs text-muted-foreground">
-                  +20% from last month
-                </p>
-              </CardContent>
-            </Card>
+
+            <CardDashboard icon={Box} title="Total Users" total={256} percentage="+20% from last month" />
+           
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
