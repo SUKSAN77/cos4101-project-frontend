@@ -503,7 +503,15 @@ export default function EquipmentPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false); // State to manage dialog visibility
   const [newEquipment, setNewEquipment] = useState([
-    { name: "", serialNumber: "", status: "", acquisitionMethod: "", room: "" },
+    { 
+      name: "", 
+      serialNumber: "", 
+      status: "", 
+      acquisitionMethod: "", 
+      room: "",
+      price: "",
+      notes: ""
+    },
   ]); // State to manage new equipment items
   const [currentPage, setCurrentPage] = useState(1); // State to manage current page
   const [selectedEquipment, setSelectedEquipment] = useState(null); // State to manage selected equipment for details view
@@ -523,7 +531,10 @@ export default function EquipmentPage() {
   );
 
   const handleAddEquipment = () => {
-    // Logic to handle adding new equipment
+    // จำลองการเพิ่มข้อมูล
+    console.log('Adding equipment:', newEquipment);
+    // ทำการเพิ่มข้อมูลจริงที่นี่
+    
     setIsDialogOpen(false);
     resetNewEquipment();
   };
@@ -537,6 +548,8 @@ export default function EquipmentPage() {
         status: "",
         acquisitionMethod: "",
         room: "",
+        price: "",
+        notes: ""
       },
     ]);
   };
@@ -548,6 +561,22 @@ export default function EquipmentPage() {
     setNewEquipment(updatedEquipment);
   };
 
+  const handleRemoveEquipment = (index: number) => {
+    if (newEquipment.length > 1) {
+      const updatedEquipment = newEquipment.filter((_, i) => i !== index);
+      setNewEquipment(updatedEquipment);
+    }
+  };
+
+  const isFormValid = () => {
+    return newEquipment.every(item => 
+      item.name && 
+      item.serialNumber && 
+      item.status && 
+      item.acquisitionMethod
+    );
+  };
+
   const resetNewEquipment = () => {
     setNewEquipment([
       {
@@ -556,6 +585,8 @@ export default function EquipmentPage() {
         status: "",
         acquisitionMethod: "",
         room: "",
+        price: "",
+        notes: ""
       },
     ]);
   };
@@ -615,7 +646,10 @@ export default function EquipmentPage() {
             <SidebarTrigger className="-ml-2" />
             <h1 className="text-2xl font-semibold tracking-tight">Equipment Management</h1>
           </div>
-          <Button className="gap-2 shadow-sm hover:shadow-md transition-all">
+          <Button 
+            onClick={() => setIsDialogOpen(true)} 
+            className="gap-2 shadow-sm hover:shadow-md transition-all"
+          >
             <Plus className="h-4 w-4" /> เพิ่มครุภัณฑ์
           </Button>
         </header>
@@ -737,7 +771,7 @@ export default function EquipmentPage() {
       </SidebarInset>
       {/* ปรับ Dialog ให้สวยงามขึ้น */}
       <Dialog open={isDialogOpen} onOpenChange={handleCloseDialog}>
-        <DialogContent className="sm:max-w-[500px] w-[95vw] max-h-[90vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-[600px] w-[95vw] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-xl font-semibold">เพิ่มครุภัณฑ์</DialogTitle>
           </DialogHeader>
@@ -745,69 +779,128 @@ export default function EquipmentPage() {
             <Accordion type="single" collapsible className="space-y-4">
               {newEquipment.map((item, index) => (
                 <AccordionItem key={index} value={`item-${index}`}>
-                  <AccordionTrigger>ครุภัณฑ์ {index + 1}</AccordionTrigger>
+                  <AccordionTrigger className="hover:bg-gray-50/50 px-4 py-2 rounded-lg">
+                    {item.name ? `ครุภัณฑ์: ${item.name}` : `ครุภัณฑ์ ${index + 1}`}
+                  </AccordionTrigger>
                   <AccordionContent>
-                    <div className="mb-4">
-                      <Input
-                        placeholder="ชื่อครุภัณฑ์"
-                        value={item.name}
-                        onChange={(e) =>
-                          handleNewEquipmentChange(
-                            index,
-                            "name",
-                            e.target.value
-                          )
-                        }
-                        className="mb-2"
-                      />
-                      <Input
-                        placeholder="เลขครุภัณฑ์"
-                        value={item.serialNumber}
-                        onChange={(e) =>
-                          handleNewEquipmentChange(
-                            index,
-                            "serialNumber",
-                            e.target.value
-                          )
-                        }
-                        className="mb-2"
-                      />
-                      <Input
-                        placeholder="สถานะ"
-                        value={item.status}
-                        onChange={(e) =>
-                          handleNewEquipmentChange(
-                            index,
-                            "status",
-                            e.target.value
-                          )
-                        }
-                        className="mb-2"
-                      />
-                      <Input
-                        placeholder="หมวดหมู่"
-                        value={item.acquisitionMethod}
-                        onChange={(e) =>
-                          handleNewEquipmentChange(
-                            index,
-                            "acquisitionMethod",
-                            e.target.value
-                          )
-                        }
-                        className="mb-2"
-                      />
-                      <Input
-                        placeholder="ห้อง"
-                        value={item.room}
-                        onChange={(e) =>
-                          handleNewEquipmentChange(
-                            index,
-                            "room",
-                            e.target.value
-                          )
-                        }
-                        className="mb-2"
-                      />
+                    <div className="space-y-4 p-4">
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-gray-700">ชื่อครุภัณฑ์</label>
+                        <Input
+                          placeholder="ชื่อครุภัณฑ์"
+                          value={item.name}
+                          onChange={(e) =>
+                            handleNewEquipmentChange(
+                              index,
+                              "name",
+                              e.target.value
+                            )
+                          }
+                          className="w-full"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-gray-700">เลขครุภัณฑ์</label>
+                        <Input
+                          placeholder="เลขครุภัณฑ์"
+                          value={item.serialNumber}
+                          onChange={(e) =>
+                            handleNewEquipmentChange(
+                              index,
+                              "serialNumber",
+                              e.target.value
+                            )
+                          }
+                          className="w-full"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-gray-700">สถานะ</label>
+                        <select
+                          value={item.status}
+                          onChange={(e) =>
+                            handleNewEquipmentChange(
+                              index,
+                              "status",
+                              e.target.value
+                            )
+                          }
+                          className="w-full rounded-md border border-gray-300 p-2"
+                        >
+                          <option value="">เลือกสถานะ</option>
+                          <option value="Active">พร้อมใช้งาน</option>
+                          <option value="Inactive">กำลังใช้งาน</option>
+                          <option value="Maintenance">กำลังซ่อมบำรุง</option>
+                        </select>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-gray-700">หมวดหมู่</label>
+                        <Input
+                          placeholder="หมวดหมู่"
+                          value={item.acquisitionMethod}
+                          onChange={(e) =>
+                            handleNewEquipmentChange(
+                              index,
+                              "acquisitionMethod",
+                              e.target.value
+                            )
+                          }
+                          className="w-full"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-gray-700">ห้อง</label>
+                        <Input
+                          placeholder="ห้อง"
+                          value={item.room}
+                          onChange={(e) =>
+                            handleNewEquipmentChange(
+                              index,
+                              "room",
+                              e.target.value
+                            )
+                          }
+                          className="w-full"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-gray-700">ราคา</label>
+                        <Input
+                          type="number"
+                          placeholder="ราคา"
+                          value={item.price}
+                          onChange={(e) =>
+                            handleNewEquipmentChange(
+                              index,
+                              "price",
+                              e.target.value
+                            )
+                          }
+                          className="w-full"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-gray-700">หมายเหตุ</label>
+                        <Input
+                          placeholder="หมายเหตุ"
+                          value={item.notes}
+                          onChange={(e) =>
+                            handleNewEquipmentChange(
+                              index,
+                              "notes",
+                              e.target.value
+                            )
+                          }
+                          className="w-full"
+                        />
+                      </div>
+                      <Button 
+                        variant="destructive" 
+                        onClick={() => handleRemoveEquipment(index)}
+                        className="mt-2"
+                      >
+                        ลบรายการนี้
+                      </Button>
                     </div>
                   </AccordionContent>
                 </AccordionItem>
@@ -825,7 +918,11 @@ export default function EquipmentPage() {
             <Button variant="outline" onClick={handleCloseDialog}>
               ยกเลิก
             </Button>
-            <Button onClick={handleAddEquipment}>
+            <Button 
+              onClick={handleAddEquipment}
+              className="bg-blue-500 hover:bg-blue-600"
+              disabled={!isFormValid()}
+            >
               บันทึก
             </Button>
           </DialogFooter>
