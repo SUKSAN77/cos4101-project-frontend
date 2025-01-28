@@ -25,7 +25,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, Plus } from "lucide-react";
+import { MoreHorizontal, Plus, Eye, Trash2 } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Dialog, DialogContent, DialogHeader, DialogFooter, DialogTitle } from "@/components/ui/dialog";
 
 // Mock data for users
 const mockUsers = [
@@ -63,6 +65,8 @@ const roleMap = {
 
 export default function UsersPage() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedUsers, setSelectedUsers] = useState([]);
+  const [selectedUser, setSelectedUser] = useState(null); // State to manage selected user for details view
 
   const filteredUsers = mockUsers.filter(
     (user) =>
@@ -70,6 +74,30 @@ export default function UsersPage() {
       user.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.lastName.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const handleSelectUser = (userId) => {
+    setSelectedUsers((prevSelected) =>
+      prevSelected.includes(userId)
+        ? prevSelected.filter((id) => id !== userId)
+        : [...prevSelected, userId]
+    );
+  };
+
+  const handleSelectAllUsers = () => {
+    if (selectedUsers.length === filteredUsers.length) {
+      setSelectedUsers([]);
+    } else {
+      setSelectedUsers(filteredUsers.map((user) => user.id));
+    }
+  };
+
+  const handleViewDetails = (user) => {
+    setSelectedUser(user);
+  };
+
+  const handleCloseDetailsDialog = () => {
+    setSelectedUser(null);
+  };
 
   return (
     <SidebarProvider>
@@ -85,17 +113,28 @@ export default function UsersPage() {
           </Button>
         </header>
         <main className="flex-1 p-4 md:p-6">
-          <div className="mb-4">
+          <div className="mb-4 flex justify-between items-center">
             <Input
               placeholder="Search users..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="max-w-sm"
             />
+            {selectedUsers.length > 0 && (
+              <Button variant="destructive" onClick={() => console.log("Delete selected users", selectedUsers)}>
+                <Trash2 className="mr-2 h-4 w-4" /> Delete Selected
+              </Button>
+            )}
           </div>
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead>
+                  <Checkbox
+                    checked={selectedUsers.length === filteredUsers.length}
+                    onCheckedChange={handleSelectAllUsers}
+                  />
+                </TableHead>
                 <TableHead>Email</TableHead>
                 <TableHead>First Name</TableHead>
                 <TableHead>Last Name</TableHead>
@@ -107,6 +146,12 @@ export default function UsersPage() {
             <TableBody>
               {filteredUsers.map((user) => (
                 <TableRow key={user.id}>
+                  <TableCell>
+                    <Checkbox
+                      checked={selectedUsers.includes(user.id)}
+                      onCheckedChange={() => handleSelectUser(user.id)}
+                    />
+                  </TableCell>
                   <TableCell className="font-medium">{user.email}</TableCell>
                   <TableCell>{user.firstName}</TableCell>
                   <TableCell>{user.lastName}</TableCell>
@@ -122,7 +167,9 @@ export default function UsersPage() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem>View details</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleViewDetails(user)}>
+                          <Eye className="mr-2 h-4 w-4" /> View details
+                        </DropdownMenuItem>
                         <DropdownMenuItem>Edit</DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem>Delete</DropdownMenuItem>
@@ -135,6 +182,27 @@ export default function UsersPage() {
           </Table>
         </main>
       </SidebarInset>
+      {selectedUser && (
+        <Dialog open={true} onOpenChange={handleCloseDetailsDialog}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>User Details</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-2">
+              <p><strong>Email:</strong> {selectedUser.email}</p>
+              <p><strong>First Name:</strong> {selectedUser.firstName}</p>
+              <p><strong>Last Name:</strong> {selectedUser.lastName}</p>
+              <p><strong>Role:</strong> {roleMap[selectedUser.role]}</p>
+              <p><strong>Status:</strong> {selectedUser.isActive ? "Active" : "Inactive"}</p>
+            </div>
+            <DialogFooter>
+              <Button variant="ghost" onClick={handleCloseDetailsDialog}>
+                Close
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
     </SidebarProvider>
   );
 }
