@@ -1,9 +1,12 @@
 "use client";
 
+import type React from "react";
+
 import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Menu, X, Box, Users, Home, Tag } from "lucide-react";
+import { Navbar } from "./navbar";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -12,24 +15,26 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex h-screen bg-gray-100">
-      {/* Mobile sidebar toggle */}
-      <Button
-        variant="ghost"
-        className="fixed top-4 left-4 z-50 md:hidden"
-        onClick={toggleSidebar}
-      >
-        {isSidebarOpen ? <X size={24} /> : <Menu size={24} />}
-      </Button>
-
       {/* Sidebar */}
       <aside
         className={`
-        fixed inset-y-0 left-0 z-40 w-64 bg-white p-6 shadow-md transform transition-transform duration-200 ease-in-out
-        ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}
-        md:relative md:translate-x-0
-      `}
+          fixed inset-y-0 left-0 z-40 w-64 bg-white shadow-md transform transition-transform duration-200 ease-in-out
+          ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}
+          md:relative md:translate-x-0
+        `}
       >
-        <nav className="space-y-2">
+        <div className="flex items-center justify-between h-16 px-4 border-b">
+          <span className="text-xl font-semibold">ระบบจัดการ</span>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="md:hidden"
+            onClick={toggleSidebar}
+          >
+            <X className="h-5 w-5" />
+          </Button>
+        </div>
+        <nav className="p-4 space-y-2">
           <Link href="/equipment" onClick={() => setIsSidebarOpen(false)}>
             <Button variant="ghost" className="w-full justify-start">
               <Box className="mr-2 h-4 w-4" />
@@ -58,7 +63,22 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       </aside>
 
       {/* Main content */}
-      <main className="flex-1 p-4 md:p-10 overflow-y-auto">{children}</main>
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <Navbar />
+        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-4 md:p-6">
+          {children}
+        </main>
+      </div>
+
+      {/* Mobile sidebar toggle */}
+      <Button
+        variant="ghost"
+        size="icon"
+        className="fixed bottom-4 right-4 z-50 md:hidden"
+        onClick={toggleSidebar}
+      >
+        <Menu className="h-6 w-6" />
+      </Button>
     </div>
   );
 }

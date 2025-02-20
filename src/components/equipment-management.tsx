@@ -134,7 +134,7 @@ export default function EquipmentManagement() {
         </div>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid gap-6 md:grid-cols-1">
         <div className="space-y-6">
           <div className="overflow-x-auto -mx-4 sm:mx-0">
             <div className="inline-block min-w-full align-middle">
@@ -188,9 +188,6 @@ export default function EquipmentManagement() {
               <ChevronRight className="h-4 w-4 ml-2" />
             </Button>
           </div>
-        </div>
-        <div>
-          <RecentActivities />
         </div>
       </div>
     </div>
