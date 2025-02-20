@@ -29,6 +29,16 @@ const mockCategories = [
     name: "อุปกรณ์ต่อพ่วง",
     createdAt: "2023-03-20T00:00:00.000Z",
   },
+  {
+    id: "CAT004",
+    name: "โต๊ะ",
+    createdAt: "2023-04-20T00:00:00.000Z",
+  },
+  {
+    id: "CAT005",
+    name: "เม้าส์",
+    createdAt: "2023-01-20T00:00:00.000Z",
+  },
 ];
 
 export default function CategoryManagement() {

@@ -20,13 +20,13 @@ const mockRooms = [
     createdAt: "2023-01-01T00:00:00.000Z",
   },
   {
-    id: "ROOM101",
-    roomNumber: "101",
+    id: "ROOM211",
+    roomNumber: "211",
     createdAt: "2023-02-15T00:00:00.000Z",
   },
   {
-    id: "ROOM301",
-    roomNumber: "301",
+    id: "ROOM204",
+    roomNumber: "204",
     createdAt: "2023-03-20T00:00:00.000Z",
   },
 ];
