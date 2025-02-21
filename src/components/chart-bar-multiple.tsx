@@ -17,25 +17,79 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 
-// ข้อมูลแสดงจำนวนครุภัณฑ์ตามหมวดหมู่และสถานะ
+// ข้อมูลแสดงจำนวนครุภัณฑ์ตามเดือน
 const chartData = [
   { 
-    category: "คอมพิวเตอร์",
-    ปกติ: 3,
-    ชำรุด: 0,
+    month: "ม.ค.",
+    ปกติ: 5,
+    ชำรุด: 1,
     จำหน่าย: 0,
   },
   { 
-    category: "อุปกรณ์นำเสนอ",
-    ปกติ: 1,
+    month: "ก.พ.",
+    ปกติ: 6,
     ชำรุด: 1,
+    จำหน่าย: 0,
+  },
+  { 
+    month: "มี.ค.",
+    ปกติ: 6,
+    ชำรุด: 2,
     จำหน่าย: 1,
   },
   { 
-    category: "อุปกรณ์ต่อพ่วง",
-    ปกติ: 3,
-    ชำรุด: 1,
-    จำหน่าย: 0,
+    month: "เม.ย.",
+    ปกติ: 7,
+    ชำรุด: 2,
+    จำหน่าย: 1,
+  },
+  { 
+    month: "พ.ค.",
+    ปกติ: 7,
+    ชำรุด: 2,
+    จำหน่าย: 1,
+  },
+  { 
+    month: "มิ.ย.",
+    ปกติ: 7,
+    ชำรุด: 2,
+    จำหน่าย: 1,
+  },
+  { 
+    month: "ก.ค.",
+    ปกติ: 8,
+    ชำรุด: 2,
+    จำหน่าย: 1,
+  },
+  { 
+    month: "ส.ค.",
+    ปกติ: 8,
+    ชำรุด: 2,
+    จำหน่าย: 1,
+  },
+  { 
+    month: "ก.ย.",
+    ปกติ: 8,
+    ชำรุด: 2,
+    จำหน่าย: 1,
+  },
+  { 
+    month: "ต.ค.",
+    ปกติ: 7,
+    ชำรุด: 2,
+    จำหน่าย: 1,
+  },
+  { 
+    month: "พ.ย.",
+    ปกติ: 7,
+    ชำรุด: 2,
+    จำหน่าย: 1,
+  },
+  { 
+    month: "ธ.ค.",
+    ปกติ: 7,
+    ชำรุด: 2,
+    จำหน่าย: 1,
   },
 ];
 
@@ -58,8 +112,8 @@ export function BarChartComponent() {
   return (
     <Card className="mt-6">
       <CardHeader>
-        <CardTitle>จำนวนครุภัณฑ์ตามหมวดหมู่</CardTitle>
-        <CardDescription>แสดงจำนวนครุภัณฑ์แยกตามหมวดหมู่และสถานะ</CardDescription>
+        <CardTitle>สถิติครุภัณฑ์รายเดือน</CardTitle>
+        <CardDescription>แสดงจำนวนครุภัณฑ์แยกตามสถานะรายเดือน</CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>
@@ -70,7 +124,7 @@ export function BarChartComponent() {
           >
             <CartesianGrid strokeDasharray="3 3" vertical={false} />
             <XAxis 
-              dataKey="category" 
+              dataKey="month" 
               tickLine={false}
               axisLine={false}
             />
@@ -107,7 +161,7 @@ export function BarChartComponent() {
       </CardContent>
       <CardFooter className="flex-col items-start gap-2 text-sm">
         <div className="leading-none text-muted-foreground">
-          แสดงจำนวนครุภัณฑ์ทั้งหมดแยกตามหมวดหมู่และสถานะ
+          แสดงจำนวนครุภัณฑ์ทั้งหมดแยกตามสถานะในแต่ละเดือน ปี {new Date().getFullYear() + 543}
         </div>
       </CardFooter>
     </Card>
