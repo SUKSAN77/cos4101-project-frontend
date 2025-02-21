@@ -54,7 +54,6 @@ export function Navbar() {
               align="end"
               forceMount
               sideOffset={8}
-              className="animate-in fade-in-0 zoom-in-95"
             >
               <DropdownMenuLabel className="font-normal">
                 <div className="flex flex-col space-y-1.5">

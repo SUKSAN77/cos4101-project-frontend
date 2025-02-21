@@ -29,6 +29,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   }, [isSidebarOpen]);
 
   const navItems = [
+    { href: "/dashboard", icon: Home, label: "หน้าหลัก" },
     { href: "/equipment", icon: Box, label: "จัดการครุภัณฑ์" },
     { href: "/users", icon: Users, label: "จัดการผู้ใช้" },
     { href: "/rooms", icon: Home, label: "จัดการห้อง" },
@@ -39,7 +40,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     <div className="flex h-screen bg-gray-50">
       {/* Overlay for mobile */}
       {isSidebarOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/20 backdrop-blur-sm z-30 md:hidden"
           onClick={() => setIsSidebarOpen(false)}
         />
@@ -71,24 +72,26 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           {navItems.map((item) => {
             const isActive = pathname === item.href;
             return (
-              <Link 
-                key={item.href} 
-                href={item.href} 
+              <Link
+                key={item.href}
+                href={item.href}
                 onClick={() => setIsSidebarOpen(false)}
               >
-                <Button 
-                  variant="ghost" 
+                <Button
+                  variant="ghost"
                   className={cn(
                     "w-full justify-start transition-colors duration-200",
-                    isActive 
-                      ? "bg-blue-50 text-blue-600 hover:bg-blue-100" 
+                    isActive
+                      ? "bg-blue-50 text-blue-600 hover:bg-blue-100"
                       : "hover:bg-gray-100"
                   )}
                 >
-                  <item.icon className={cn(
-                    "mr-2 h-4 w-4",
-                    isActive ? "text-blue-600" : "text-gray-500"
-                  )} />
+                  <item.icon
+                    className={cn(
+                      "mr-2 h-4 w-4",
+                      isActive ? "text-blue-600" : "text-gray-500"
+                    )}
+                  />
                   {item.label}
                 </Button>
               </Link>

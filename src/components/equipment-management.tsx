@@ -20,55 +20,22 @@ import {
 } from "@/components/ui/select";
 import { ChevronLeft, ChevronRight, Plus, Search } from "lucide-react";
 import { RecentActivities } from "./recent-activities";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { Trash2 } from "lucide-react";
 
 // Updated mock data
-// const mockEquipment = [
-//   {
-//     id: "001",
-//     name: "คอมพิวเตอร์ตั้งโต๊ะ",
-//     description: "คอมพิวเตอร์ตั้งโต๊ะสำหรับสำนักงาน",
-//     lifetime: 5,
-//     price: 30000.0,
-//     customId: "COM001",
-//     serialNumber: "SN12345",
-//     status: 0,
-//     acquisitionMethod: "ซื้อ",
-//     acquiredDate: "2023-01-15T00:00:00.000Z",
-//     categoryId: "CAT001",
-//     roomId: "ROOM201",
-//     createdBy: "USER001",
-//   },
-//   {
-//     id: "002",
-//     name: "โปรเจคเตอร์",
-//     description: "โปรเจคเตอร์สำหรับห้องประชุม",
-//     lifetime: 3,
-//     price: 25000.0,
-//     customId: "PRJ001",
-//     serialNumber: "SN67890",
-//     status: 1,
-//     acquisitionMethod: "ซื้อ",
-//     acquiredDate: "2022-11-20T00:00:00.000Z",
-//     categoryId: "CAT002",
-//     roomId: "ROOM101",
-//     createdBy: "USER002",
-//   },
-//   {
-//     id: "003",
-//     name: "เครื่องพิมพ์",
-//     description: "เครื่องพิมพ์เลเซอร์สี",
-//     lifetime: 4,
-//     price: 15000.0,
-//     customId: "PRT001",
-//     serialNumber: "SN24680",
-//     status: 0,
-//     acquisitionMethod: "เช่า",
-//     acquiredDate: "2023-03-05T00:00:00.000Z",
-//     categoryId: "CAT003",
-//     roomId: "ROOM301",
-//     createdBy: "USER001",
-//   },
-// ];
 const mockEquipment = [
   {
     id: "001",
@@ -218,10 +185,35 @@ const statusMap = {
   2: "จำหน่าย",
 };
 
+// เพิ่ม interface สำหรับข้อมูลครุภัณฑ์ใหม่
+interface NewEquipment {
+  name: string;
+  customId: string;
+  serialNumber: string;
+  status: string;
+  price: string;
+  acquisitionMethod: string;
+  acquiredDate: string;
+  notes: string;
+}
+
 export default function EquipmentManagement() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCategory, setFilterCategory] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [newEquipment, setNewEquipment] = useState<NewEquipment[]>([
+    {
+      name: "",
+      customId: "",
+      serialNumber: "",
+      status: "",
+      price: "",
+      acquisitionMethod: "",
+      acquiredDate: "",
+      notes: "",
+    },
+  ]);
 
   const filteredEquipment = mockEquipment.filter(
     (item) =>
@@ -231,11 +223,69 @@ export default function EquipmentManagement() {
       (filterStatus === "all" || item.status.toString() === filterStatus)
   );
 
+  // ฟังก์ชันสำหรับจัดการข้อมูลใหม่
+  const handleNewEquipmentChange = (
+    index: number,
+    field: keyof NewEquipment,
+    value: string
+  ) => {
+    const updatedEquipment = [...newEquipment];
+    updatedEquipment[index] = { ...updatedEquipment[index], [field]: value };
+    setNewEquipment(updatedEquipment);
+  };
+
+  const handleAddNewEquipmentField = () => {
+    setNewEquipment([
+      ...newEquipment,
+      {
+        name: "",
+        customId: "",
+        serialNumber: "",
+        status: "",
+        price: "",
+        acquisitionMethod: "",
+        acquiredDate: "",
+        notes: "",
+      },
+    ]);
+  };
+
+  const handleRemoveEquipment = (index: number) => {
+    if (newEquipment.length > 1) {
+      setNewEquipment(newEquipment.filter((_, i) => i !== index));
+    }
+  };
+
+  const handleCloseDialog = () => {
+    setIsDialogOpen(false);
+    setNewEquipment([
+      {
+        name: "",
+        customId: "",
+        serialNumber: "",
+        status: "",
+        price: "",
+        acquisitionMethod: "",
+        acquiredDate: "",
+        notes: "",
+      },
+    ]);
+  };
+
+  const handleSaveEquipment = () => {
+    // TODO: Implement save logic here
+    console.log("Saving equipment:", newEquipment);
+    handleCloseDialog();
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
         <h1 className="text-3xl font-bold mb-4 sm:mb-0">จัดการครุภัณฑ์</h1>
-        <Button>
+        <Button
+          onClick={() => setIsDialogOpen(true)}
+          className="bg-blue-500 hover:bg-blue-600"
+        >
           <Plus className="mr-2 h-4 w-4" /> เพิ่มครุภัณฑ์
         </Button>
       </div>
@@ -332,6 +382,194 @@ export default function EquipmentManagement() {
           </div>
         </div>
       </div>
+
+      <Dialog open={isDialogOpen} onOpenChange={handleCloseDialog}>
+        <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-semibold">
+              เพิ่มครุภัณฑ์
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <Accordion type="single" collapsible className="space-y-4">
+              {newEquipment.map((item, index) => (
+                <AccordionItem key={index} value={`item-${index}`}>
+                  <AccordionTrigger className="hover:bg-gray-50/50 px-4 py-2 rounded-lg">
+                    <div className="flex items-center justify-between w-full">
+                      <span>{item.name || `ครุภัณฑ์ ${index + 1}`}</span>
+                      {newEquipment.length > 1 && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 w-8 p-0 hover:bg-red-100 hover:text-red-600"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleRemoveEquipment(index);
+                          }}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="p-4 space-y-4">
+                    <div className="grid gap-4">
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">
+                          ชื่อครุภัณฑ์
+                        </label>
+                        <Input
+                          value={item.name}
+                          onChange={(e) =>
+                            handleNewEquipmentChange(
+                              index,
+                              "name",
+                              e.target.value
+                            )
+                          }
+                          placeholder="ชื่อครุภัณฑ์"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">
+                          รหัสครุภัณฑ์
+                        </label>
+                        <Input
+                          value={item.customId}
+                          onChange={(e) =>
+                            handleNewEquipmentChange(
+                              index,
+                              "customId",
+                              e.target.value
+                            )
+                          }
+                          placeholder="รหัสครุภัณฑ์"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">
+                          Serial Number
+                        </label>
+                        <Input
+                          value={item.serialNumber}
+                          onChange={(e) =>
+                            handleNewEquipmentChange(
+                              index,
+                              "serialNumber",
+                              e.target.value
+                            )
+                          }
+                          placeholder="Serial Number"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">สถานะ</label>
+                        <Select
+                          value={item.status}
+                          onValueChange={(value) =>
+                            handleNewEquipmentChange(index, "status", value)
+                          }
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="เลือกสถานะ" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="0">ปกติ</SelectItem>
+                            <SelectItem value="1">ชำรุด</SelectItem>
+                            <SelectItem value="2">จำหน่าย</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">ราคา</label>
+                        <Input
+                          type="number"
+                          value={item.price}
+                          onChange={(e) =>
+                            handleNewEquipmentChange(
+                              index,
+                              "price",
+                              e.target.value
+                            )
+                          }
+                          placeholder="ราคา"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">
+                          วิธีการได้มา
+                        </label>
+                        <Input
+                          value={item.acquisitionMethod}
+                          onChange={(e) =>
+                            handleNewEquipmentChange(
+                              index,
+                              "acquisitionMethod",
+                              e.target.value
+                            )
+                          }
+                          placeholder="วิธีการได้มา"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">
+                          วันที่ได้รับ
+                        </label>
+                        <Input
+                          type="date"
+                          value={item.acquiredDate}
+                          onChange={(e) =>
+                            handleNewEquipmentChange(
+                              index,
+                              "acquiredDate",
+                              e.target.value
+                            )
+                          }
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">หมายเหตุ</label>
+                        <Input
+                          value={item.notes}
+                          onChange={(e) =>
+                            handleNewEquipmentChange(
+                              index,
+                              "notes",
+                              e.target.value
+                            )
+                          }
+                          placeholder="หมายเหตุ"
+                        />
+                      </div>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+
+            <Button
+              variant="outline"
+              onClick={handleAddNewEquipmentField}
+              className="w-full mt-4"
+            >
+              <Plus className="mr-2 h-4 w-4" /> เพิ่มรายการใหม่
+            </Button>
+          </div>
+
+          <DialogFooter className="mt-6">
+            <Button variant="outline" onClick={handleCloseDialog}>
+              ยกเลิก
+            </Button>
+            <Button
+              onClick={handleSaveEquipment}
+              className="bg-blue-500 hover:bg-blue-600"
+            >
+              บันทึก
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
