@@ -42,7 +42,7 @@ export default function RoomManagement() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
         <h1 className="text-3xl font-bold mb-4 sm:mb-0">จัดการห้อง</h1>
-        <Button>
+        <Button className="bg-blue-500 hover:bg-blue-600">
           <Plus className="mr-2 h-4 w-4" /> เพิ่มห้อง
         </Button>
       </div>
