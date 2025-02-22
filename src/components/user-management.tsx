@@ -12,39 +12,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Search, Plus } from "lucide-react";
-
-const mockUsers = [
-  {
-    id: "USER001",
-    email: "user1@example.com",
-    firstName: "John",
-    lastName: "Doe",
-    isActive: true,
-    emailVerified: true,
-    role: 0,
-    createdAt: "2023-01-01T00:00:00.000Z",
-  },
-  {
-    id: "USER002",
-    email: "user2@example.com",
-    firstName: "Jane",
-    lastName: "Smith",
-    isActive: true,
-    emailVerified: false,
-    role: 1,
-    createdAt: "2023-02-15T00:00:00.000Z",
-  },
-  {
-    id: "USER003",
-    email: "user3@example.com",
-    firstName: "Bob",
-    lastName: "Johnson",
-    isActive: false,
-    emailVerified: true,
-    role: 0,
-    createdAt: "2023-03-20T00:00:00.000Z",
-  },
-];
+import { mockUsers } from "@/app/MockData";
 
 const roleMap = {
   0: "ผู้ใช้ทั่วไป",
@@ -110,7 +78,9 @@ export default function UserManagement() {
                     <TableCell>
                       {user.emailVerified ? "ยืนยันแล้ว" : "ยังไม่ยืนยัน"}
                     </TableCell>
-                    <TableCell>{[user.role]}</TableCell>
+                    <TableCell>
+                      {[user.role ? "แอดมิน" : "ผู้ใช้ทั่วไป"]}
+                    </TableCell>
                     <TableCell>
                       {new Date(user.createdAt).toLocaleDateString("th-TH")}
                     </TableCell>

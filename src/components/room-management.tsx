@@ -12,8 +12,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Search, Plus } from "lucide-react";
-
-
+import { mockRooms } from "@/app/MockData";
 
 export default function RoomManagement() {
   const [searchTerm, setSearchTerm] = useState("");
