@@ -121,7 +121,7 @@ export function PieChartComponent() {
                 </ChartContainer>
             </CardContent>
             <CardFooter className="flex-col gap-2 text-sm">
-                <div className="flex items-center justify-between w-full">
+                <div className="flex w-full items-center justify-between">
                     {chartData.map((item, index) => (
                         <div key={index} className="flex items-center gap-2">
                             <div

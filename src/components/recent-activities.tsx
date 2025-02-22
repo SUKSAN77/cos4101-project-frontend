@@ -63,7 +63,7 @@ export function RecentActivities() {
                                     {activity.equipment}
                                 </p>
                             </div>
-                            <div className="ml-auto font-medium text-sm text-muted-foreground">
+                            <div className="ml-auto text-sm font-medium text-muted-foreground">
                                 {activity.timestamp}
                             </div>
                         </div>

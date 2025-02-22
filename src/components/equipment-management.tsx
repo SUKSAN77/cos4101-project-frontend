@@ -196,8 +196,8 @@ export default function EquipmentManagement() {
 
     return (
         <div className="space-y-6">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
-                <h1 className="text-3xl font-bold mb-4 sm:mb-0">
+            <div className="mb-6 flex flex-col items-start justify-between sm:flex-row sm:items-center">
+                <h1 className="mb-4 text-3xl font-bold sm:mb-0">
                     จัดการครุภัณฑ์
                 </h1>
                 <Button
@@ -208,9 +208,9 @@ export default function EquipmentManagement() {
                 </Button>
             </div>
 
-            <div className="flex flex-col space-y-4 mb-6">
+            <div className="mb-6 flex flex-col space-y-4">
                 <div className="relative">
-                    <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                    <Search className="absolute left-2 top-1/2 -translate-y-1/2 transform text-gray-400" />
                     <Input
                         placeholder="ค้นหาครุภัณฑ์..."
                         value={searchTerm}
@@ -218,7 +218,7 @@ export default function EquipmentManagement() {
                         className="pl-8"
                     />
                 </div>
-                <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
+                <div className="flex flex-col space-y-2 sm:flex-row sm:space-x-4 sm:space-y-0">
                     <Select
                         value={filterCategory}
                         onValueChange={setFilterCategory}
@@ -257,7 +257,7 @@ export default function EquipmentManagement() {
 
             <div className="grid gap-6 md:grid-cols-1">
                 <div className="space-y-6">
-                    <div className="overflow-x-auto -mx-4 sm:mx-0">
+                    <div className="-mx-4 overflow-x-auto sm:mx-0">
                         <div className="inline-block min-w-full align-middle">
                             <div className="overflow-hidden border border-gray-200 sm:rounded-lg">
                                 <Table>
@@ -337,7 +337,7 @@ export default function EquipmentManagement() {
                             size="sm"
                             className="w-[100px]"
                         >
-                            <ChevronLeft className="h-4 w-4 mr-2" />
+                            <ChevronLeft className="mr-2 h-4 w-4" />
                             ก่อนหน้า
                         </Button>
                         <Button
@@ -346,14 +346,14 @@ export default function EquipmentManagement() {
                             className="w-[100px]"
                         >
                             ถัดไป
-                            <ChevronRight className="h-4 w-4 ml-2" />
+                            <ChevronRight className="ml-2 h-4 w-4" />
                         </Button>
                     </div>
                 </div>
             </div>
 
             <Dialog open={isDialogOpen} onOpenChange={handleCloseDialog}>
-                <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
+                <DialogContent className="max-h-[80vh] overflow-y-auto sm:max-w-[600px]">
                     <DialogHeader>
                         <DialogTitle className="text-xl font-semibold">
                             เพิ่มครุภัณฑ์
@@ -371,8 +371,8 @@ export default function EquipmentManagement() {
                                     key={index}
                                     value={`item-${index}`}
                                 >
-                                    <AccordionTrigger className="hover:bg-gray-50/50 px-4 py-2 rounded-lg">
-                                        <div className="flex items-center justify-between w-full">
+                                    <AccordionTrigger className="rounded-lg px-4 py-2 hover:bg-gray-50/50">
+                                        <div className="flex w-full items-center justify-between">
                                             <span>
                                                 {item.name ||
                                                     `ครุภัณฑ์ ${index + 1}`}
@@ -394,7 +394,7 @@ export default function EquipmentManagement() {
                                             )}
                                         </div>
                                     </AccordionTrigger>
-                                    <AccordionContent className="p-4 space-y-4">
+                                    <AccordionContent className="space-y-4 p-4">
                                         <div className="grid gap-4">
                                             <div className="space-y-2">
                                                 <label className="text-sm font-medium">
@@ -550,7 +550,7 @@ export default function EquipmentManagement() {
                         <Button
                             variant="outline"
                             onClick={handleAddNewEquipmentField}
-                            className="w-full mt-4"
+                            className="mt-4 w-full"
                         >
                             <Plus className="mr-2 h-4 w-4" /> เพิ่มรายการใหม่
                         </Button>
@@ -683,7 +683,7 @@ export default function EquipmentManagement() {
                     open={isEditDialogOpen}
                     onOpenChange={setIsEditDialogOpen}
                 >
-                    <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
+                    <DialogContent className="max-h-[80vh] overflow-y-auto sm:max-w-[600px]">
                         <DialogHeader>
                             <DialogTitle className="text-xl font-semibold">
                                 แก้ไขข้อมูลครุภัณฑ์
@@ -882,7 +882,7 @@ export default function EquipmentManagement() {
                                 </Select>
                             </div>
                         </div>
-                        <DialogFooter className="sticky bottom-0 bg-white py-4 border-t">
+                        <DialogFooter className="sticky bottom-0 border-t bg-white py-4">
                             <Button
                                 variant="outline"
                                 onClick={() => setIsEditDialogOpen(false)}

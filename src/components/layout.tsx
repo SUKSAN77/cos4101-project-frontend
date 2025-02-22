@@ -48,7 +48,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             {/* Overlay for mobile */}
             {isSidebarOpen && (
                 <div
-                    className="fixed inset-0 bg-black/20 backdrop-blur-sm z-30 md:hidden"
+                    className="fixed inset-0 z-30 bg-black/20 backdrop-blur-sm md:hidden"
                     onClick={() => setIsSidebarOpen(false)}
                 />
             )}
@@ -57,25 +57,25 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             <aside
                 id="sidebar"
                 className={cn(
-                    "fixed inset-y-0 left-0 z-40 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out",
+                    "fixed inset-y-0 left-0 z-40 w-64 transform bg-white shadow-lg transition-transform duration-300 ease-in-out",
                     isSidebarOpen ? "translate-x-0" : "-translate-x-full",
                     "md:relative md:translate-x-0",
                 )}
             >
-                <div className="flex items-center justify-between h-16 px-6 border-b">
-                    <span className="text-xl font-semibold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent">
+                <div className="flex h-16 items-center justify-between border-b px-6">
+                    <span className="bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-xl font-semibold text-transparent">
                         ระบบจัดการ
                     </span>
                     <Button
                         variant="ghost"
                         size="icon"
-                        className="md:hidden hover:bg-gray-100 transition-colors"
+                        className="transition-colors hover:bg-gray-100 md:hidden"
                         onClick={toggleSidebar}
                     >
                         <X className="h-5 w-5" />
                     </Button>
                 </div>
-                <nav className="p-4 space-y-1">
+                <nav className="space-y-1 p-4">
                     {navItems.map((item) => {
                         const isActive = pathname === item.href;
                         return (
@@ -110,9 +110,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             </aside>
 
             {/* Main content */}
-            <div className="flex-1 flex flex-col overflow-hidden">
+            <div className="flex flex-1 flex-col overflow-hidden">
                 <Navbar />
-                <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-4 md:p-6">
+                <main className="flex-1 overflow-y-auto overflow-x-hidden bg-gray-50 p-4 md:p-6">
                     {children}
                 </main>
             </div>
@@ -121,7 +121,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             <Button
                 variant="ghost"
                 size="icon"
-                className="fixed bottom-4 right-4 z-50 md:hidden bg-white shadow-lg hover:bg-gray-100 transition-colors duration-200"
+                className="fixed bottom-4 right-4 z-50 bg-white shadow-lg transition-colors duration-200 hover:bg-gray-100 md:hidden"
                 onClick={toggleSidebar}
             >
                 <Menu className="h-6 w-6" />

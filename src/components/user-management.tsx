@@ -32,8 +32,8 @@ export default function UserManagement() {
 
     return (
         <div className="space-y-6">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
-                <h1 className="text-3xl font-bold mb-4 sm:mb-0">
+            <div className="mb-6 flex flex-col items-start justify-between sm:flex-row sm:items-center">
+                <h1 className="mb-4 text-3xl font-bold sm:mb-0">
                     จัดการผู้ใช้
                 </h1>
                 <Button className="bg-blue-500 hover:bg-blue-600">
@@ -43,7 +43,7 @@ export default function UserManagement() {
 
             <div className="mb-6">
                 <div className="relative">
-                    <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                    <Search className="absolute left-2 top-1/2 -translate-y-1/2 transform text-gray-400" />
                     <Input
                         placeholder="ค้นหาผู้ใช้..."
                         value={searchTerm}
@@ -53,7 +53,7 @@ export default function UserManagement() {
                 </div>
             </div>
 
-            <div className="overflow-x-auto -mx-4 sm:mx-0">
+            <div className="-mx-4 overflow-x-auto sm:mx-0">
                 <div className="inline-block min-w-full align-middle">
                     <div className="overflow-hidden border border-gray-200 sm:rounded-lg">
                         <Table>
