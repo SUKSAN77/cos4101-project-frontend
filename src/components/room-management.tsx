@@ -1,5 +1,4 @@
 "use client";
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -49,6 +48,7 @@ export default function RoomManagement() {
               <TableHeader>
                 <TableRow>
                   <TableHead>หมายเลขห้อง</TableHead>
+                  <TableHead>รายละเอียดครุภัณฑ์</TableHead>
                   <TableHead>วันที่สร้าง</TableHead>
                   <TableHead>การจัดการ</TableHead>
                 </TableRow>
@@ -57,6 +57,11 @@ export default function RoomManagement() {
                 {filteredRooms.map((room) => (
                   <TableRow key={room.id}>
                     <TableCell>{room.roomNumber}</TableCell>
+                    <TableCell>
+                      <Button variant="outline" size="sm" className="mr-2">
+                        ดูรายละเอียด
+                      </Button>
+                    </TableCell>
                     <TableCell>
                       {new Date(room.createdAt).toLocaleDateString("th-TH")}
                     </TableCell>

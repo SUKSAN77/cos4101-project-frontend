@@ -79,7 +79,7 @@ export default function UserManagement() {
                       {user.emailVerified ? "ยืนยันแล้ว" : "ยังไม่ยืนยัน"}
                     </TableCell>
                     <TableCell>
-                      {[user.role ? "แอดมิน" : "ผู้ใช้ทั่วไป"]}
+                      {user.role ? "แอดมิน" : "ผู้ใช้ทั่วไป"}
                     </TableCell>
                     <TableCell>
                       {new Date(user.createdAt).toLocaleDateString("th-TH")}

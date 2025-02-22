@@ -36,10 +36,23 @@ import {
 import { Trash2 } from "lucide-react";
 import { mockEquipment } from "@/app/MockData";
 
-const statusMap = {
-  0: "ปกติ",
-  1: "ชำรุด",
-  2: "จำหน่าย",
+// const statusMap = {
+//   0: "ปกติ",
+//   1: "ชำรุด",
+//   2: "จำหน่าย",
+// };
+
+const getRoleLabel = (role: number) => {
+  switch (role) {
+    case 0:
+      return "ปกติ";
+    case 1:
+      return "ชำรุด";
+    case 2:
+      return "จำหน่าย";
+    default:
+      return "ไม่ทราบบทบาท";
+  }
 };
 
 // เพิ่ม interface สำหรับข้อมูลครุภัณฑ์ใหม่
@@ -204,7 +217,7 @@ export default function EquipmentManagement() {
                       <TableRow key={item.id}>
                         <TableCell>{item.customId}</TableCell>
                         <TableCell>{item.name}</TableCell>
-                        <TableCell>{[item.status]}</TableCell>
+                        <TableCell>{getRoleLabel(item.status)}</TableCell>
                         <TableCell>{item.price.toLocaleString()} บาท</TableCell>
                         <TableCell>
                           {new Date(item.acquiredDate).toLocaleDateString(

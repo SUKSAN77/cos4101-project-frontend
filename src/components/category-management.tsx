@@ -12,34 +12,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Search, Plus } from "lucide-react";
-
-const mockCategories = [
-  {
-    id: "CAT001",
-    name: "คอมพิวเตอร์",
-    createdAt: "2023-01-01T00:00:00.000Z",
-  },
-  {
-    id: "CAT002",
-    name: "อุปกรณ์นำเสนอ",
-    createdAt: "2023-02-15T00:00:00.000Z",
-  },
-  {
-    id: "CAT003",
-    name: "อุปกรณ์ต่อพ่วง",
-    createdAt: "2023-03-20T00:00:00.000Z",
-  },
-  {
-    id: "CAT004",
-    name: "โต๊ะ",
-    createdAt: "2023-04-20T00:00:00.000Z",
-  },
-  {
-    id: "CAT005",
-    name: "เม้าส์",
-    createdAt: "2023-01-20T00:00:00.000Z",
-  },
-];
+import { mockCategories } from "@/app/MockData";
 
 export default function CategoryManagement() {
   const [searchTerm, setSearchTerm] = useState("");
