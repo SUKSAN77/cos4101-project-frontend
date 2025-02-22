@@ -84,6 +84,10 @@ export default function EquipmentManagement() {
       notes: "",
     },
   ]);
+  const [selectedEquipment, setSelectedEquipment] = useState<any>(null);
+  const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editingEquipment, setEditingEquipment] = useState<any>(null);
 
   const filteredEquipment = mockEquipment.filter(
     (item) =>
@@ -146,6 +150,30 @@ export default function EquipmentManagement() {
     // TODO: Implement save logic here
     console.log("Saving equipment:", newEquipment);
     handleCloseDialog();
+  };
+
+  const handleShowDetails = (equipment: any) => {
+    setSelectedEquipment(equipment);
+    setIsDetailsDialogOpen(true);
+  };
+
+  const handleEditEquipment = (equipment: any) => {
+    setEditingEquipment({ ...equipment });
+    setIsEditDialogOpen(true);
+  };
+
+  const handleEditChange = (field: string, value: any) => {
+    setEditingEquipment({
+      ...editingEquipment,
+      [field]: value,
+    });
+  };
+
+  const handleSaveEdit = () => {
+    // TODO: Implement save edit logic here
+    console.log("Saving edited equipment:", editingEquipment);
+    setIsEditDialogOpen(false);
+    setEditingEquipment(null);
   };
 
   return (
@@ -216,7 +244,14 @@ export default function EquipmentManagement() {
                     {mockEquipment.map((item) => (
                       <TableRow key={item.id}>
                         <TableCell>{item.customId}</TableCell>
-                        <TableCell>{item.name}</TableCell>
+                        <TableCell>
+                          <button
+                            onClick={() => handleShowDetails(item)}
+                            className="text-left hover:text-blue-600 hover:underline"
+                          >
+                            {item.name}
+                          </button>
+                        </TableCell>
                         <TableCell>{getRoleLabel(item.status)}</TableCell>
                         <TableCell>{item.price.toLocaleString()} บาท</TableCell>
                         <TableCell>
@@ -225,7 +260,12 @@ export default function EquipmentManagement() {
                           )}
                         </TableCell>
                         <TableCell>
-                          <Button variant="outline" size="sm" className="mr-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="mr-2"
+                            onClick={() => handleEditEquipment(item)}
+                          >
                             แก้ไข
                           </Button>
                           <Button variant="destructive" size="sm">
@@ -440,6 +480,246 @@ export default function EquipmentManagement() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {selectedEquipment && (
+        <Dialog
+          open={isDetailsDialogOpen}
+          onOpenChange={setIsDetailsDialogOpen}
+        >
+          <DialogContent className="sm:max-w-[600px]">
+            <DialogHeader>
+              <DialogTitle className="text-xl font-semibold">
+                รายละเอียดครุภัณฑ์
+              </DialogTitle>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <span className="font-medium">รหัสครุภัณฑ์:</span>
+                <span className="col-span-3">{selectedEquipment.customId}</span>
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <span className="font-medium">ชื่อครุภัณฑ์:</span>
+                <span className="col-span-3">{selectedEquipment.name}</span>
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <span className="font-medium">รายละเอียด:</span>
+                <span className="col-span-3">
+                  {selectedEquipment.description}
+                </span>
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <span className="font-medium">Serial Number:</span>
+                <span className="col-span-3">
+                  {selectedEquipment.serialNumber}
+                </span>
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <span className="font-medium">สถานะ:</span>
+                <span className="col-span-3">
+                  {getRoleLabel(selectedEquipment.status)}
+                </span>
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <span className="font-medium">ราคา:</span>
+                <span className="col-span-3">
+                  {selectedEquipment.price.toLocaleString()} บาท
+                </span>
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <span className="font-medium">อายุการใช้งาน:</span>
+                <span className="col-span-3">
+                  {selectedEquipment.lifetime} ปี
+                </span>
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <span className="font-medium">วิธีการได้มา:</span>
+                <span className="col-span-3">
+                  {selectedEquipment.acquisitionMethod}
+                </span>
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <span className="font-medium">วันที่ได้รับ:</span>
+                <span className="col-span-3">
+                  {new Date(selectedEquipment.acquiredDate).toLocaleDateString(
+                    "th-TH"
+                  )}
+                </span>
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <span className="font-medium">ห้อง:</span>
+                <span className="col-span-3">{selectedEquipment.roomId}</span>
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <span className="font-medium">หมวดหมู่:</span>
+                <span className="col-span-3">
+                  {selectedEquipment.categoryId}
+                </span>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => setIsDetailsDialogOpen(false)}
+              >
+                ปิด
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {editingEquipment && (
+        <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+          <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="text-xl font-semibold">
+                แก้ไขข้อมูลครุภัณฑ์
+              </DialogTitle>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <label className="text-sm font-medium">ชื่อครุภัณฑ์</label>
+                <Input
+                  value={editingEquipment.name}
+                  onChange={(e) => handleEditChange("name", e.target.value)}
+                />
+              </div>
+              <div className="grid gap-2">
+                <label className="text-sm font-medium">รหัสครุภัณฑ์</label>
+                <Input
+                  value={editingEquipment.customId}
+                  onChange={(e) => handleEditChange("customId", e.target.value)}
+                />
+              </div>
+              <div className="grid gap-2">
+                <label className="text-sm font-medium">รายละเอียด</label>
+                <Input
+                  value={editingEquipment.description}
+                  onChange={(e) =>
+                    handleEditChange("description", e.target.value)
+                  }
+                />
+              </div>
+              <div className="grid gap-2">
+                <label className="text-sm font-medium">Serial Number</label>
+                <Input
+                  value={editingEquipment.serialNumber}
+                  onChange={(e) =>
+                    handleEditChange("serialNumber", e.target.value)
+                  }
+                />
+              </div>
+              <div className="grid gap-2">
+                <label className="text-sm font-medium">สถานะ</label>
+                <Select
+                  value={editingEquipment.status.toString()}
+                  onValueChange={(value) =>
+                    handleEditChange("status", parseInt(value))
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="0">ปกติ</SelectItem>
+                    <SelectItem value="1">ชำรุด</SelectItem>
+                    <SelectItem value="2">จำหน่าย</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid gap-2">
+                <label className="text-sm font-medium">ราคา</label>
+                <Input
+                  type="number"
+                  value={editingEquipment.price}
+                  onChange={(e) =>
+                    handleEditChange("price", parseFloat(e.target.value))
+                  }
+                />
+              </div>
+              <div className="grid gap-2">
+                <label className="text-sm font-medium">
+                  อายุการใช้งาน (ปี)
+                </label>
+                <Input
+                  type="number"
+                  value={editingEquipment.lifetime}
+                  onChange={(e) =>
+                    handleEditChange("lifetime", parseInt(e.target.value))
+                  }
+                />
+              </div>
+              <div className="grid gap-2">
+                <label className="text-sm font-medium">วิธีการได้มา</label>
+                <Input
+                  value={editingEquipment.acquisitionMethod}
+                  onChange={(e) =>
+                    handleEditChange("acquisitionMethod", e.target.value)
+                  }
+                />
+              </div>
+              <div className="grid gap-2">
+                <label className="text-sm font-medium">วันที่ได้รับ</label>
+                <Input
+                  type="date"
+                  value={editingEquipment.acquiredDate.split("T")[0]}
+                  onChange={(e) =>
+                    handleEditChange("acquiredDate", e.target.value)
+                  }
+                />
+              </div>
+              <div className="grid gap-2">
+                <label className="text-sm font-medium">ห้อง</label>
+                <Select
+                  value={editingEquipment.roomId}
+                  onValueChange={(value) => handleEditChange("roomId", value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="ROOM101">ห้อง 101</SelectItem>
+                    <SelectItem value="ROOM201">ห้อง 201</SelectItem>
+                    <SelectItem value="ROOM301">ห้อง 301</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid gap-2">
+                <label className="text-sm font-medium">หมวดหมู่</label>
+                <Select
+                  value={editingEquipment.categoryId}
+                  onValueChange={(value) =>
+                    handleEditChange("categoryId", value)
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="CAT001">คอมพิวเตอร์</SelectItem>
+                    <SelectItem value="CAT002">อุปกรณ์นำเสนอ</SelectItem>
+                    <SelectItem value="CAT003">อุปกรณ์ต่อพ่วง</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <DialogFooter className="sticky bottom-0 bg-white py-4 border-t">
+              <Button
+                variant="outline"
+                onClick={() => setIsEditDialogOpen(false)}
+              >
+                ยกเลิก
+              </Button>
+              <Button
+                onClick={handleSaveEdit}
+                className="bg-blue-500 hover:bg-blue-600"
+              >
+                บันทึก
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 }
