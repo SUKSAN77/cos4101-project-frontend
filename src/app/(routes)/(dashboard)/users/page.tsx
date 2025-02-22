@@ -1,10 +1,10 @@
-import UserManagement from "@/components/user-management";
 import Layout from "@/components/layout";
+import UserManagement from "@/components/user-management";
 
 export default function UsersPage() {
-  return (
-    <Layout>
-      <UserManagement />
-    </Layout>
-  );
+    return (
+        <Layout>
+            <UserManagement />
+        </Layout>
+    );
 }
