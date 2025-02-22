@@ -1,6 +1,8 @@
 "use client";
 
+import React from "react";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Legend } from "recharts";
+import { mockEquipment } from "@/app/MockData";
 
 import {
   Card,
@@ -17,81 +19,27 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 
-// ข้อมูลแสดงจำนวนครุภัณฑ์ตามเดือน
-const chartData = [
-  { 
-    month: "ม.ค.",
-    ปกติ: 5,
-    ชำรุด: 1,
+// คำนวณข้อมูลรายเดือน
+const calculateMonthlyData = () => {
+  const monthlyData = new Array(12).fill(null).map((_, index) => ({
+    month: new Date(2023, index).toLocaleString('th-TH', { month: 'short' }),
+    ปกติ: 0,
+    ชำรุด: 0,
     จำหน่าย: 0,
-  },
-  { 
-    month: "ก.พ.",
-    ปกติ: 6,
-    ชำรุด: 1,
-    จำหน่าย: 0,
-  },
-  { 
-    month: "มี.ค.",
-    ปกติ: 6,
-    ชำรุด: 2,
-    จำหน่าย: 1,
-  },
-  { 
-    month: "เม.ย.",
-    ปกติ: 7,
-    ชำรุด: 2,
-    จำหน่าย: 1,
-  },
-  { 
-    month: "พ.ค.",
-    ปกติ: 7,
-    ชำรุด: 2,
-    จำหน่าย: 1,
-  },
-  { 
-    month: "มิ.ย.",
-    ปกติ: 7,
-    ชำรุด: 2,
-    จำหน่าย: 1,
-  },
-  { 
-    month: "ก.ค.",
-    ปกติ: 8,
-    ชำรุด: 2,
-    จำหน่าย: 1,
-  },
-  { 
-    month: "ส.ค.",
-    ปกติ: 8,
-    ชำรุด: 2,
-    จำหน่าย: 1,
-  },
-  { 
-    month: "ก.ย.",
-    ปกติ: 8,
-    ชำรุด: 2,
-    จำหน่าย: 1,
-  },
-  { 
-    month: "ต.ค.",
-    ปกติ: 7,
-    ชำรุด: 2,
-    จำหน่าย: 1,
-  },
-  { 
-    month: "พ.ย.",
-    ปกติ: 7,
-    ชำรุด: 2,
-    จำหน่าย: 1,
-  },
-  { 
-    month: "ธ.ค.",
-    ปกติ: 7,
-    ชำรุด: 2,
-    จำหน่าย: 1,
-  },
-];
+  }));
+
+  mockEquipment.forEach(item => {
+    const date = new Date(item.acquiredDate);
+    const monthIndex = date.getMonth();
+    const status = item.status;
+    
+    if (status === 0) monthlyData[monthIndex].ปกติ++;
+    else if (status === 1) monthlyData[monthIndex].ชำรุด++;
+    else if (status === 2) monthlyData[monthIndex].จำหน่าย++;
+  });
+
+  return monthlyData;
+};
 
 const chartConfig = {
   ปกติ: {
@@ -109,6 +57,8 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 export function BarChartComponent() {
+  const chartData = React.useMemo(() => calculateMonthlyData(), []);
+
   return (
     <Card className="mt-6">
       <CardHeader>

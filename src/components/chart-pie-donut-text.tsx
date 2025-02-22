@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { Label, Pie, PieChart } from "recharts";
+import { mockEquipment } from "@/app/MockData";
 
 import {
   Card,
@@ -18,12 +19,19 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 
-// ข้อมูลสำหรับแสดงสถานะครุภัณฑ์
-const chartData = [
-  { status: "ปกติ", count: 7, fill: "#22c55e" },
-  { status: "ชำรุด", count: 2, fill: "#f59e0b" },
-  { status: "จำหน่าย", count: 1, fill: "#ef4444" },
-];
+// คำนวณข้อมูลจาก mockEquipment
+const calculateChartData = () => {
+  const statusCount = mockEquipment.reduce((acc, item) => {
+    acc[item.status] = (acc[item.status] || 0) + 1;
+    return acc;
+  }, {} as Record<number, number>);
+
+  return [
+    { status: "ปกติ", count: statusCount[0] || 0, fill: "#22c55e" },
+    { status: "ชำรุด", count: statusCount[1] || 0, fill: "#f59e0b" },
+    { status: "จำหน่าย", count: statusCount[2] || 0, fill: "#ef4444" },
+  ];
+};
 
 const chartConfig = {
   count: {
@@ -44,9 +52,8 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 export function PieChartComponent() {
-  const totalItems = React.useMemo(() => {
-    return chartData.reduce((acc, curr) => acc + curr.count, 0);
-  }, []);
+  const chartData = React.useMemo(() => calculateChartData(), []);
+  const totalItems = React.useMemo(() => mockEquipment.length, []);
 
   return (
     <Card className="flex flex-col">

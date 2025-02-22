@@ -34,7 +34,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Trash2 } from "lucide-react";
-import { mockEquipment } from "@/app/MockData";
+import { mockEquipment, mockCategories, mockRooms } from "@/app/MockData";
 
 // const statusMap = {
 //   0: "ปกติ",
@@ -176,6 +176,17 @@ export default function EquipmentManagement() {
     setEditingEquipment(null);
   };
 
+  // เพิ่มฟังก์ชัน helper ก่อน return
+  const getCategoryName = (categoryId: string) => {
+    const category = mockCategories.find(c => c.id === categoryId);
+    return category ? category.name : categoryId;
+  };
+
+  const getRoomNumber = (roomId: string) => {
+    const room = mockRooms.find(r => r.id === roomId);
+    return room ? `ห้อง ${room.roomNumber}` : roomId;
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
@@ -200,14 +211,16 @@ export default function EquipmentManagement() {
         </div>
         <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
           <Select value={filterCategory} onValueChange={setFilterCategory}>
-            <SelectTrigger className="w-full sm:w-[180px]">
+            <SelectTrigger>
               <SelectValue placeholder="ประเภทครุภัณฑ์" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">ทั้งหมด</SelectItem>
-              <SelectItem value="CAT001">คอมพิวเตอร์</SelectItem>
-              <SelectItem value="CAT002">อุปกรณ์นำเสนอ</SelectItem>
-              <SelectItem value="CAT003">อุปกรณ์ต่อพ่วง</SelectItem>
+              {mockCategories.map(category => (
+                <SelectItem key={category.id} value={category.id}>
+                  {category.name}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
           <Select value={filterStatus} onValueChange={setFilterStatus}>
@@ -547,13 +560,11 @@ export default function EquipmentManagement() {
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
                 <span className="font-medium">ห้อง:</span>
-                <span className="col-span-3">{selectedEquipment.roomId}</span>
+                <span className="col-span-3">{getRoomNumber(selectedEquipment.roomId)}</span>
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
                 <span className="font-medium">หมวดหมู่:</span>
-                <span className="col-span-3">
-                  {selectedEquipment.categoryId}
-                </span>
+                <span className="col-span-3">{getCategoryName(selectedEquipment.categoryId)}</span>
               </div>
             </div>
             <DialogFooter>
@@ -678,9 +689,11 @@ export default function EquipmentManagement() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="ROOM101">ห้อง 101</SelectItem>
-                    <SelectItem value="ROOM201">ห้อง 201</SelectItem>
-                    <SelectItem value="ROOM301">ห้อง 301</SelectItem>
+                    {mockRooms.map(room => (
+                      <SelectItem key={room.id} value={room.id}>
+                        ห้อง {room.roomNumber}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -696,9 +709,11 @@ export default function EquipmentManagement() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="CAT001">คอมพิวเตอร์</SelectItem>
-                    <SelectItem value="CAT002">อุปกรณ์นำเสนอ</SelectItem>
-                    <SelectItem value="CAT003">อุปกรณ์ต่อพ่วง</SelectItem>
+                    {mockCategories.map(category => (
+                      <SelectItem key={category.id} value={category.id}>
+                        {category.name}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
