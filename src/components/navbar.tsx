@@ -68,10 +68,10 @@ export function Navbar() {
                 <User className="mr-2 h-4 w-4" />
                 <span>ข้อมูลส่วนตัว</span>
               </DropdownMenuItem>
-              <DropdownMenuItem className="hover:bg-gray-100 cursor-pointer transition-colors duration-200">
+              {/* <DropdownMenuItem className="hover:bg-gray-100 cursor-pointer transition-colors duration-200">
                 <Settings className="mr-2 h-4 w-4" />
                 <span>ตั้งค่า</span>
-              </DropdownMenuItem>
+              </DropdownMenuItem> */}
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 className="text-red-600 hover:bg-red-50 cursor-pointer transition-colors duration-200"
