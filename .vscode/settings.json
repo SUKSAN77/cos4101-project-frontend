@@ -1,4 +1,12 @@
 {
+    // Tailwind CSS IntelliSense
+    "files.associations": {
+        "*.css": "tailwindcss"
+    },
+    "editor.quickSuggestions": {
+        "strings": "on"
+    },
+
     // Prettier
     "prettier.configPath": "prettier.config.mjs",
 
