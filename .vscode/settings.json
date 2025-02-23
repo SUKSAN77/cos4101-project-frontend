@@ -8,7 +8,7 @@
     },
 
     // Prettier
-    "prettier.configPath": "prettier.config.mjs",
+    "prettier.configPath": ".prettierrc",
 
     // Language specific settings
     "[typescript]": {
