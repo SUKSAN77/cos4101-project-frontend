@@ -36,14 +36,6 @@ import {
     TableRow,
 } from "@/components/ui/table";
 
-import { RecentActivities } from "./recent-activities";
-
-// const statusMap = {
-//   0: "ปกติ",
-//   1: "ชำรุด",
-//   2: "จำหน่าย",
-// };
-
 const getRoleLabel = (role: number) => {
     switch (role) {
         case 0:
@@ -91,15 +83,15 @@ export default function EquipmentManagement() {
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
     const [editingEquipment, setEditingEquipment] = useState<any>(null);
 
-    const filteredEquipment = mockEquipment.filter(
-        (item) =>
-            (item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                item.customId
-                    .toLowerCase()
-                    .includes(searchTerm.toLowerCase())) &&
-            (filterCategory === "all" || item.categoryId === filterCategory) &&
-            (filterStatus === "all" || item.status.toString() === filterStatus),
-    );
+    // const filteredEquipment = mockEquipment.filter(
+    //     (item) =>
+    //         (item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    //             item.customId
+    //                 .toLowerCase()
+    //                 .includes(searchTerm.toLowerCase())) &&
+    //         (filterCategory === "all" || item.categoryId === filterCategory) &&
+    //         (filterStatus === "all" || item.status.toString() === filterStatus),
+    // );
 
     // ฟังก์ชันสำหรับจัดการข้อมูลใหม่
     const handleNewEquipmentChange = (
@@ -162,6 +154,7 @@ export default function EquipmentManagement() {
     const handleShowDetails = (equipment: any) => {
         setSelectedEquipment(equipment);
         setIsDetailsDialogOpen(true);
+        1;
     };
 
     const handleEditEquipment = (equipment: any) => {
