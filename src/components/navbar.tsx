@@ -2,6 +2,7 @@
 
 import { Bell, LogOut, User } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { use } from "react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -13,13 +14,22 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useUser } from "@/lib/auth";
 
 export function Navbar() {
+    const { userPromise } = useUser();
+    const user = use(userPromise);
+
     const router = useRouter();
 
-    const handleLogout = () => {
-        // TODO: Implement logout logic here
-        console.log("Logging out...");
+    const handleLogout = async () => {
+        const baseUrl = "http://localhost:8000";
+        const response = await fetch(`${baseUrl}/api/v1/auth/logout`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+        });
+        console.log(response);
         router.push("/login");
     };
 
@@ -48,7 +58,8 @@ export function Navbar() {
                                         alt="@somchai"
                                     />
                                     <AvatarFallback className="bg-blue-500 text-white">
-                                        สช
+                                        {user?.firstName?.charAt(0)}
+                                        {user?.lastName?.charAt(0)}
                                     </AvatarFallback>
                                 </Avatar>
                             </Button>
@@ -62,10 +73,10 @@ export function Navbar() {
                             <DropdownMenuLabel className="font-normal">
                                 <div className="flex flex-col space-y-1.5">
                                     <p className="text-sm font-medium leading-none">
-                                        สมชาย ใจดี
+                                        {user?.firstName} {user?.lastName}
                                     </p>
                                     <p className="text-xs leading-none text-muted-foreground">
-                                        somchai@example.com
+                                        {user?.email}
                                     </p>
                                 </div>
                             </DropdownMenuLabel>
