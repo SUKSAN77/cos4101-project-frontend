@@ -1,5 +1,5 @@
 import "./globals.css";
-
+import { Toaster } from "@/components/ui/sonner";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 
@@ -29,6 +29,7 @@ export default function RootLayout({
                 className={`${geistSans.variable} ${geistMono.variable} flex justify-center bg-slate-100 antialiased`}
             >
                 <div className="w-[100rem]">{children}</div>
+                <Toaster />
             </body>
         </html>
     );

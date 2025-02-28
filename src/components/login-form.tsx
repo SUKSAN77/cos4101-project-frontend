@@ -1,3 +1,12 @@
+"use client";
+
+import { zodResolver } from "@hookform/resolvers/zod";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { z } from "zod";
+
 import { Button } from "@/components/ui/button";
 import {
     Card,
@@ -6,9 +15,134 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
+import {
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
+
+const formSchema = z.object({
+    username: z
+        .string()
+        .email({
+            message: "Invalid email format.",
+        })
+        .max(320, {
+            message: "Email must be at most 320 characters.",
+        }),
+    password: z.string().min(4, {
+        message: "Password must be at least 4 characters.",
+    }),
+});
+
+export function LoginFormHandle() {
+    const router = useRouter();
+
+    const form = useForm<z.infer<typeof formSchema>>({
+        resolver: zodResolver(formSchema),
+        defaultValues: {
+            username: "",
+            password: "",
+        },
+    });
+
+    async function onSubmit(values: z.infer<typeof formSchema>) {
+        console.log(values.username, values.password);
+        const response = await fetch(
+            "http://localhost:8000/api/v1/auth/login",
+            {
+                method: "POST",
+                body: JSON.stringify(values),
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                credentials: "include",
+            },
+        );
+        // const data = await response.json();
+        if (response.ok) {
+            toast("Logged in successfully.");
+            // navigate();
+            router.push("/dashboard");
+        } else {
+            toast("Invalid username or password.");
+        }
+        // console.log(data);
+    }
+
+    return (
+        <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+                <FormField
+                    control={form.control}
+                    name="username"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>อีเมล</FormLabel>
+                            <FormControl>
+                                <Input
+                                    placeholder="cos@rumail.ru.ac.th"
+                                    type="email"
+                                    {...field}
+                                />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <FormField
+                    control={form.control}
+                    name="password"
+                    render={({ field }) => (
+                        <FormItem>
+                            <div className="flex items-center">
+                                <FormLabel>รหัสผ่าน</FormLabel>
+                                <Link
+                                    href="#"
+                                    className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
+                                >
+                                    ลืมรหัสผ่าน?
+                                </Link>
+                            </div>
+
+                            <FormControl>
+                                <Input
+                                    placeholder="********"
+                                    type="password"
+                                    {...field}
+                                />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <Button type="submit" className="w-full">
+                    เข้าสู่ระบบ
+                </Button>
+            </form>
+            <Button
+                onClick={() => {
+                    router.push("http://localhost:8000/api/v1/auth/google");
+                }}
+                variant="outline"
+                className="mt-5 w-full"
+            >
+                เข้าสู่ระบบด้วยบัญชี Google
+            </Button>
+            <div className="mt-4 text-center text-sm">
+                มีบัญชีแล้วหรือยัง?{" "}
+                <Link href="#" className="underline underline-offset-4">
+                    สมัครสมาชิก
+                </Link>
+            </div>
+        </Form>
+    );
+}
 
 export function LoginForm({
     className,
@@ -24,51 +158,7 @@ export function LoginForm({
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <form>
-                        <div className="flex flex-col gap-6">
-                            <div className="grid gap-2">
-                                <Label htmlFor="email">อีเมล</Label>
-                                <Input
-                                    id="email"
-                                    type="email"
-                                    placeholder="cos@rumail.ru.ac.th"
-                                    required
-                                />
-                            </div>
-                            <div className="grid gap-2">
-                                <div className="flex items-center">
-                                    <Label htmlFor="password">รหัสผ่าน</Label>
-                                    <a
-                                        href="#"
-                                        className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
-                                    >
-                                        ลืมรหัสผ่าน?
-                                    </a>
-                                </div>
-                                <Input
-                                    id="password"
-                                    type="password"
-                                    placeholder="********"
-                                    required
-                                />
-                            </div>
-                            <Button type="submit" className="w-full">
-                                เข้าสู่ระบบ
-                            </Button>
-                            <Button variant="outline" className="w-full">
-                                เข้าสู่ระบบด้วยบัญชี Google
-                            </Button>
-                        </div>
-                        <div className="mt-4 text-center text-sm">
-                            มีบัญชีแล้วหรือยัง?{" "}
-                            <a
-                                href="#"
-                                className="underline underline-offset-4"
-                            >
-                                สมัครสมาชิก
-                            </a>
-                        </div>
-                    </form>
+                    <LoginFormHandle />
                 </CardContent>
             </Card>
         </div>
