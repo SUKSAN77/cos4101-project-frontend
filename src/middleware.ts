@@ -12,9 +12,7 @@ export async function middleware(request: NextRequest) {
         return NextResponse.redirect(new URL("/login", request.url));
     }
 
-    const res = NextResponse.next();
-
-    return res;
+    return NextResponse.next();
 }
 
 export const config = {
