@@ -178,17 +178,14 @@ export const mockRooms = [
     {
         id: "ROOM201",
         roomNumber: "201",
-        createdAt: "2023-01-01T00:00:00.000Z",
     },
     {
         id: "ROOM211",
         roomNumber: "211",
-        createdAt: "2023-02-15T00:00:00.000Z",
     },
     {
         id: "ROOM204",
         roomNumber: "204",
-        createdAt: "2023-03-20T00:00:00.000Z",
     },
 ];
 

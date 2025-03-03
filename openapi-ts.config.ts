@@ -8,6 +8,7 @@ export default defineConfig({
         lint: "eslint",
         format: "prettier",
     },
+
     plugins: [
         ...defaultPlugins,
         {

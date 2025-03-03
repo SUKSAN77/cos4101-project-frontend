@@ -4,7 +4,6 @@ import { ChevronLeft, ChevronRight, Plus, Search } from "lucide-react";
 import { Trash2 } from "lucide-react";
 import { useState } from "react";
 
-import { mockCategories, mockEquipment, mockRooms } from "@/app/MockData";
 import {
     Accordion,
     AccordionContent,
@@ -35,6 +34,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
+import { useCategories, useEquipments, useRooms } from "@/hooks/api";
 
 const getRoleLabel = (role: number) => {
     switch (role) {
@@ -62,6 +62,10 @@ interface NewEquipment {
 }
 
 export default function EquipmentManagement() {
+    const { equipments } = useEquipments();
+    const { categories } = useCategories();
+    const { rooms } = useRooms();
+
     const [searchTerm, setSearchTerm] = useState("");
     const [filterCategory, setFilterCategory] = useState("");
     const [filterStatus, setFilterStatus] = useState("");
@@ -154,7 +158,6 @@ export default function EquipmentManagement() {
     const handleShowDetails = (equipment: any) => {
         setSelectedEquipment(equipment);
         setIsDetailsDialogOpen(true);
-        1;
     };
 
     const handleEditEquipment = (equipment: any) => {
@@ -178,12 +181,12 @@ export default function EquipmentManagement() {
 
     // เพิ่มฟังก์ชัน helper ก่อน return
     const getCategoryName = (categoryId: string) => {
-        const category = mockCategories.find((c) => c.id === categoryId);
+        const category = categories.find((c) => c.id === categoryId);
         return category ? category.name : categoryId;
     };
 
     const getRoomNumber = (roomId: string) => {
-        const room = mockRooms.find((r) => r.id === roomId);
+        const room = rooms.find((r) => r.id === roomId);
         return room ? `ห้อง ${room.roomNumber}` : roomId;
     };
 
@@ -221,7 +224,7 @@ export default function EquipmentManagement() {
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="all">ทั้งหมด</SelectItem>
-                            {mockCategories.map((category) => (
+                            {categories.map((category) => (
                                 <SelectItem
                                     key={category.id}
                                     value={category.id}
@@ -265,10 +268,10 @@ export default function EquipmentManagement() {
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
-                                        {mockEquipment.map((item) => (
+                                        {equipments.map((item) => (
                                             <TableRow key={item.id}>
                                                 <TableCell>
-                                                    {item.customId}
+                                                    {item.customId || "NULL"}
                                                 </TableCell>
                                                 <TableCell>
                                                     <button
@@ -283,10 +286,14 @@ export default function EquipmentManagement() {
                                                     </button>
                                                 </TableCell>
                                                 <TableCell>
-                                                    {getRoleLabel(item.status)}
+                                                    {getRoleLabel(
+                                                        item.status as number,
+                                                    )}
                                                 </TableCell>
                                                 <TableCell>
-                                                    {item.price.toLocaleString()}{" "}
+                                                    {(
+                                                        item.price as string
+                                                    ).toLocaleString()}{" "}
                                                     บาท
                                                 </TableCell>
                                                 <TableCell>
@@ -838,7 +845,7 @@ export default function EquipmentManagement() {
                                         <SelectValue />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        {mockRooms.map((room) => (
+                                        {rooms.map((room) => (
                                             <SelectItem
                                                 key={room.id}
                                                 value={room.id}
@@ -863,7 +870,7 @@ export default function EquipmentManagement() {
                                         <SelectValue />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        {mockCategories.map((category) => (
+                                        {categories.map((category) => (
                                             <SelectItem
                                                 key={category.id}
                                                 value={category.id}

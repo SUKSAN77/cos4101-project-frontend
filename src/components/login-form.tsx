@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
+import { AuthService } from "@/client";
 import { Button } from "@/components/ui/button";
 import {
     Card,
@@ -52,27 +53,15 @@ export function LoginFormHandle() {
     });
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
-        console.log(values.username, values.password);
-        const response = await fetch(
-            "http://localhost:8000/api/v1/auth/login",
-            {
-                method: "POST",
-                body: JSON.stringify(values),
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                credentials: "include",
-            },
-        );
-        // const data = await response.json();
+        const { response } = await AuthService.postApiV1AuthLogin({
+            body: values,
+        });
         if (response.ok) {
             toast("Logged in successfully.");
-            // navigate();
             router.push("/dashboard");
         } else {
             toast("Invalid username or password.");
         }
-        // console.log(data);
     }
 
     return (

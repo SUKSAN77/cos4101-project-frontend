@@ -2,24 +2,46 @@
 import { Plus, Search } from "lucide-react";
 import { useState } from "react";
 
-import { mockRooms } from "@/app/MockData";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table";
+import { useRooms } from "@/hooks/api";
+
+import TableData from "./TableData";
 
 export default function RoomManagement() {
     const [searchTerm, setSearchTerm] = useState("");
 
-    const filteredRooms = mockRooms.filter((room) =>
-        room.roomNumber.toLowerCase().includes(searchTerm.toLowerCase()),
+    const { rooms } = useRooms();
+
+    const filteredRooms = rooms.filter((room) =>
+        room.roomNumber.includes(searchTerm),
     );
+
+    const headers = [
+        {
+            head: "หมายเลขห้อง",
+            dataKey: "roomNumber",
+        },
+        {
+            head: "จัดการห้อง",
+            dataKey: "actions",
+
+            cellFormat: () => (
+                <div className="flex gap-2">
+                    <Button size="sm" variant="outline">
+                        แก้ไข
+                    </Button>
+                    <Button
+                        size="sm"
+                        variant="destructive"
+                        // onClick={() => handleDelete(row.id)}
+                    >
+                        ลบ
+                    </Button>
+                </div>
+            ),
+        },
+    ];
 
     return (
         <div className="space-y-6">
@@ -45,52 +67,10 @@ export default function RoomManagement() {
             <div className="-mx-4 overflow-x-auto sm:mx-0">
                 <div className="inline-block min-w-full align-middle">
                     <div className="overflow-hidden border border-gray-200 sm:rounded-lg">
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>หมายเลขห้อง</TableHead>
-                                    <TableHead>รายละเอียดครุภัณฑ์</TableHead>
-                                    <TableHead>วันที่สร้าง</TableHead>
-                                    <TableHead>การจัดการ</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {filteredRooms.map((room) => (
-                                    <TableRow key={room.id}>
-                                        <TableCell>{room.roomNumber}</TableCell>
-                                        <TableCell>
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                className="mr-2"
-                                            >
-                                                ดูรายละเอียด
-                                            </Button>
-                                        </TableCell>
-                                        <TableCell>
-                                            {new Date(
-                                                room.createdAt,
-                                            ).toLocaleDateString("th-TH")}
-                                        </TableCell>
-                                        <TableCell>
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                className="mr-2"
-                                            >
-                                                แก้ไข
-                                            </Button>
-                                            <Button
-                                                variant="destructive"
-                                                size="sm"
-                                            >
-                                                ลบ
-                                            </Button>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
+                        <TableData
+                            columns={headers}
+                            data={filteredRooms || []}
+                        />
                     </div>
                 </div>
             </div>
