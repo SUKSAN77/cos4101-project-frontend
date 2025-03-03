@@ -7,6 +7,7 @@ import {
     createConfig,
 } from "@hey-api/client-next";
 
+import { createClientConfig } from "../init-openapi";
 import type { ClientOptions } from "./types.gen";
 
 /**
@@ -23,7 +24,9 @@ export type CreateClientConfig<T extends DefaultClientOptions = ClientOptions> =
     ) => Config<Required<DefaultClientOptions> & T>;
 
 export const client = createClient(
-    createConfig<ClientOptions>({
-        baseUrl: "http://localhost:8000",
-    }),
+    createClientConfig(
+        createConfig<ClientOptions>({
+            baseUrl: "http://localhost:8000",
+        }),
+    ),
 );

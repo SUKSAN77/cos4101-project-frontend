@@ -78,13 +78,13 @@ export type GetApiV1UsersResponses = {
             id: string;
             email: string;
             emailVerified: boolean;
-            firstName: string | unknown;
-            lastName: string | unknown;
+            firstName: string | null;
+            lastName: string | null;
             role: string | number;
             isActive: boolean;
             createdAt: unknown | string | number;
             updatedAt: unknown | string | number;
-            deletedAt: (unknown | string | number) | unknown;
+            deletedAt: (unknown | string | number) | null;
         }>;
         pagination: {
             total: number;
@@ -126,13 +126,13 @@ export type PostApiV1UsersResponses = {
         id: string;
         email: string;
         emailVerified: boolean;
-        firstName: string | unknown;
-        lastName: string | unknown;
+        firstName: string | null;
+        lastName: string | null;
         role: string | number;
         isActive: boolean;
         createdAt: unknown | string | number;
         updatedAt: unknown | string | number;
-        deletedAt: (unknown | string | number) | unknown;
+        deletedAt: (unknown | string | number) | null;
     };
 };
 
@@ -189,13 +189,13 @@ export type GetApiV1UsersByIdResponses = {
         id: string;
         email: string;
         emailVerified: boolean;
-        firstName: string | unknown;
-        lastName: string | unknown;
+        firstName: string | null;
+        lastName: string | null;
         role: string | number;
         isActive: boolean;
         createdAt: unknown | string | number;
         updatedAt: unknown | string | number;
-        deletedAt: (unknown | string | number) | unknown;
+        deletedAt: (unknown | string | number) | null;
     };
 };
 
@@ -233,13 +233,13 @@ export type PatchApiV1UsersByIdResponses = {
         id: string;
         email: string;
         emailVerified: boolean;
-        firstName: string | unknown;
-        lastName: string | unknown;
+        firstName: string | null;
+        lastName: string | null;
         role: string | number;
         isActive: boolean;
         createdAt: unknown | string | number;
         updatedAt: unknown | string | number;
-        deletedAt: (unknown | string | number) | unknown;
+        deletedAt: (unknown | string | number) | null;
     };
 };
 
@@ -258,13 +258,13 @@ export type GetApiV1UsersMeResponses = {
         id: string;
         email: string;
         emailVerified: boolean;
-        firstName: string | unknown;
-        lastName: string | unknown;
+        firstName: string | null;
+        lastName: string | null;
         role: string | number;
         isActive: boolean;
         createdAt: unknown | string | number;
         updatedAt: unknown | string | number;
-        deletedAt: (unknown | string | number) | unknown;
+        deletedAt: (unknown | string | number) | null;
     };
 };
 
@@ -286,13 +286,13 @@ export type PatchApiV1UsersMeResponses = {
         id: string;
         email: string;
         emailVerified: boolean;
-        firstName: string | unknown;
-        lastName: string | unknown;
+        firstName: string | null;
+        lastName: string | null;
         role: string | number;
         isActive: boolean;
         createdAt: unknown | string | number;
         updatedAt: unknown | string | number;
-        deletedAt: (unknown | string | number) | unknown;
+        deletedAt: (unknown | string | number) | null;
     };
 };
 
@@ -672,33 +672,29 @@ export type GetApiV1EquipmentsResponses = {
         data: Array<{
             id: string;
             name: string;
-            description: string | unknown;
+            description: string | null;
             price: unknown;
             lifetime: string | number;
             status: string | number;
-            notes: string | unknown;
+            notes: string | null;
             createdAt: unknown | string | number;
             updatedAt: unknown | string | number;
-            deletedAt: (unknown | string | number) | unknown;
-            serialNumber: string | unknown;
+            deletedAt: (unknown | string | number) | null;
+            serialNumber: string | null;
             acquisitionMethod: string;
-            disposalDate: (unknown | string | number) | unknown;
-            createdBy: string | unknown;
-            creator?:
-                | {
-                      id: string;
-                      email: string;
-                      firstName: string | unknown;
-                      lastName: string | unknown;
-                  }
-                | unknown;
-            roomId: string | unknown;
-            room?:
-                | {
-                      id: string;
-                      roomNumber: string;
-                  }
-                | unknown;
+            disposalDate: (unknown | string | number) | null;
+            createdBy: string | null;
+            creator?: {
+                id: string;
+                email: string;
+                firstName: string | null;
+                lastName: string | null;
+            } | null;
+            roomId: string | null;
+            room?: {
+                id: string;
+                roomNumber: string;
+            } | null;
         }>;
         pagination: {
             total: number;
@@ -744,33 +740,29 @@ export type PostApiV1EquipmentsResponses = {
     201: {
         id: string;
         name: string;
-        description: string | unknown;
+        description: string | null;
         price: unknown;
         lifetime: string | number;
         status: string | number;
-        notes: string | unknown;
+        notes: string | null;
         createdAt: unknown | string | number;
         updatedAt: unknown | string | number;
-        deletedAt: (unknown | string | number) | unknown;
-        serialNumber: string | unknown;
+        deletedAt: (unknown | string | number) | null;
+        serialNumber: string | null;
         acquisitionMethod: string;
-        disposalDate: (unknown | string | number) | unknown;
-        createdBy: string | unknown;
-        creator?:
-            | {
-                  id: string;
-                  email: string;
-                  firstName: string | unknown;
-                  lastName: string | unknown;
-              }
-            | unknown;
-        roomId: string | unknown;
-        room?:
-            | {
-                  id: string;
-                  roomNumber: string;
-              }
-            | unknown;
+        disposalDate: (unknown | string | number) | null;
+        createdBy: string | null;
+        creator?: {
+            id: string;
+            email: string;
+            firstName: string | null;
+            lastName: string | null;
+        } | null;
+        roomId: string | null;
+        room?: {
+            id: string;
+            roomNumber: string;
+        } | null;
     };
 };
 
@@ -829,33 +821,29 @@ export type GetApiV1EquipmentsByIdResponses = {
     200: {
         id: string;
         name: string;
-        description: string | unknown;
+        description: string | null;
         price: unknown;
         lifetime: string | number;
         status: string | number;
-        notes: string | unknown;
+        notes: string | null;
         createdAt: unknown | string | number;
         updatedAt: unknown | string | number;
-        deletedAt: (unknown | string | number) | unknown;
-        serialNumber: string | unknown;
+        deletedAt: (unknown | string | number) | null;
+        serialNumber: string | null;
         acquisitionMethod: string;
-        disposalDate: (unknown | string | number) | unknown;
-        createdBy: string | unknown;
-        creator?:
-            | {
-                  id: string;
-                  email: string;
-                  firstName: string | unknown;
-                  lastName: string | unknown;
-              }
-            | unknown;
-        roomId: string | unknown;
-        room?:
-            | {
-                  id: string;
-                  roomNumber: string;
-              }
-            | unknown;
+        disposalDate: (unknown | string | number) | null;
+        createdBy: string | null;
+        creator?: {
+            id: string;
+            email: string;
+            firstName: string | null;
+            lastName: string | null;
+        } | null;
+        roomId: string | null;
+        room?: {
+            id: string;
+            roomNumber: string;
+        } | null;
     };
 };
 
@@ -895,33 +883,29 @@ export type PatchApiV1EquipmentsByIdResponses = {
     200: {
         id: string;
         name: string;
-        description: string | unknown;
+        description: string | null;
         price: unknown;
         lifetime: string | number;
         status: string | number;
-        notes: string | unknown;
+        notes: string | null;
         createdAt: unknown | string | number;
         updatedAt: unknown | string | number;
-        deletedAt: (unknown | string | number) | unknown;
-        serialNumber: string | unknown;
+        deletedAt: (unknown | string | number) | null;
+        serialNumber: string | null;
         acquisitionMethod: string;
-        disposalDate: (unknown | string | number) | unknown;
-        createdBy: string | unknown;
-        creator?:
-            | {
-                  id: string;
-                  email: string;
-                  firstName: string | unknown;
-                  lastName: string | unknown;
-              }
-            | unknown;
-        roomId: string | unknown;
-        room?:
-            | {
-                  id: string;
-                  roomNumber: string;
-              }
-            | unknown;
+        disposalDate: (unknown | string | number) | null;
+        createdBy: string | null;
+        creator?: {
+            id: string;
+            email: string;
+            firstName: string | null;
+            lastName: string | null;
+        } | null;
+        roomId: string | null;
+        room?: {
+            id: string;
+            roomNumber: string;
+        } | null;
     };
 };
 
