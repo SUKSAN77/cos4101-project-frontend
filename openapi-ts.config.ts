@@ -12,7 +12,7 @@ export default defineConfig({
         ...defaultPlugins,
         {
             name: "@hey-api/client-next",
-            runtimeConfigPath: "src/init-openapi.ts",
+            runtimeConfigPath: "./src/init-openapi.ts",
         },
         // "zod",
         {
