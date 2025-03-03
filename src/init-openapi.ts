@@ -1,6 +1,7 @@
-import { client } from "@/client/client.gen";
+import type { CreateClientConfig } from "./client/client.gen";
 
-client.setConfig({
+export const createClientConfig: CreateClientConfig = (config) => ({
+    ...config,
     baseUrl: "http://localhost:8000",
     credentials: "include",
 });
