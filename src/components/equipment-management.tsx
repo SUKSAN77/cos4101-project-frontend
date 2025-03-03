@@ -1,6 +1,13 @@
 "use client";
 
-import { ChevronLeft, ChevronRight, Plus, Search } from "lucide-react";
+import {
+    ChevronLeft,
+    ChevronRight,
+    Image,
+    Plus,
+    Search,
+    X,
+} from "lucide-react";
 import { Trash2 } from "lucide-react";
 import { useState } from "react";
 
@@ -59,6 +66,7 @@ interface NewEquipment {
     acquisitionMethod: string;
     acquiredDate: string;
     notes: string;
+    image?: File | null; // Add this line
 }
 
 export default function EquipmentManagement() {
@@ -82,6 +90,7 @@ export default function EquipmentManagement() {
     const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
     const [editingEquipment, setEditingEquipment] = useState<any>(null);
+    const [isImageViewerOpen, setIsImageViewerOpen] = useState(false);
 
     // const filteredEquipment = mockEquipment.filter(
     //     (item) =>
@@ -97,7 +106,7 @@ export default function EquipmentManagement() {
     const handleNewEquipmentChange = (
         index: number,
         field: keyof NewEquipment,
-        value: string,
+        value: string | File | null,
     ) => {
         const updatedEquipment = [...newEquipment];
         updatedEquipment[index] = {
@@ -167,11 +176,37 @@ export default function EquipmentManagement() {
             ...editingEquipment,
             [field]: value,
         });
+        
+        // Clean up URL when component unmounts
+        if (field === "imageUrl" && !value) {
+            URL.revokeObjectURL(editingEquipment.imageUrl);
+        }
     };
 
     const handleSaveEdit = () => {
-        // TODO: Implement save edit logic here
-        console.log("Saving edited equipment:", editingEquipment);
+        // Create FormData if there's a new image
+        if (editingEquipment.imageFile) {
+            const formData = new FormData();
+            formData.append("image", editingEquipment.imageFile);
+            // Add other equipment data to formData
+            Object.keys(editingEquipment).forEach(key => {
+                if (key !== "imageFile" && key !== "imageUrl") {
+                    formData.append(key, editingEquipment[key]);
+                }
+            });
+            
+            // TODO: Send formData to API
+            console.log("Saving edited equipment with new image:", formData);
+        } else {
+            // Send regular JSON if no new image
+            console.log("Saving edited equipment:", editingEquipment);
+        }
+        
+        // Clean up any object URLs
+        if (editingEquipment.imageUrl) {
+            URL.revokeObjectURL(editingEquipment.imageUrl);
+        }
+        
         setIsEditDialogOpen(false);
         setEditingEquipment(null);
     };
@@ -534,6 +569,53 @@ export default function EquipmentManagement() {
                                                     placeholder="หมายเหตุ"
                                                 />
                                             </div>
+                                            <div className="space-y-2">
+                                                <label className="text-sm font-medium">
+                                                    รูปภาพครุภัณฑ์
+                                                </label>
+                                                <div className="flex items-center gap-4">
+                                                    <Input
+                                                        type="file"
+                                                        accept="image/*"
+                                                        onChange={(e) => {
+                                                            const file =
+                                                                e.target
+                                                                    .files?.[0];
+                                                            handleNewEquipmentChange(
+                                                                index,
+                                                                "image",
+                                                                file || null,
+                                                            );
+                                                        }}
+                                                        className="flex-1"
+                                                    />
+                                                    {item.image && (
+                                                        <div className="relative h-20 w-20">
+                                                            <img
+                                                                src={URL.createObjectURL(
+                                                                    item.image,
+                                                                )}
+                                                                alt="Equipment preview"
+                                                                className="h-full w-full rounded-md object-cover"
+                                                            />
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="sm"
+                                                                className="absolute -right-2 -top-2 h-6 w-6 rounded-full p-0"
+                                                                onClick={() =>
+                                                                    handleNewEquipmentChange(
+                                                                        index,
+                                                                        "image",
+                                                                        null,
+                                                                    )
+                                                                }
+                                                            >
+                                                                <X className="h-4 w-4" />
+                                                            </Button>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
                                         </div>
                                     </AccordionContent>
                                 </AccordionItem>
@@ -657,6 +739,28 @@ export default function EquipmentManagement() {
                                         selectedEquipment.categoryId,
                                     )}
                                 </span>
+                            </div>
+                            <div className="grid grid-cols-4 items-center gap-4">
+                                <span className="font-medium">รูปภาพ:</span>
+                                <div className="col-span-3">
+                                    {selectedEquipment.imageUrl ? (
+                                        <Button
+                                            variant="outline"
+                                            onClick={() => {
+                                                // Create a new dialog for image viewing
+                                                setIsImageViewerOpen(true);
+                                            }}
+                                            className="flex items-center gap-2"
+                                        >
+                                            <Image className="h-4 w-4" />
+                                            ดูรูปภาพ
+                                        </Button>
+                                    ) : (
+                                        <span className="text-gray-500">
+                                            ไม่มีรูปภาพ
+                                        </span>
+                                    )}
+                                </div>
                             </div>
                         </div>
                         <DialogFooter>
@@ -874,6 +978,63 @@ export default function EquipmentManagement() {
                                     </SelectContent>
                                 </Select>
                             </div>
+                            <div className="grid gap-2">
+                                <label className="text-sm font-medium">
+                                    รูปภาพครุภัณฑ์
+                                </label>
+                                <div className="flex items-center gap-4">
+                                    {editingEquipment.imageUrl ? (
+                                        <div className="relative h-32 w-32">
+                                            <img
+                                                src={
+                                                    editingEquipment.imageUrl
+                                                }
+                                                alt="Equipment"
+                                                className="h-full w-full rounded-md object-cover"
+                                            />
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                className="absolute -right-2 -top-2 h-6 w-6 rounded-full p-0"
+                                                onClick={() =>
+                                                    handleEditChange(
+                                                        "imageUrl",
+                                                        null,
+                                                    )
+                                                }
+                                            >
+                                                <X className="h-4 w-4" />
+                                            </Button>
+                                        </div>
+                                    ) : (
+                                        <div className="flex-1">
+                                            <Input
+                                                type="file"
+                                                accept="image/*"
+                                                onChange={(e) => {
+                                                    const file =
+                                                        e.target.files?.[0];
+                                                    if (file) {
+                                                        // Create a temporary URL for preview
+                                                        const imageUrl =
+                                                            URL.createObjectURL(
+                                                                file,
+                                                            );
+                                                        handleEditChange(
+                                                            "imageUrl",
+                                                            imageUrl,
+                                                        );
+                                                        handleEditChange(
+                                                            "imageFile",
+                                                            file,
+                                                        );
+                                                    }
+                                                }}
+                                            />
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
                         </div>
                         <DialogFooter className="sticky bottom-0 border-t bg-white py-4">
                             <Button
@@ -892,6 +1053,28 @@ export default function EquipmentManagement() {
                     </DialogContent>
                 </Dialog>
             )}
+
+            <Dialog
+                open={isImageViewerOpen}
+                onOpenChange={setIsImageViewerOpen}
+            >
+                <DialogContent className="max-h-[90vh] max-w-[90vw] p-0">
+                    <div className="relative h-full w-full">
+                        <img
+                            src={selectedEquipment?.imageUrl}
+                            alt={selectedEquipment?.name}
+                            className="h-full w-full object-contain"
+                        />
+                        <Button
+                            variant="ghost"
+                            className="absolute right-2 top-2"
+                            onClick={() => setIsImageViewerOpen(false)}
+                        >
+                            <X className="h-6 w-6" />
+                        </Button>
+                    </div>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }
