@@ -673,6 +673,7 @@ export type GetApiV1EquipmentsResponses = {
             id: string;
             name: string;
             description: string | null;
+            customId: string;
             price: unknown;
             lifetime: string | number;
             status: string | number;
@@ -681,6 +682,7 @@ export type GetApiV1EquipmentsResponses = {
             updatedAt: unknown | string | number;
             deletedAt: (unknown | string | number) | null;
             serialNumber: string | null;
+            acquiredDate: unknown | string | number;
             acquisitionMethod: string;
             disposalDate: (unknown | string | number) | null;
             createdBy: string | null;
@@ -741,6 +743,7 @@ export type PostApiV1EquipmentsResponses = {
         id: string;
         name: string;
         description: string | null;
+        customId: string;
         price: unknown;
         lifetime: string | number;
         status: string | number;
@@ -749,6 +752,7 @@ export type PostApiV1EquipmentsResponses = {
         updatedAt: unknown | string | number;
         deletedAt: (unknown | string | number) | null;
         serialNumber: string | null;
+        acquiredDate: unknown | string | number;
         acquisitionMethod: string;
         disposalDate: (unknown | string | number) | null;
         createdBy: string | null;
@@ -822,6 +826,7 @@ export type GetApiV1EquipmentsByIdResponses = {
         id: string;
         name: string;
         description: string | null;
+        customId: string;
         price: unknown;
         lifetime: string | number;
         status: string | number;
@@ -830,6 +835,7 @@ export type GetApiV1EquipmentsByIdResponses = {
         updatedAt: unknown | string | number;
         deletedAt: (unknown | string | number) | null;
         serialNumber: string | null;
+        acquiredDate: unknown | string | number;
         acquisitionMethod: string;
         disposalDate: (unknown | string | number) | null;
         createdBy: string | null;
@@ -884,6 +890,7 @@ export type PatchApiV1EquipmentsByIdResponses = {
         id: string;
         name: string;
         description: string | null;
+        customId: string;
         price: unknown;
         lifetime: string | number;
         status: string | number;
@@ -892,6 +899,7 @@ export type PatchApiV1EquipmentsByIdResponses = {
         updatedAt: unknown | string | number;
         deletedAt: (unknown | string | number) | null;
         serialNumber: string | null;
+        acquiredDate: unknown | string | number;
         acquisitionMethod: string;
         disposalDate: (unknown | string | number) | null;
         createdBy: string | null;
