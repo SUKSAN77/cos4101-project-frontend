@@ -1,16 +1,19 @@
-import React from "react";
+import { cookies } from "next/headers";
 
-import { AuthService } from "@/client";
+import { BarChartComponent } from "@/components/chart-bar-multiple";
+import { PieChartComponent } from "@/components/chart-pie-donut-text";
+import Layout from "@/components/layout";
 
-async function Page() {
-    const { data, error } = await AuthService.postApiV1AuthLogin({
-        body: {
-            username: "stacia.customer1@gmail.com",
-            password: "testtest",
-        },
-    });
-    console.log(data, error);
-    return <div>Page</div>;
+export default async function Page() {
+    const cookieStore = await cookies();
+    const myData = cookieStore.get("myData")?.value || "ไม่มีข้อมูลในคุกกี้";
+
+    return (
+        <div>
+            <Layout>
+                <PieChartComponent />
+                <BarChartComponent />
+            </Layout>
+        </div>
+    );
 }
-
-export default Page;

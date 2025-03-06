@@ -96,16 +96,6 @@ export default function EquipmentManagement() {
     const [editingEquipment, setEditingEquipment] = useState<any>(null);
     const [isImageViewerOpen, setIsImageViewerOpen] = useState(false);
 
-    // const filteredEquipment = mockEquipment.filter(
-    //     (item) =>
-    //         (item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    //             item.customId
-    //                 .toLowerCase()
-    //                 .includes(searchTerm.toLowerCase())) &&
-    //         (filterCategory === "all" || item.categoryId === filterCategory) &&
-    //         (filterStatus === "all" || item.status.toString() === filterStatus),
-    // );
-
     // ฟังก์ชันสำหรับจัดการข้อมูลใหม่
     const handleNewEquipmentChange = (
         index: number,
@@ -179,7 +169,7 @@ export default function EquipmentManagement() {
             ...editingEquipment,
             [field]: value,
         });
-        
+
         // Clean up URL when component unmounts
         if (field === "imageUrl" && !value) {
             URL.revokeObjectURL(editingEquipment.imageUrl);
@@ -192,24 +182,24 @@ export default function EquipmentManagement() {
             const formData = new FormData();
             formData.append("image", editingEquipment.imageFile);
             // Add other equipment data to formData
-            Object.keys(editingEquipment).forEach(key => {
+            Object.keys(editingEquipment).forEach((key) => {
                 if (key !== "imageFile" && key !== "imageUrl") {
                     formData.append(key, editingEquipment[key]);
                 }
             });
-            
+
             // TODO: Send formData to API
             console.log("Saving edited equipment with new image:", formData);
         } else {
             // Send regular JSON if no new image
             console.log("Saving edited equipment:", editingEquipment);
         }
-        
+
         // Clean up any object URLs
         if (editingEquipment.imageUrl) {
             URL.revokeObjectURL(editingEquipment.imageUrl);
         }
-        
+
         setIsEditDialogOpen(false);
         setEditingEquipment(null);
     };
@@ -333,7 +323,10 @@ export default function EquipmentManagement() {
                                                 </TableCell>
                                                 <TableCell>
                                                     {new Date(
-                                                        item.acquiredDate,
+                                                        item.acquiredDate as
+                                                            | string
+                                                            | number
+                                                            | Date,
                                                     ).toLocaleDateString(
                                                         "th-TH",
                                                     )}
@@ -993,9 +986,7 @@ export default function EquipmentManagement() {
                                     {editingEquipment.imageUrl ? (
                                         <div className="relative h-32 w-32">
                                             <img
-                                                src={
-                                                    editingEquipment.imageUrl
-                                                }
+                                                src={editingEquipment.imageUrl}
                                                 alt="Equipment"
                                                 className="h-full w-full rounded-md object-cover"
                                             />

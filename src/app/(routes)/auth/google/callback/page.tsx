@@ -3,6 +3,8 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef } from "react";
 
+import { AuthService } from "@/client";
+
 export default function Page() {
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -16,24 +18,16 @@ export default function Page() {
                 if (called.current) return;
                 called.current = true;
                 if (code) {
-                    const response = await fetch(
-                        "http://localhost:8000/api/v1/auth/google/callback",
-                        {
-                            method: "POST",
+                    const { response } =
+                        await AuthService.postApiV1AuthGoogleCallback({
+                            body: { code: code },
+                            headers: { "Content-Type": "application/json" },
                             credentials: "include",
-                            headers: {
-                                "Content-Type": "application/json",
-                            },
-                            body: JSON.stringify({
-                                code: code,
-                            }),
-                        },
-                    );
-                    console.log(response);
+                        });
                     if (response.ok) {
                         router.push("/dashboard");
-                    } else {
                     }
+                    console.log(response);
                 }
             } catch (err) {
                 console.error(err);

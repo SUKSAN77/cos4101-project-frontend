@@ -2,26 +2,14 @@
 
 import { cookies } from "next/headers";
 
-// TODO: move User type to a shared location
-export type User = {
-    id: string;
-    email: string;
-    firstName: string | null;
-    lastName: string | null;
-};
+import { PatchApiV1UsersByIdResponse as User, UsersService } from "@/client";
 
 export async function getUser(): Promise<User> {
     const cookieStore = await cookies();
-    const baseUrl = "http://localhost:8000";
-    const response = await fetch(`${baseUrl}/api/v1/users/me`, {
-        method: "GET",
-        credentials: "include",
+    const { data } = await UsersService.getApiV1UsersMe({
         headers: {
-            "Content-Type": "application/json",
             cookie: cookieStore.toString(),
         },
     });
-    const data = await response.json();
-    // console.log(data);
-    return data;
+    return data as User;
 }

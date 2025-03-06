@@ -2,7 +2,7 @@
 
 import { createContext, ReactNode, useContext } from "react";
 
-import { type User } from "@/lib/actions/users";
+import { PatchApiV1UsersByIdResponse as User } from "@/client";
 
 type UserContextType = {
     userPromise: Promise<User | null>;

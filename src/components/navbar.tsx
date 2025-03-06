@@ -4,7 +4,8 @@ import { Bell, LogOut, User } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { use } from "react";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { AuthService } from "@/client";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
@@ -23,13 +24,11 @@ export function Navbar() {
     const router = useRouter();
 
     const handleLogout = async () => {
-        const baseUrl = "http://localhost:8000";
-        const response = await fetch(`${baseUrl}/api/v1/auth/logout`, {
-            method: "POST",
+        const { data } = await AuthService.postApiV1AuthLogout({
             headers: { "Content-Type": "application/json" },
             credentials: "include",
         });
-        console.log(response);
+        console.log(data);
         router.push("/login");
     };
 
@@ -53,10 +52,6 @@ export function Navbar() {
                                 className="relative h-9 w-9 rounded-full transition-colors duration-200 hover:bg-gray-100"
                             >
                                 <Avatar className="h-9 w-9 ring-2 ring-gray-100">
-                                    <AvatarImage
-                                        src="/avatars/01.png"
-                                        alt="@somchai"
-                                    />
                                     <AvatarFallback className="bg-blue-500 text-white">
                                         {user?.firstName?.charAt(0)}
                                         {user?.lastName?.charAt(0)}

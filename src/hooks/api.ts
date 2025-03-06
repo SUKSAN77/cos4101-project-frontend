@@ -84,7 +84,9 @@ export const useUsers = () => {
                     offset: (page - 1) * limit,
                 },
             });
-            if (data) setUsers(data.data);
+            if (data?.data) {
+                setUsers(data.data);
+            }
             if (error) {
                 console.error(error);
             }
@@ -92,7 +94,7 @@ export const useUsers = () => {
 
         fetchUsers();
     }, [page, limit]);
-    return { users, setPage, setLimit };
+    return { users, setUsers, setPage, setLimit };
 };
 
 export const useCategories = () => {
