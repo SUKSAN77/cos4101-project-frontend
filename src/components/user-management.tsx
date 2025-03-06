@@ -140,17 +140,6 @@ export default function UserManagement() {
                 body: { isActive: !isActive },
             });
 
-            // const response = await fetch(
-            //     `http://localhost:8000/api/v1/users/${user_id}`,
-            //     {
-            //         method: "PATCH",
-            //         headers: {
-            //             "Content-Type": "application/json",
-            //         },
-            //         body: JSON.stringify({ isActive: !isActive }),
-            //     },
-            // );
-
             if (!response.ok) {
                 throw new Error("Failed to update user");
             }
