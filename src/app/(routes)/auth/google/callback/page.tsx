@@ -1,40 +1,40 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
-import { useRef, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useRef } from "react";
+
+import { AuthService } from "@/client";
 
 export default function Page() {
-	const searchParams = useSearchParams();
-	const called = useRef(false);
-	const code = searchParams.get("code");
-	// const state = searchParams.get("state");
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const called = useRef(false);
+    const code = searchParams.get("code");
+    // const state = searchParams.get("state");
 
-	useEffect(() => {
-		(async () => {
-			try {
-				if (called.current) return;
-				called.current = true;
-				if (code) {
-					const response = await fetch(
-						"http://localhost:8000/api/v1/auth/google/callback",
-						{
-							method: "POST",
-							credentials: "include",
-							headers: {
-								"Content-Type": "application/json",
-							},
-							body: JSON.stringify({
-								code: code,
-							}),
-						},
-					);
-					console.log(response);
-				}
-			} catch (err) {
-				console.error(err);
-			}
-		})();
-	}, [code]);
+    useEffect(() => {
+        const handleCallback = async () => {
+            try {
+                if (called.current) return;
+                called.current = true;
+                if (code) {
+                    const { response } =
+                        await AuthService.postApiV1AuthGoogleCallback({
+                            body: { code: code },
+                            headers: { "Content-Type": "application/json" },
+                            credentials: "include",
+                        });
+                    if (response.ok) {
+                        router.push("/dashboard");
+                    }
+                    console.log(response);
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        };
+        handleCallback();
+    }, [code, router]);
 
-	return <div>Redirecting...</div>;
+    return <div>Redirecting...</div>;
 }
