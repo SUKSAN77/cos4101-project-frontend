@@ -8,10 +8,11 @@ import {
     GetApiV1CategoriesResponses,
     GetApiV1EquipmentsResponses,
     GetApiV1RoomsResponses,
-    GetApiV1UsersResponses,
     RoomsService,
     UsersService,
 } from "@/client";
+
+import { User } from "./interface";
 
 // export const useEquipments = () => {
 //     const [equipments, setEquipments] = useState<
@@ -62,8 +63,9 @@ export const useEquipments = () => {
                 },
             });
             if (data) setEquipments(data.data);
-            if (error) {
-                console.error(error);
+
+            if (error?.message === "Could not validate credentials") {
+                console.log(error?.message);
             }
         };
 
@@ -75,7 +77,7 @@ export const useEquipments = () => {
 export const useUsers = () => {
     const [page, setPage] = useState(1);
     const [limit, setLimit] = useState(100);
-    const [users, setUsers] = useState<GetApiV1UsersResponses[200]["data"]>([]);
+    const [users, setUsers] = useState<User[]>([]);
     useEffect(() => {
         const fetchUsers = async () => {
             const { data, error } = await UsersService.getApiV1Users({
@@ -87,8 +89,9 @@ export const useUsers = () => {
             if (data?.data) {
                 setUsers(data.data);
             }
-            if (error) {
-                console.error(error);
+
+            if (error?.message === "Could not validate credentials") {
+                console.log(error?.message);
             }
         };
 

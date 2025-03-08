@@ -58,7 +58,7 @@ export function LoginFormHandle() {
         });
         if (response.ok) {
             toast("Logged in successfully.");
-            router.push("/dashboard");
+            router.push("/");
         } else {
             toast("Invalid username or password.");
         }
