@@ -21,26 +21,32 @@ import type {
     DeleteApiV1UsersByIdError,
     DeleteApiV1UsersByIdResponse,
     GetApiV1AuthGoogleData,
+    GetApiV1AuthGoogleError,
     GetApiV1CategoriesByIdData,
     GetApiV1CategoriesByIdError,
     GetApiV1CategoriesByIdResponse,
     GetApiV1CategoriesData,
+    GetApiV1CategoriesError,
     GetApiV1CategoriesResponse,
     GetApiV1EquipmentsByIdData,
     GetApiV1EquipmentsByIdError,
     GetApiV1EquipmentsByIdResponse,
     GetApiV1EquipmentsData,
+    GetApiV1EquipmentsError,
     GetApiV1EquipmentsResponse,
     GetApiV1RoomsByIdData,
     GetApiV1RoomsByIdError,
     GetApiV1RoomsByIdResponse,
     GetApiV1RoomsData,
+    GetApiV1RoomsError,
     GetApiV1RoomsResponse,
     GetApiV1UsersByIdData,
     GetApiV1UsersByIdError,
     GetApiV1UsersByIdResponse,
     GetApiV1UsersData,
+    GetApiV1UsersError,
     GetApiV1UsersMeData,
+    GetApiV1UsersMeError,
     GetApiV1UsersMeResponse,
     GetApiV1UsersResponse,
     PatchApiV1CategoriesByIdData,
@@ -56,18 +62,24 @@ import type {
     PatchApiV1UsersByIdError,
     PatchApiV1UsersByIdResponse,
     PatchApiV1UsersMeData,
+    PatchApiV1UsersMeError,
     PatchApiV1UsersMePasswordData,
     PatchApiV1UsersMePasswordError,
     PatchApiV1UsersMePasswordResponse,
     PatchApiV1UsersMeResponse,
     PostApiV1AuthGoogleCallbackData,
+    PostApiV1AuthGoogleCallbackError,
     PostApiV1AuthGoogleCallbackResponse,
     PostApiV1AuthLoginData,
+    PostApiV1AuthLoginError,
     PostApiV1AuthLogoutData,
+    PostApiV1AuthLogoutError,
     PostApiV1AuthLogoutResponse,
     PostApiV1CategoriesData,
     PostApiV1CategoriesError,
     PostApiV1CategoriesResponse,
+    PostApiV1EquipmentsByIdImagesData,
+    PostApiV1EquipmentsByIdImagesError,
     PostApiV1EquipmentsData,
     PostApiV1EquipmentsError,
     PostApiV1EquipmentsResponse,
@@ -105,7 +117,7 @@ export class AuthService {
     ) {
         return (options.client ?? _heyApiClient).post<
             unknown,
-            unknown,
+            PostApiV1AuthLoginError,
             ThrowOnError
         >({
             url: "/api/v1/auth/login",
@@ -122,7 +134,7 @@ export class AuthService {
     ) {
         return (options?.client ?? _heyApiClient).get<
             unknown,
-            unknown,
+            GetApiV1AuthGoogleError,
             ThrowOnError
         >({
             url: "/api/v1/auth/google",
@@ -135,7 +147,7 @@ export class AuthService {
     >(options: Options<PostApiV1AuthGoogleCallbackData, ThrowOnError>) {
         return (options.client ?? _heyApiClient).post<
             PostApiV1AuthGoogleCallbackResponse,
-            unknown,
+            PostApiV1AuthGoogleCallbackError,
             ThrowOnError
         >({
             url: "/api/v1/auth/google/callback",
@@ -152,7 +164,7 @@ export class AuthService {
     ) {
         return (options?.client ?? _heyApiClient).post<
             PostApiV1AuthLogoutResponse,
-            unknown,
+            PostApiV1AuthLogoutError,
             ThrowOnError
         >({
             url: "/api/v1/auth/logout",
@@ -167,7 +179,7 @@ export class UsersService {
     ) {
         return (options.client ?? _heyApiClient).get<
             GetApiV1UsersResponse,
-            unknown,
+            GetApiV1UsersError,
             ThrowOnError
         >({
             url: "/api/v1/users/",
@@ -240,7 +252,7 @@ export class UsersService {
     ) {
         return (options?.client ?? _heyApiClient).get<
             GetApiV1UsersMeResponse,
-            unknown,
+            GetApiV1UsersMeError,
             ThrowOnError
         >({
             url: "/api/v1/users/me",
@@ -253,7 +265,7 @@ export class UsersService {
     ) {
         return (options.client ?? _heyApiClient).patch<
             PatchApiV1UsersMeResponse,
-            unknown,
+            PatchApiV1UsersMeError,
             ThrowOnError
         >({
             url: "/api/v1/users/me",
@@ -306,7 +318,7 @@ export class CategoriesService {
     ) {
         return (options.client ?? _heyApiClient).get<
             GetApiV1CategoriesResponse,
-            unknown,
+            GetApiV1CategoriesError,
             ThrowOnError
         >({
             url: "/api/v1/categories/",
@@ -381,7 +393,7 @@ export class RoomsService {
     ) {
         return (options.client ?? _heyApiClient).get<
             GetApiV1RoomsResponse,
-            unknown,
+            GetApiV1RoomsError,
             ThrowOnError
         >({
             url: "/api/v1/rooms/",
@@ -456,7 +468,7 @@ export class EquipmentsService {
     ) {
         return (options.client ?? _heyApiClient).get<
             GetApiV1EquipmentsResponse,
-            unknown,
+            GetApiV1EquipmentsError,
             ThrowOnError
         >({
             url: "/api/v1/equipments/",
@@ -516,6 +528,23 @@ export class EquipmentsService {
             ThrowOnError
         >({
             url: "/api/v1/equipments/{id}",
+            ...options,
+            headers: {
+                "Content-Type": "application/json",
+                ...options?.headers,
+            },
+        });
+    }
+
+    public static postApiV1EquipmentsByIdImages<
+        ThrowOnError extends boolean = false,
+    >(options: Options<PostApiV1EquipmentsByIdImagesData, ThrowOnError>) {
+        return (options.client ?? _heyApiClient).post<
+            unknown,
+            PostApiV1EquipmentsByIdImagesError,
+            ThrowOnError
+        >({
+            url: "/api/v1/equipments/{id}/images",
             ...options,
             headers: {
                 "Content-Type": "application/json",

@@ -10,9 +10,26 @@ export type PostApiV1AuthLoginData = {
     url: "/api/v1/auth/login";
 };
 
-export type PostApiV1AuthLoginResponses = {
-    200: unknown;
+export type PostApiV1AuthLoginErrors = {
+    400: {
+        message: string;
+    };
+    401: {
+        message: string;
+    };
+    403: {
+        message: string;
+    };
+    404: {
+        message: string;
+    };
+    500: {
+        message: string;
+    };
 };
+
+export type PostApiV1AuthLoginError =
+    PostApiV1AuthLoginErrors[keyof PostApiV1AuthLoginErrors];
 
 export type GetApiV1AuthGoogleData = {
     body?: never;
@@ -21,9 +38,26 @@ export type GetApiV1AuthGoogleData = {
     url: "/api/v1/auth/google";
 };
 
-export type GetApiV1AuthGoogleResponses = {
-    200: unknown;
+export type GetApiV1AuthGoogleErrors = {
+    400: {
+        message: string;
+    };
+    401: {
+        message: string;
+    };
+    403: {
+        message: string;
+    };
+    404: {
+        message: string;
+    };
+    500: {
+        message: string;
+    };
 };
+
+export type GetApiV1AuthGoogleError =
+    GetApiV1AuthGoogleErrors[keyof GetApiV1AuthGoogleErrors];
 
 export type PostApiV1AuthGoogleCallbackData = {
     body: {
@@ -33,6 +67,27 @@ export type PostApiV1AuthGoogleCallbackData = {
     query?: never;
     url: "/api/v1/auth/google/callback";
 };
+
+export type PostApiV1AuthGoogleCallbackErrors = {
+    400: {
+        message: string;
+    };
+    401: {
+        message: string;
+    };
+    403: {
+        message: string;
+    };
+    404: {
+        message: string;
+    };
+    500: {
+        message: string;
+    };
+};
+
+export type PostApiV1AuthGoogleCallbackError =
+    PostApiV1AuthGoogleCallbackErrors[keyof PostApiV1AuthGoogleCallbackErrors];
 
 export type PostApiV1AuthGoogleCallbackResponses = {
     200: {
@@ -53,6 +108,27 @@ export type PostApiV1AuthLogoutData = {
     url: "/api/v1/auth/logout";
 };
 
+export type PostApiV1AuthLogoutErrors = {
+    400: {
+        message: string;
+    };
+    401: {
+        message: string;
+    };
+    403: {
+        message: string;
+    };
+    404: {
+        message: string;
+    };
+    500: {
+        message: string;
+    };
+};
+
+export type PostApiV1AuthLogoutError =
+    PostApiV1AuthLogoutErrors[keyof PostApiV1AuthLogoutErrors];
+
 export type PostApiV1AuthLogoutResponses = {
     200: {
         message: string;
@@ -66,11 +142,31 @@ export type GetApiV1UsersData = {
     body?: never;
     path?: never;
     query: {
-        limit: number;
-        offset: number;
+        limit: string | number;
+        offset: string | number;
     };
     url: "/api/v1/users/";
 };
+
+export type GetApiV1UsersErrors = {
+    400: {
+        message: string;
+    };
+    401: {
+        message: string;
+    };
+    403: {
+        message: string;
+    };
+    404: {
+        message: string;
+    };
+    500: {
+        message: string;
+    };
+};
+
+export type GetApiV1UsersError = GetApiV1UsersErrors[keyof GetApiV1UsersErrors];
 
 export type GetApiV1UsersResponses = {
     200: {
@@ -116,6 +212,18 @@ export type PostApiV1UsersErrors = {
     400: {
         message: string;
     };
+    401: {
+        message: string;
+    };
+    403: {
+        message: string;
+    };
+    404: {
+        message: string;
+    };
+    500: {
+        message: string;
+    };
 };
 
 export type PostApiV1UsersError =
@@ -149,7 +257,19 @@ export type DeleteApiV1UsersByIdData = {
 };
 
 export type DeleteApiV1UsersByIdErrors = {
+    400: {
+        message: string;
+    };
+    401: {
+        message: string;
+    };
+    403: {
+        message: string;
+    };
     404: {
+        message: string;
+    };
+    500: {
         message: string;
     };
 };
@@ -176,7 +296,19 @@ export type GetApiV1UsersByIdData = {
 };
 
 export type GetApiV1UsersByIdErrors = {
+    400: {
+        message: string;
+    };
+    401: {
+        message: string;
+    };
+    403: {
+        message: string;
+    };
     404: {
+        message: string;
+    };
+    500: {
         message: string;
     };
 };
@@ -220,7 +352,19 @@ export type PatchApiV1UsersByIdData = {
 };
 
 export type PatchApiV1UsersByIdErrors = {
+    400: {
+        message: string;
+    };
+    401: {
+        message: string;
+    };
+    403: {
+        message: string;
+    };
     404: {
+        message: string;
+    };
+    500: {
         message: string;
     };
 };
@@ -253,6 +397,27 @@ export type GetApiV1UsersMeData = {
     url: "/api/v1/users/me";
 };
 
+export type GetApiV1UsersMeErrors = {
+    400: {
+        message: string;
+    };
+    401: {
+        message: string;
+    };
+    403: {
+        message: string;
+    };
+    404: {
+        message: string;
+    };
+    500: {
+        message: string;
+    };
+};
+
+export type GetApiV1UsersMeError =
+    GetApiV1UsersMeErrors[keyof GetApiV1UsersMeErrors];
+
 export type GetApiV1UsersMeResponses = {
     200: {
         id: string;
@@ -280,6 +445,27 @@ export type PatchApiV1UsersMeData = {
     query?: never;
     url: "/api/v1/users/me";
 };
+
+export type PatchApiV1UsersMeErrors = {
+    400: {
+        message: string;
+    };
+    401: {
+        message: string;
+    };
+    403: {
+        message: string;
+    };
+    404: {
+        message: string;
+    };
+    500: {
+        message: string;
+    };
+};
+
+export type PatchApiV1UsersMeError =
+    PatchApiV1UsersMeErrors[keyof PatchApiV1UsersMeErrors];
 
 export type PatchApiV1UsersMeResponses = {
     200: {
@@ -313,6 +499,18 @@ export type PatchApiV1UsersMePasswordErrors = {
     400: {
         message: string;
     };
+    401: {
+        message: string;
+    };
+    403: {
+        message: string;
+    };
+    404: {
+        message: string;
+    };
+    500: {
+        message: string;
+    };
 };
 
 export type PatchApiV1UsersMePasswordError =
@@ -343,6 +541,18 @@ export type PostApiV1UsersSignupErrors = {
     400: {
         message: string;
     };
+    401: {
+        message: string;
+    };
+    403: {
+        message: string;
+    };
+    404: {
+        message: string;
+    };
+    500: {
+        message: string;
+    };
 };
 
 export type PostApiV1UsersSignupError =
@@ -361,11 +571,32 @@ export type GetApiV1CategoriesData = {
     body?: never;
     path?: never;
     query: {
-        limit: number;
-        offset: number;
+        limit: string | number;
+        offset: string | number;
     };
     url: "/api/v1/categories/";
 };
+
+export type GetApiV1CategoriesErrors = {
+    400: {
+        message: string;
+    };
+    401: {
+        message: string;
+    };
+    403: {
+        message: string;
+    };
+    404: {
+        message: string;
+    };
+    500: {
+        message: string;
+    };
+};
+
+export type GetApiV1CategoriesError =
+    GetApiV1CategoriesErrors[keyof GetApiV1CategoriesErrors];
 
 export type GetApiV1CategoriesResponses = {
     200: {
@@ -396,6 +627,18 @@ export type PostApiV1CategoriesData = {
 };
 
 export type PostApiV1CategoriesErrors = {
+    400: {
+        message: string;
+    };
+    401: {
+        message: string;
+    };
+    403: {
+        message: string;
+    };
+    404: {
+        message: string;
+    };
     500: {
         message: string;
     };
@@ -426,6 +669,15 @@ export type DeleteApiV1CategoriesByIdData = {
 };
 
 export type DeleteApiV1CategoriesByIdErrors = {
+    400: {
+        message: string;
+    };
+    401: {
+        message: string;
+    };
+    403: {
+        message: string;
+    };
     404: {
         message: string;
     };
@@ -456,7 +708,19 @@ export type GetApiV1CategoriesByIdData = {
 };
 
 export type GetApiV1CategoriesByIdErrors = {
+    400: {
+        message: string;
+    };
+    401: {
+        message: string;
+    };
+    403: {
+        message: string;
+    };
     404: {
+        message: string;
+    };
+    500: {
         message: string;
     };
 };
@@ -488,6 +752,15 @@ export type PatchApiV1CategoriesByIdData = {
 };
 
 export type PatchApiV1CategoriesByIdErrors = {
+    400: {
+        message: string;
+    };
+    401: {
+        message: string;
+    };
+    403: {
+        message: string;
+    };
     404: {
         message: string;
     };
@@ -515,11 +788,31 @@ export type GetApiV1RoomsData = {
     body?: never;
     path?: never;
     query: {
-        limit: number;
-        offset: number;
+        limit: string | number;
+        offset: string | number;
     };
     url: "/api/v1/rooms/";
 };
+
+export type GetApiV1RoomsErrors = {
+    400: {
+        message: string;
+    };
+    401: {
+        message: string;
+    };
+    403: {
+        message: string;
+    };
+    404: {
+        message: string;
+    };
+    500: {
+        message: string;
+    };
+};
+
+export type GetApiV1RoomsError = GetApiV1RoomsErrors[keyof GetApiV1RoomsErrors];
 
 export type GetApiV1RoomsResponses = {
     200: {
@@ -548,6 +841,18 @@ export type PostApiV1RoomsData = {
 };
 
 export type PostApiV1RoomsErrors = {
+    400: {
+        message: string;
+    };
+    401: {
+        message: string;
+    };
+    403: {
+        message: string;
+    };
+    404: {
+        message: string;
+    };
     500: {
         message: string;
     };
@@ -576,6 +881,15 @@ export type DeleteApiV1RoomsByIdData = {
 };
 
 export type DeleteApiV1RoomsByIdErrors = {
+    400: {
+        message: string;
+    };
+    401: {
+        message: string;
+    };
+    403: {
+        message: string;
+    };
     404: {
         message: string;
     };
@@ -606,7 +920,19 @@ export type GetApiV1RoomsByIdData = {
 };
 
 export type GetApiV1RoomsByIdErrors = {
+    400: {
+        message: string;
+    };
+    401: {
+        message: string;
+    };
+    403: {
+        message: string;
+    };
     404: {
+        message: string;
+    };
+    500: {
         message: string;
     };
 };
@@ -636,6 +962,15 @@ export type PatchApiV1RoomsByIdData = {
 };
 
 export type PatchApiV1RoomsByIdErrors = {
+    400: {
+        message: string;
+    };
+    401: {
+        message: string;
+    };
+    403: {
+        message: string;
+    };
     404: {
         message: string;
     };
@@ -661,11 +996,32 @@ export type GetApiV1EquipmentsData = {
     body?: never;
     path?: never;
     query: {
-        limit: number;
-        offset: number;
+        limit: string | number;
+        offset: string | number;
     };
     url: "/api/v1/equipments/";
 };
+
+export type GetApiV1EquipmentsErrors = {
+    400: {
+        message: string;
+    };
+    401: {
+        message: string;
+    };
+    403: {
+        message: string;
+    };
+    404: {
+        message: string;
+    };
+    500: {
+        message: string;
+    };
+};
+
+export type GetApiV1EquipmentsError =
+    GetApiV1EquipmentsErrors[keyof GetApiV1EquipmentsErrors];
 
 export type GetApiV1EquipmentsResponses = {
     200: {
@@ -697,6 +1053,20 @@ export type GetApiV1EquipmentsResponses = {
                 id: string;
                 roomNumber: string;
             } | null;
+            categoryId: string | null;
+            category?: {
+                id: string;
+                name: string;
+            } | null;
+            images: Array<{
+                id: string;
+                filename: string;
+                filepath: string;
+                filesize: string | number;
+                filetype: string;
+                createdAt: unknown | string | number;
+                equipmentId: string;
+            }>;
         }>;
         pagination: {
             total: number;
@@ -721,8 +1091,9 @@ export type PostApiV1EquipmentsData = {
         serialNumber?: string;
         acquisitionMethod: string;
         disposalDate?: unknown | string | number;
-        roomId?: string;
         notes?: string;
+        roomId?: string;
+        categoryId?: string;
     };
     path?: never;
     query?: never;
@@ -730,6 +1101,18 @@ export type PostApiV1EquipmentsData = {
 };
 
 export type PostApiV1EquipmentsErrors = {
+    400: {
+        message: string;
+    };
+    401: {
+        message: string;
+    };
+    403: {
+        message: string;
+    };
+    404: {
+        message: string;
+    };
     500: {
         message: string;
     };
@@ -767,6 +1150,20 @@ export type PostApiV1EquipmentsResponses = {
             id: string;
             roomNumber: string;
         } | null;
+        categoryId: string | null;
+        category?: {
+            id: string;
+            name: string;
+        } | null;
+        images: Array<{
+            id: string;
+            filename: string;
+            filepath: string;
+            filesize: string | number;
+            filetype: string;
+            createdAt: unknown | string | number;
+            equipmentId: string;
+        }>;
     };
 };
 
@@ -783,6 +1180,15 @@ export type DeleteApiV1EquipmentsByIdData = {
 };
 
 export type DeleteApiV1EquipmentsByIdErrors = {
+    400: {
+        message: string;
+    };
+    401: {
+        message: string;
+    };
+    403: {
+        message: string;
+    };
     404: {
         message: string;
     };
@@ -813,7 +1219,19 @@ export type GetApiV1EquipmentsByIdData = {
 };
 
 export type GetApiV1EquipmentsByIdErrors = {
+    400: {
+        message: string;
+    };
+    401: {
+        message: string;
+    };
+    403: {
+        message: string;
+    };
     404: {
+        message: string;
+    };
+    500: {
         message: string;
     };
 };
@@ -850,6 +1268,20 @@ export type GetApiV1EquipmentsByIdResponses = {
             id: string;
             roomNumber: string;
         } | null;
+        categoryId: string | null;
+        category?: {
+            id: string;
+            name: string;
+        } | null;
+        images: Array<{
+            id: string;
+            filename: string;
+            filepath: string;
+            filesize: string | number;
+            filetype: string;
+            createdAt: unknown | string | number;
+            equipmentId: string;
+        }>;
     };
 };
 
@@ -863,8 +1295,9 @@ export type PatchApiV1EquipmentsByIdData = {
         serialNumber?: string;
         acquisitionMethod?: string;
         disposalDate?: unknown | string | number;
-        roomId?: string;
         notes?: string;
+        roomId?: string;
+        categoryId?: string;
     };
     path: {
         id: string;
@@ -874,6 +1307,15 @@ export type PatchApiV1EquipmentsByIdData = {
 };
 
 export type PatchApiV1EquipmentsByIdErrors = {
+    400: {
+        message: string;
+    };
+    401: {
+        message: string;
+    };
+    403: {
+        message: string;
+    };
     404: {
         message: string;
     };
@@ -914,11 +1356,57 @@ export type PatchApiV1EquipmentsByIdResponses = {
             id: string;
             roomNumber: string;
         } | null;
+        categoryId: string | null;
+        category?: {
+            id: string;
+            name: string;
+        } | null;
+        images: Array<{
+            id: string;
+            filename: string;
+            filepath: string;
+            filesize: string | number;
+            filetype: string;
+            createdAt: unknown | string | number;
+            equipmentId: string;
+        }>;
     };
 };
 
 export type PatchApiV1EquipmentsByIdResponse =
     PatchApiV1EquipmentsByIdResponses[keyof PatchApiV1EquipmentsByIdResponses];
+
+export type PostApiV1EquipmentsByIdImagesData = {
+    body: {
+        file: Blob | File;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: "/api/v1/equipments/{id}/images";
+};
+
+export type PostApiV1EquipmentsByIdImagesErrors = {
+    400: {
+        message: string;
+    };
+    401: {
+        message: string;
+    };
+    403: {
+        message: string;
+    };
+    404: {
+        message: string;
+    };
+    500: {
+        message: string;
+    };
+};
+
+export type PostApiV1EquipmentsByIdImagesError =
+    PostApiV1EquipmentsByIdImagesErrors[keyof PostApiV1EquipmentsByIdImagesErrors];
 
 export type ClientOptions = {
     baseUrl: "http://localhost:8000" | (string & {});
