@@ -53,14 +53,16 @@ export function LoginFormHandle() {
     });
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
-        const { response } = await AuthService.postApiV1AuthLogin({
+        const { response, error } = await AuthService.postApiV1AuthLogin({
             body: values,
         });
+
         if (response.ok) {
             toast("Logged in successfully.");
             router.push("/");
+            router.refresh();
         } else {
-            toast("Invalid username or password.");
+            toast(error?.message ?? "An error occurred.");
         }
     }
 

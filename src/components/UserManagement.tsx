@@ -60,7 +60,15 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { useUsers } from "@/hooks/api";
-import type { UpdateUser, User } from "@/types/users";
+import { UpdateUser, User, UserRole } from "@/types/users";
+
+const USER_ROLES = {
+    [UserRole.ADMIN]: "ผู้ดูแลระบบ",
+    [UserRole.DEPARTMENT_HEAD]: "หัวหน้าภาควิชา",
+    [UserRole.INVENTORY_MANAGER]: "ผู้จัดการคลัง",
+    [UserRole.INSTRUCTOR]: "อาจารย์",
+    [UserRole.STAFF]: "เจ้าหน้าที่",
+} as const;
 
 const userCreateSchema = z.object({
     email: z.string().email({ message: "กรุณากรอกอีเมลให้ถูกต้อง" }).max(320, {
@@ -130,14 +138,7 @@ const DateDisplay = ({ dateString }: { dateString: string }) => {
 };
 
 const getRoleLabel = (role: number) => {
-    switch (role) {
-        case 0:
-            return "ผู้ใช้งานทั่วไป";
-        case 1:
-            return "ผู้ดูแลระบบ";
-        default:
-            return "ไม่ทราบบทบาท";
-    }
+    return USER_ROLES[role as keyof typeof USER_ROLES] || "ไม่ทราบบทบาท";
 };
 
 export default function UserManagement() {
