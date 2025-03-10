@@ -127,17 +127,17 @@ export default function UserManagement() {
                     role: parseInt(newUser.role),
                 },
             });
-            setIsAddModalOpen(false);
-            setNewUser({
-                email: "",
-                password: "",
-                firstName: "",
-                lastName: "",
-                role: "0",
-                isActive: true,
-                emailVerified: false,
-            });
             if (!error) {
+                setIsAddModalOpen(false);
+                setNewUser({
+                    email: "",
+                    password: "",
+                    firstName: "",
+                    lastName: "",
+                    role: "0",
+                    isActive: true,
+                    emailVerified: false,
+                });
                 toast.success("เพิ่มผู้ใช้งานสำเร็จ");
                 await mutate();
             } else {
@@ -183,22 +183,22 @@ export default function UserManagement() {
                 path: { id: editingUser.id },
                 body: editPayload,
             });
-            setIsEditModalOpen(false);
-            setEditingUser(null);
-            setNewUser({
-                email: "",
-                password: "",
-                firstName: "",
-                lastName: "",
-                role: "0",
-                isActive: true,
-                emailVerified: false,
-            });
             if (!error) {
+                setIsEditModalOpen(false);
+                setEditingUser(null);
+                setNewUser({
+                    email: "",
+                    password: "",
+                    firstName: "",
+                    lastName: "",
+                    role: "0",
+                    isActive: true,
+                    emailVerified: false,
+                });
                 toast.success("แก้ไขผู้ใช้งานสำเร็จ");
                 await mutate();
             } else {
-                toast.error("เกิดข้อผิดพลาดในการแก้ไขผู้ใช้งาน");
+                toast.error(error.message);
             }
         } finally {
             setIsLoading(false);
@@ -210,16 +210,18 @@ export default function UserManagement() {
 
         setIsLoading(true);
         try {
-            await UsersService.deleteApiV1UsersById({
+            const { error } = await UsersService.deleteApiV1UsersById({
                 path: { id: userToDelete },
             });
-            setIsDeleteAlertOpen(false);
-            setUserToDelete(null);
-            toast.success("ลบผู้ใช้งานสำเร็จ");
-            await mutate();
-        } catch (error: unknown) {
-            console.error("Error deleting user:", error);
-            toast.error("เกิดข้อผิดพลาดในการลบผู้ใช้งาน");
+
+            if (!error) {
+                setIsDeleteAlertOpen(false);
+                setUserToDelete(null);
+                toast.success("ลบผู้ใช้งานสำเร็จ");
+                await mutate();
+            } else {
+                toast.error(error.message);
+            }
         } finally {
             setIsLoading(false);
         }
