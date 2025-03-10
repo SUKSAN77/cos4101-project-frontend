@@ -1,9 +1,12 @@
 "use client";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { format, formatDistanceToNow } from "date-fns";
 import { th } from "date-fns/locale";
 import { Edit, Loader2, Plus, Search, Trash2 } from "lucide-react";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import * as z from "zod";
 
 import { RoomsService } from "@/client";
 import {
@@ -27,16 +30,33 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog";
 import {
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from "@/components/ui/form";
+import {
     HoverCard,
     HoverCardContent,
     HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { useRooms } from "@/hooks/api";
 import { Room } from "@/types/rooms";
 
 import TableData from "./TableData";
+
+// Define schemas for form validation
+const roomFormSchema = z.object({
+    roomNumber: z
+        .string()
+        .min(1, { message: "กรุณากรอกหมายเลขห้อง" })
+        .max(32, { message: "หมายเลขห้องยาวเกินไป" }),
+});
+
+type RoomFormValues = z.infer<typeof roomFormSchema>;
 
 const DateDisplay = ({ dateString }: { dateString: string }) => {
     if (typeof dateString !== "string") return <span>ไม่ระบุ</span>;
@@ -73,28 +93,38 @@ export default function RoomManagement() {
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState(false);
-    const [newRoomNumber, setNewRoomNumber] = useState("");
     const [editingRoom, setEditingRoom] = useState<Room | null>(null);
     const [roomToDelete, setRoomToDelete] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
 
     const { rooms, mutate } = useRooms();
 
-    const handleAdd = async () => {
-        if (!newRoomNumber.trim()) {
-            toast.error("กรุณากรอกหมายเลขห้อง");
-            return;
-        }
+    // Create form for adding rooms
+    const addForm = useForm<RoomFormValues>({
+        resolver: zodResolver(roomFormSchema),
+        defaultValues: {
+            roomNumber: "",
+        },
+    });
 
+    // Create form for editing rooms
+    const editForm = useForm<RoomFormValues>({
+        resolver: zodResolver(roomFormSchema),
+        defaultValues: {
+            roomNumber: "",
+        },
+    });
+
+    const handleAdd = async (values: RoomFormValues) => {
         setIsLoading(true);
         try {
             const { error } = await RoomsService.postApiV1Rooms({
-                body: { roomNumber: newRoomNumber },
+                body: { roomNumber: values.roomNumber },
             });
 
             if (!error) {
                 setIsAddModalOpen(false);
-                setNewRoomNumber("");
+                addForm.reset();
                 toast.success("เพิ่มห้องสำเร็จ");
                 await mutate();
             } else {
@@ -105,24 +135,20 @@ export default function RoomManagement() {
         }
     };
 
-    const handleEdit = async () => {
+    const handleEdit = async (values: RoomFormValues) => {
         if (!editingRoom) return;
-        if (!newRoomNumber.trim()) {
-            toast.error("กรุณากรอกหมายเลขห้อง");
-            return;
-        }
 
         setIsLoading(true);
         try {
             const { error } = await RoomsService.patchApiV1RoomsById({
                 path: { id: editingRoom.id },
-                body: { roomNumber: newRoomNumber },
+                body: { roomNumber: values.roomNumber },
             });
 
             if (!error) {
                 setIsEditModalOpen(false);
                 setEditingRoom(null);
-                setNewRoomNumber("");
+                editForm.reset();
                 toast.success("แก้ไขห้องสำเร็จ");
                 await mutate();
             } else {
@@ -180,7 +206,7 @@ export default function RoomManagement() {
                         className="flex items-center gap-1"
                         onClick={() => {
                             setEditingRoom(row);
-                            setNewRoomNumber(row.roomNumber);
+                            editForm.setValue("roomNumber", row.roomNumber);
                             setIsEditModalOpen(true);
                         }}
                     >
@@ -245,7 +271,15 @@ export default function RoomManagement() {
             </Card>
 
             {/* Add Room Modal */}
-            <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
+            <Dialog
+                open={isAddModalOpen}
+                onOpenChange={(open) => {
+                    if (!open) {
+                        addForm.reset();
+                    }
+                    setIsAddModalOpen(open);
+                }}
+            >
                 <DialogContent className="sm:max-w-[425px]">
                     <DialogHeader>
                         <DialogTitle className="text-xl">
@@ -255,51 +289,65 @@ export default function RoomManagement() {
                             กรอกหมายเลขห้องที่ต้องการเพิ่ม
                         </DialogDescription>
                     </DialogHeader>
-                    <div className="space-y-4 py-4">
-                        <div className="space-y-2">
-                            <Label
-                                htmlFor="roomNumber"
-                                className="text-sm font-medium"
-                            >
-                                หมายเลขห้อง
-                            </Label>
-                            <Input
-                                id="roomNumber"
-                                value={newRoomNumber}
-                                onChange={(e) =>
-                                    setNewRoomNumber(e.target.value)
-                                }
-                                placeholder="กรอกหมายเลขห้อง"
-                                className="col-span-3"
-                            />
-                        </div>
-                    </div>
-                    <DialogFooter>
-                        <Button
-                            variant="outline"
-                            onClick={() => {
-                                setIsAddModalOpen(false);
-                                setNewRoomNumber("");
-                            }}
+                    <Form {...addForm}>
+                        <form
+                            onSubmit={addForm.handleSubmit(handleAdd)}
+                            className="space-y-4 py-4"
                         >
-                            ยกเลิก
-                        </Button>
-                        <Button onClick={handleAdd} disabled={isLoading}>
-                            {isLoading ? (
-                                <>
-                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                    กำลังเพิ่ม...
-                                </>
-                            ) : (
-                                "เพิ่ม"
-                            )}
-                        </Button>
-                    </DialogFooter>
+                            <FormField
+                                control={addForm.control}
+                                name="roomNumber"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>หมายเลขห้อง</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                placeholder="กรอกหมายเลขห้อง"
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <DialogFooter>
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    onClick={() => {
+                                        setIsAddModalOpen(false);
+                                        addForm.reset();
+                                    }}
+                                >
+                                    ยกเลิก
+                                </Button>
+                                <Button type="submit" disabled={isLoading}>
+                                    {isLoading ? (
+                                        <>
+                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                            กำลังเพิ่ม...
+                                        </>
+                                    ) : (
+                                        "เพิ่ม"
+                                    )}
+                                </Button>
+                            </DialogFooter>
+                        </form>
+                    </Form>
                 </DialogContent>
             </Dialog>
 
             {/* Edit Room Modal */}
-            <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
+            <Dialog
+                open={isEditModalOpen}
+                onOpenChange={(open) => {
+                    if (!open) {
+                        editForm.reset();
+                        setEditingRoom(null);
+                    }
+                    setIsEditModalOpen(open);
+                }}
+            >
                 <DialogContent className="sm:max-w-[425px]">
                     <DialogHeader>
                         <DialogTitle className="text-xl">แก้ไขห้อง</DialogTitle>
@@ -307,55 +355,60 @@ export default function RoomManagement() {
                             แก้ไขหมายเลขห้องที่ต้องการเปลี่ยน
                         </DialogDescription>
                     </DialogHeader>
-                    <div className="space-y-4 py-4">
-                        <div className="space-y-2">
-                            <Label className="text-sm font-medium text-gray-500">
-                                หมายเลขห้องเดิม:{" "}
-                                <span className="font-semibold text-black">
-                                    {editingRoom?.roomNumber}
-                                </span>
-                            </Label>
-                        </div>
-                        <div className="space-y-2">
-                            <Label
-                                htmlFor="newRoomNumber"
-                                className="text-sm font-medium"
-                            >
-                                หมายเลขห้องใหม่
-                            </Label>
-                            <Input
-                                id="newRoomNumber"
-                                value={newRoomNumber}
-                                onChange={(e) =>
-                                    setNewRoomNumber(e.target.value)
-                                }
-                                placeholder="กรอกหมายเลขห้องใหม่"
-                                className="col-span-3"
-                            />
-                        </div>
-                    </div>
-                    <DialogFooter>
-                        <Button
-                            variant="outline"
-                            onClick={() => {
-                                setIsEditModalOpen(false);
-                                setEditingRoom(null);
-                                setNewRoomNumber("");
-                            }}
+                    <Form {...editForm}>
+                        <form
+                            onSubmit={editForm.handleSubmit(handleEdit)}
+                            className="space-y-4 py-4"
                         >
-                            ยกเลิก
-                        </Button>
-                        <Button onClick={handleEdit} disabled={isLoading}>
-                            {isLoading ? (
-                                <>
-                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                    กำลังบันทึก...
-                                </>
-                            ) : (
-                                "บันทึก"
-                            )}
-                        </Button>
-                    </DialogFooter>
+                            <div className="space-y-2">
+                                <p className="text-sm font-medium text-gray-500">
+                                    หมายเลขห้องเดิม:{" "}
+                                    <span className="font-semibold text-black">
+                                        {editingRoom?.roomNumber}
+                                    </span>
+                                </p>
+                            </div>
+                            <FormField
+                                control={editForm.control}
+                                name="roomNumber"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>หมายเลขห้องใหม่</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                placeholder="กรอกหมายเลขห้องใหม่"
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <DialogFooter>
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    onClick={() => {
+                                        setIsEditModalOpen(false);
+                                        setEditingRoom(null);
+                                        editForm.reset();
+                                    }}
+                                >
+                                    ยกเลิก
+                                </Button>
+                                <Button type="submit" disabled={isLoading}>
+                                    {isLoading ? (
+                                        <>
+                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                            กำลังบันทึก...
+                                        </>
+                                    ) : (
+                                        "บันทึก"
+                                    )}
+                                </Button>
+                            </DialogFooter>
+                        </form>
+                    </Form>
                 </DialogContent>
             </Dialog>
 

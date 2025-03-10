@@ -1,10 +1,13 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
 import { format, formatDistanceToNow } from "date-fns";
 import { th } from "date-fns/locale";
 import { Edit, Loader2, Plus, Search, Trash2 } from "lucide-react";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import * as z from "zod";
 
 import { CategoriesService } from "@/client";
 import {
@@ -28,12 +31,19 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog";
 import {
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from "@/components/ui/form";
+import {
     HoverCard,
     HoverCardContent,
     HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
     Table,
     TableBody,
@@ -44,6 +54,14 @@ import {
 } from "@/components/ui/table";
 import { useCategories } from "@/hooks/api";
 import { Category } from "@/types/categories";
+
+const categoryFormSchema = z.object({
+    name: z.string().min(1, { message: "กรุณากรอกชื่อหมวดหมู่" }).max(128, {
+        message: "ชื่อหมวดหมู่ต้องมีความยาวไม่เกิน 128 ตัวอักษร",
+    }),
+});
+
+type CategoryFormValues = z.infer<typeof categoryFormSchema>;
 
 const DateDisplay = ({ dateString }: { dateString: string }) => {
     if (typeof dateString !== "string") return <span>ไม่ระบุ</span>;
@@ -80,7 +98,6 @@ export default function CategoryManagement() {
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState(false);
-    const [newCategoryName, setNewCategoryName] = useState("");
     const [editingCategory, setEditingCategory] = useState<Category | null>(
         null,
     );
@@ -91,21 +108,32 @@ export default function CategoryManagement() {
 
     const { categories, mutate } = useCategories();
 
-    const handleAdd = async () => {
-        if (!newCategoryName.trim()) {
-            toast.error("กรุณากรอกชื่อหมวดหมู่");
-            return;
-        }
+    // Create form for adding categories
+    const addForm = useForm<CategoryFormValues>({
+        resolver: zodResolver(categoryFormSchema),
+        defaultValues: {
+            name: "",
+        },
+    });
 
+    // Create form for editing categories
+    const editForm = useForm<CategoryFormValues>({
+        resolver: zodResolver(categoryFormSchema),
+        defaultValues: {
+            name: "",
+        },
+    });
+
+    const handleAdd = async (values: CategoryFormValues) => {
         setIsLoading(true);
         try {
             const { error } = await CategoriesService.postApiV1Categories({
-                body: { name: newCategoryName },
+                body: { name: values.name },
             });
 
             if (!error) {
                 setIsAddModalOpen(false);
-                setNewCategoryName("");
+                addForm.reset();
                 toast.success("เพิ่มหมวดหมู่สำเร็จ");
                 await mutate();
             } else {
@@ -118,24 +146,20 @@ export default function CategoryManagement() {
         }
     };
 
-    const handleEdit = async () => {
+    const handleEdit = async (values: CategoryFormValues) => {
         if (!editingCategory) return;
-        if (!newCategoryName.trim()) {
-            toast.error("กรุณากรอกชื่อหมวดหมู่");
-            return;
-        }
 
         setIsLoading(true);
         try {
             const { error } = await CategoriesService.patchApiV1CategoriesById({
                 path: { id: editingCategory.id },
-                body: { name: newCategoryName },
+                body: { name: values.name },
             });
 
             if (!error) {
                 setIsEditModalOpen(false);
                 setEditingCategory(null);
-                setNewCategoryName("");
+                editForm.reset();
                 toast.success("แก้ไขหมวดหมู่สำเร็จ");
                 await mutate();
             } else {
@@ -248,7 +272,10 @@ export default function CategoryManagement() {
                                                         <TableCell>
                                                             <DateDisplay
                                                                 dateString={
-                                                                    category.createdAt
+                                                                    typeof category.createdAt ===
+                                                                    "string"
+                                                                        ? category.createdAt
+                                                                        : ""
                                                                 }
                                                             />
                                                         </TableCell>
@@ -262,7 +289,8 @@ export default function CategoryManagement() {
                                                                         setEditingCategory(
                                                                             category,
                                                                         );
-                                                                        setNewCategoryName(
+                                                                        editForm.setValue(
+                                                                            "name",
                                                                             category.name,
                                                                         );
                                                                         setIsEditModalOpen(
@@ -304,7 +332,15 @@ export default function CategoryManagement() {
             </Card>
 
             {/* Add Category Modal */}
-            <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
+            <Dialog
+                open={isAddModalOpen}
+                onOpenChange={(open) => {
+                    if (!open) {
+                        addForm.reset();
+                    }
+                    setIsAddModalOpen(open);
+                }}
+            >
                 <DialogContent className="sm:max-w-[425px]">
                     <DialogHeader>
                         <DialogTitle className="text-xl">
@@ -314,51 +350,65 @@ export default function CategoryManagement() {
                             กรอกชื่อหมวดหมู่ที่ต้องการเพิ่ม
                         </DialogDescription>
                     </DialogHeader>
-                    <div className="space-y-4 py-4">
-                        <div className="space-y-2">
-                            <Label
-                                htmlFor="categoryName"
-                                className="text-sm font-medium"
-                            >
-                                ชื่อหมวดหมู่
-                            </Label>
-                            <Input
-                                id="categoryName"
-                                value={newCategoryName}
-                                onChange={(e) =>
-                                    setNewCategoryName(e.target.value)
-                                }
-                                placeholder="กรอกชื่อหมวดหมู่"
-                                className="col-span-3"
-                            />
-                        </div>
-                    </div>
-                    <DialogFooter>
-                        <Button
-                            variant="outline"
-                            onClick={() => {
-                                setIsAddModalOpen(false);
-                                setNewCategoryName("");
-                            }}
+                    <Form {...addForm}>
+                        <form
+                            onSubmit={addForm.handleSubmit(handleAdd)}
+                            className="space-y-4 py-4"
                         >
-                            ยกเลิก
-                        </Button>
-                        <Button onClick={handleAdd} disabled={isLoading}>
-                            {isLoading ? (
-                                <>
-                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                    กำลังเพิ่ม...
-                                </>
-                            ) : (
-                                "เพิ่ม"
-                            )}
-                        </Button>
-                    </DialogFooter>
+                            <FormField
+                                control={addForm.control}
+                                name="name"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>ชื่อหมวดหมู่</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                placeholder="กรอกชื่อหมวดหมู่"
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <DialogFooter>
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    onClick={() => {
+                                        setIsAddModalOpen(false);
+                                        addForm.reset();
+                                    }}
+                                >
+                                    ยกเลิก
+                                </Button>
+                                <Button type="submit" disabled={isLoading}>
+                                    {isLoading ? (
+                                        <>
+                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                            กำลังเพิ่ม...
+                                        </>
+                                    ) : (
+                                        "เพิ่ม"
+                                    )}
+                                </Button>
+                            </DialogFooter>
+                        </form>
+                    </Form>
                 </DialogContent>
             </Dialog>
 
             {/* Edit Category Modal */}
-            <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
+            <Dialog
+                open={isEditModalOpen}
+                onOpenChange={(open) => {
+                    if (!open) {
+                        editForm.reset();
+                        setEditingCategory(null);
+                    }
+                    setIsEditModalOpen(open);
+                }}
+            >
                 <DialogContent className="sm:max-w-[425px]">
                     <DialogHeader>
                         <DialogTitle className="text-xl">
@@ -368,55 +418,60 @@ export default function CategoryManagement() {
                             แก้ไขชื่อหมวดหมู่ที่ต้องการเปลี่ยน
                         </DialogDescription>
                     </DialogHeader>
-                    <div className="space-y-4 py-4">
-                        <div className="space-y-2">
-                            <Label className="text-sm font-medium text-gray-500">
-                                ชื่อหมวดหมู่เดิม:{" "}
-                                <span className="font-semibold text-black">
-                                    {editingCategory?.name}
-                                </span>
-                            </Label>
-                        </div>
-                        <div className="space-y-2">
-                            <Label
-                                htmlFor="newCategoryName"
-                                className="text-sm font-medium"
-                            >
-                                ชื่อหมวดหมู่ใหม่
-                            </Label>
-                            <Input
-                                id="newCategoryName"
-                                value={newCategoryName}
-                                onChange={(e) =>
-                                    setNewCategoryName(e.target.value)
-                                }
-                                placeholder="กรอกชื่อหมวดหมู่ใหม่"
-                                className="col-span-3"
-                            />
-                        </div>
-                    </div>
-                    <DialogFooter>
-                        <Button
-                            variant="outline"
-                            onClick={() => {
-                                setIsEditModalOpen(false);
-                                setEditingCategory(null);
-                                setNewCategoryName("");
-                            }}
+                    <Form {...editForm}>
+                        <form
+                            onSubmit={editForm.handleSubmit(handleEdit)}
+                            className="space-y-4 py-4"
                         >
-                            ยกเลิก
-                        </Button>
-                        <Button onClick={handleEdit} disabled={isLoading}>
-                            {isLoading ? (
-                                <>
-                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                    กำลังบันทึก...
-                                </>
-                            ) : (
-                                "บันทึก"
-                            )}
-                        </Button>
-                    </DialogFooter>
+                            <div className="space-y-2">
+                                <p className="text-sm font-medium text-gray-500">
+                                    ชื่อหมวดหมู่เดิม:{" "}
+                                    <span className="font-semibold text-black">
+                                        {editingCategory?.name}
+                                    </span>
+                                </p>
+                            </div>
+                            <FormField
+                                control={editForm.control}
+                                name="name"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>ชื่อหมวดหมู่ใหม่</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                placeholder="กรอกชื่อหมวดหมู่ใหม่"
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <DialogFooter>
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    onClick={() => {
+                                        setIsEditModalOpen(false);
+                                        setEditingCategory(null);
+                                        editForm.reset();
+                                    }}
+                                >
+                                    ยกเลิก
+                                </Button>
+                                <Button type="submit" disabled={isLoading}>
+                                    {isLoading ? (
+                                        <>
+                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                            กำลังบันทึก...
+                                        </>
+                                    ) : (
+                                        "บันทึก"
+                                    )}
+                                </Button>
+                            </DialogFooter>
+                        </form>
+                    </Form>
                 </DialogContent>
             </Dialog>
 
