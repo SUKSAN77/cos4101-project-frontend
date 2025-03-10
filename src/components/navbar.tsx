@@ -1,6 +1,7 @@
 "use client";
 
 import { Bell, LogOut, User } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { use } from "react";
 
@@ -16,6 +17,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useUser } from "@/lib/auth";
+import { UserRole } from "@/types/users";
 
 export function Navbar() {
     const { userPromise } = useUser();
@@ -35,6 +37,21 @@ export function Navbar() {
     return (
         <div className="sticky top-0 z-30 border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
             <div className="flex h-16 items-center px-4 transition-all duration-200 md:px-6">
+                <div className="flex items-center gap-4">
+                    {(user?.role === UserRole.ADMIN ||
+                        user?.role === UserRole.DEPARTMENT_HEAD ||
+                        user?.role === UserRole.INVENTORY_MANAGER) && (
+                        <div>
+                            <Link href="/">
+                                <Button variant="link">หน้าแรก</Button>
+                            </Link>
+                            <Link href="/home">
+                                <Button variant="link">หน้าการจัดการ</Button>
+                            </Link>
+                        </div>
+                    )}
+                </div>
+
                 <div className="ml-auto flex items-center gap-4">
                     <Button
                         variant="ghost"
