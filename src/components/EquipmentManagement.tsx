@@ -106,6 +106,9 @@ interface NewEquipment {
     acquiredDate: string;
     notes: string;
     image: File | null;
+    receipt: File | null;
+    roomId: string;
+    categoryId: string;
 }
 
 export default function EquipmentManagement() {
@@ -130,8 +133,6 @@ export default function EquipmentManagement() {
     const [equipmentToDelete, setEquipmentToDelete] = useState<string | null>(
         null,
     );
-    const [selectedImage, setSelectedImage] = useState<File | null>(null);
-    const [selectedReceipt, setSelectedReceipt] = useState<File | null>(null);
     const [newEquipment, setNewEquipment] = useState<NewEquipment[]>([
         {
             name: "",
@@ -143,6 +144,9 @@ export default function EquipmentManagement() {
             acquiredDate: new Date().toISOString().split("T")[0],
             notes: "",
             image: null,
+            receipt: null,
+            roomId: "",
+            categoryId: "",
         },
     ]);
 
@@ -287,6 +291,9 @@ export default function EquipmentManagement() {
                 acquiredDate: new Date().toISOString().split("T")[0],
                 notes: "",
                 image: null,
+                receipt: null,
+                roomId: "",
+                categoryId: "",
             },
         ]);
     };
@@ -303,7 +310,9 @@ export default function EquipmentManagement() {
                     ...equipment,
                     status: Number(equipment.status),
                     price: Number(equipment.price),
-                    lifetime: 0, // ต้องเพิ่มฟิลด์นี้ในฟอร์มถ้าต้องการ
+                    lifetime: 0,
+                    roomId: equipment.roomId || null,
+                    categoryId: equipment.categoryId || null,
                 };
 
                 const { data, error } =
@@ -315,7 +324,7 @@ export default function EquipmentManagement() {
                     throw new Error(error.message);
                 }
 
-                // อัพโหลดรูปภาพ
+                // อัพโหลดรูปภาพครุภัณฑ์
                 if (data && equipment.image) {
                     const { error: imageError } =
                         await EquipmentsService.postApiV1EquipmentsByIdImages({
@@ -324,7 +333,22 @@ export default function EquipmentManagement() {
                         });
 
                     if (imageError) {
-                        toast.error("ไม่สามารถอัพโหลดรูปภาพได้");
+                        toast.error("ไม่สามารถอัพโหลดรูปภาพครุภัณฑ์ได้");
+                    }
+                }
+
+                // อัพโหลดรูปภาพใบเสร็จ
+                if (data && equipment.receipt) {
+                    const { error: receiptError } =
+                        await EquipmentsService.postApiV1EquipmentsByIdReceipts(
+                            {
+                                path: { id: data.id },
+                                body: { file: equipment.receipt },
+                            },
+                        );
+
+                    if (receiptError) {
+                        toast.error("ไม่สามารถอัพโหลดรูปภาพใบเสร็จได้");
                     }
                 }
             }
@@ -341,6 +365,9 @@ export default function EquipmentManagement() {
                     acquiredDate: new Date().toISOString().split("T")[0],
                     notes: "",
                     image: null,
+                    receipt: null,
+                    roomId: "",
+                    categoryId: "",
                 },
             ]);
             toast.success("เพิ่มครุภัณฑ์สำเร็จ");
@@ -952,6 +979,90 @@ export default function EquipmentManagement() {
                                             </div>
                                             <div className="space-y-2">
                                                 <label className="text-sm font-medium">
+                                                    ห้อง
+                                                </label>
+                                                <Select
+                                                    value={
+                                                        item.roomId || "none"
+                                                    }
+                                                    onValueChange={(value) =>
+                                                        handleNewEquipmentChange(
+                                                            index,
+                                                            "roomId",
+                                                            value === "none"
+                                                                ? ""
+                                                                : value,
+                                                        )
+                                                    }
+                                                >
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder="เลือกห้อง" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="none">
+                                                            ไม่ระบุห้อง
+                                                        </SelectItem>
+                                                        {rooms.map((room) => (
+                                                            <SelectItem
+                                                                key={room.id}
+                                                                value={room.id}
+                                                            >
+                                                                ห้อง{" "}
+                                                                {
+                                                                    room.roomNumber
+                                                                }
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-sm font-medium">
+                                                    หมวดหมู่
+                                                </label>
+                                                <Select
+                                                    value={
+                                                        item.categoryId ||
+                                                        "none"
+                                                    }
+                                                    onValueChange={(value) =>
+                                                        handleNewEquipmentChange(
+                                                            index,
+                                                            "categoryId",
+                                                            value === "none"
+                                                                ? ""
+                                                                : value,
+                                                        )
+                                                    }
+                                                >
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder="เลือกหมวดหมู่" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="none">
+                                                            ไม่ระบุหมวดหมู่
+                                                        </SelectItem>
+                                                        {categories.map(
+                                                            (category) => (
+                                                                <SelectItem
+                                                                    key={
+                                                                        category.id
+                                                                    }
+                                                                    value={
+                                                                        category.id
+                                                                    }
+                                                                >
+                                                                    {
+                                                                        category.name
+                                                                    }
+                                                                </SelectItem>
+                                                            ),
+                                                        )}
+                                                    </SelectContent>
+                                                </Select>
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-sm font-medium">
                                                     รูปภาพครุภัณฑ์
                                                 </label>
                                                 <div className="flex items-center gap-4">
@@ -987,6 +1098,53 @@ export default function EquipmentManagement() {
                                                                     handleNewEquipmentChange(
                                                                         index,
                                                                         "image",
+                                                                        null,
+                                                                    )
+                                                                }
+                                                            >
+                                                                <X className="h-4 w-4" />
+                                                            </Button>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-sm font-medium">
+                                                    รูปภาพใบเสร็จ
+                                                </label>
+                                                <div className="flex items-center gap-4">
+                                                    <Input
+                                                        type="file"
+                                                        accept="image/*"
+                                                        onChange={(e) => {
+                                                            const file =
+                                                                e.target
+                                                                    .files?.[0];
+                                                            handleNewEquipmentChange(
+                                                                index,
+                                                                "receipt",
+                                                                file || null,
+                                                            );
+                                                        }}
+                                                        className="flex-1"
+                                                    />
+                                                    {item.receipt && (
+                                                        <div className="relative h-20 w-20">
+                                                            <img
+                                                                src={URL.createObjectURL(
+                                                                    item.receipt,
+                                                                )}
+                                                                alt="Receipt preview"
+                                                                className="h-full w-full rounded-md object-cover"
+                                                            />
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="sm"
+                                                                className="absolute -right-2 -top-2 h-6 w-6 rounded-full p-0"
+                                                                onClick={() =>
+                                                                    handleNewEquipmentChange(
+                                                                        index,
+                                                                        "receipt",
                                                                         null,
                                                                     )
                                                                 }
