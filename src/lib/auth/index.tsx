@@ -2,10 +2,10 @@
 
 import { createContext, ReactNode, useContext } from "react";
 
-import { PatchApiV1UsersByIdResponse as User } from "@/client";
+import type { UserMe } from "@/types/users";
 
 type UserContextType = {
-    userPromise: Promise<User | null>;
+    userPromise: Promise<UserMe | null>;
 };
 
 const UserContext = createContext<UserContextType | null>(null);
@@ -23,7 +23,7 @@ export function UserProvider({
     userPromise,
 }: {
     children: ReactNode;
-    userPromise: Promise<User | null>;
+    userPromise: Promise<UserMe | null>;
 }) {
     return (
         <UserContext.Provider value={{ userPromise }}>

@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { useUsers } from "@/hooks/api";
-import { User } from "@/hooks/interface";
+import type { User } from "@/types/users";
 
 import TableData from "./TableData";
 

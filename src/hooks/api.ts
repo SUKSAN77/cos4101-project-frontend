@@ -11,41 +11,7 @@ import {
     RoomsService,
     UsersService,
 } from "@/client";
-
-import { User } from "./interface";
-
-// export const useEquipments = () => {
-//     const [equipments, setEquipments] = useState<
-//         GetApiV1EquipmentsResponses[200]["data"]
-//     >([]);
-//     const [loading, setLoading] = useState(false);
-
-//     const [page, setPage] = useState(1);
-//     const [limit, setLimit] = useState(10);
-
-//     useEffect(() => {
-//         const fetchEquipments = async () => {
-//             try {
-//                 setLoading(true);
-//                 const response = await getEquipments(limit, (page - 1) * limit);
-//                 if ("error" in response) {
-//                     setError(response.error);
-//                     return;
-//                 }
-//                 setEquipments(response || []);
-//                 setLoading(false);
-//             } catch (error) {
-//                 setError(error as Error);
-//             } finally {
-//                 setLoading(false);
-//             }
-//         };
-
-//         fetchEquipments();
-//     }, [page, limit]);
-
-//     return { equipments, loading, error, page, setPage, limit, setLimit };
-// };
+import type { User } from "@/types/users";
 
 export const useEquipments = () => {
     const [page, setPage] = useState(1);

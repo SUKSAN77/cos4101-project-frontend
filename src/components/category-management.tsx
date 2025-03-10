@@ -43,7 +43,7 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { useCategories } from "@/hooks/api";
-import { Category } from "@/hooks/interface";
+import { Category } from "@/types/categories";
 
 const DateDisplay = ({ dateString }: { dateString: string }) => {
     if (typeof dateString !== "string") return <span>ไม่ระบุ</span>;
@@ -89,7 +89,6 @@ export default function CategoryManagement() {
     );
     const [isLoading, setIsLoading] = useState(false);
 
-    // ใช้ useCategories แทนการใช้ mockCategories
     const { categories, mutate } = useCategories();
 
     const handleAdd = async () => {

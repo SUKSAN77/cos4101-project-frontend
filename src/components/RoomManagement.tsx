@@ -34,19 +34,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useRooms } from "@/hooks/api";
-// guide
-// RoomsService.getApiV1RoomsById({ path: { id: "1" } });
-// RoomsService.postApiV1Rooms({ body: { roomNumber: "101" } });
-// RoomsService.patchApiV1RoomsById({
-//     path: { id: "1" },
-//     body: { roomNumber: "102" },
-// });
-// RoomsService.deleteApiV1RoomsById({ path: { id: "1" } });
-import { Room } from "@/hooks/interface";
+import { Room } from "@/types/rooms";
 
 import TableData from "./TableData";
 
-// แก้ไข DateDisplay component
 const DateDisplay = ({ dateString }: { dateString: string }) => {
     if (typeof dateString !== "string") return <span>ไม่ระบุ</span>;
 
@@ -175,15 +166,7 @@ export default function RoomManagement() {
         {
             head: "จัดการห้อง",
             dataKey: "actions",
-            cellFormat: (
-                _: unknown,
-                row: {
-                    id: string;
-                    roomNumber: string;
-                    createdAt: unknown;
-                    updatedAt: unknown;
-                },
-            ) => (
+            cellFormat: (_: unknown, row: Room) => (
                 <div className="flex gap-2">
                     <Button
                         size="sm"
