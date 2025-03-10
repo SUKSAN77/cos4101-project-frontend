@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import {
     CategoriesService,
@@ -54,50 +54,53 @@ export const useEquipments = () => {
         GetApiV1EquipmentsResponses[200]["data"]
     >([]);
 
-    useEffect(() => {
-        const fetchEquipments = async () => {
-            const { data, error } = await EquipmentsService.getApiV1Equipments({
-                query: {
-                    limit: limit,
-                    offset: (page - 1) * limit,
-                },
-            });
-            if (data) setEquipments(data.data);
+    const fetchEquipments = useCallback(async () => {
+        const { data, error } = await EquipmentsService.getApiV1Equipments({
+            query: {
+                limit: limit,
+                offset: (page - 1) * limit,
+            },
+        });
+        if (data) setEquipments(data.data);
 
-            if (error?.message === "Could not validate credentials") {
-                console.log(error?.message);
-            }
-        };
-
-        fetchEquipments();
+        if (error?.message === "Could not validate credentials") {
+            console.log(error?.message);
+        }
     }, [page, limit]);
-    return { equipments, setPage, setLimit };
+
+    useEffect(() => {
+        fetchEquipments();
+    }, [fetchEquipments]);
+
+    return { equipments, setPage, setLimit, mutate: fetchEquipments };
 };
 
 export const useUsers = () => {
     const [page, setPage] = useState(1);
     const [limit, setLimit] = useState(100);
     const [users, setUsers] = useState<User[]>([]);
-    useEffect(() => {
-        const fetchUsers = async () => {
-            const { data, error } = await UsersService.getApiV1Users({
-                query: {
-                    limit: limit,
-                    offset: (page - 1) * limit,
-                },
-            });
-            if (data?.data) {
-                setUsers(data.data);
-            }
 
-            if (error?.message === "Could not validate credentials") {
-                console.log(error?.message);
-            }
-        };
+    const fetchUsers = useCallback(async () => {
+        const { data, error } = await UsersService.getApiV1Users({
+            query: {
+                limit: limit,
+                offset: (page - 1) * limit,
+            },
+        });
+        if (data?.data) {
+            setUsers(data.data);
+        }
 
-        fetchUsers();
+        if (error?.message === "Could not validate credentials") {
+            console.log(error?.message);
+        }
     }, [page, limit]);
-    return { users, setUsers, setPage, setLimit };
+
+    useEffect(() => {
+        fetchUsers();
+    }, [fetchUsers]);
+
+    return { users, setUsers, setPage, setLimit, mutate: fetchUsers };
 };
 
 export const useCategories = () => {
@@ -107,24 +110,24 @@ export const useCategories = () => {
         GetApiV1CategoriesResponses[200]["data"]
     >([]);
 
-    useEffect(() => {
-        const fetchCategories = async () => {
-            const { data, error } = await CategoriesService.getApiV1Categories({
-                query: {
-                    limit: limit,
-                    offset: (page - 1) * limit,
-                },
-            });
-            if (data) setCategories(data.data);
-            if (error) {
-                console.error(error);
-            }
-        };
-
-        fetchCategories();
+    const fetchCategories = useCallback(async () => {
+        const { data, error } = await CategoriesService.getApiV1Categories({
+            query: {
+                limit: limit,
+                offset: (page - 1) * limit,
+            },
+        });
+        if (data) setCategories(data.data);
+        if (error) {
+            console.error(error);
+        }
     }, [page, limit]);
 
-    return { categories, setPage, setLimit };
+    useEffect(() => {
+        fetchCategories();
+    }, [fetchCategories]);
+
+    return { categories, setPage, setLimit, mutate: fetchCategories };
 };
 
 export const useRooms = () => {
@@ -132,22 +135,22 @@ export const useRooms = () => {
     const [limit, setLimit] = useState(100);
     const [rooms, setRooms] = useState<GetApiV1RoomsResponses[200]["data"]>([]);
 
-    useEffect(() => {
-        const fetchRooms = async () => {
-            const { data, error } = await RoomsService.getApiV1Rooms({
-                query: {
-                    limit: limit,
-                    offset: (page - 1) * limit,
-                },
-            });
-            if (data) setRooms(data.data);
-            if (error) {
-                console.error(error);
-            }
-        };
-
-        fetchRooms();
+    const fetchRooms = useCallback(async () => {
+        const { data, error } = await RoomsService.getApiV1Rooms({
+            query: {
+                limit: limit,
+                offset: (page - 1) * limit,
+            },
+        });
+        if (data) setRooms(data.data);
+        if (error) {
+            console.error(error);
+        }
     }, [page, limit]);
 
-    return { rooms, setPage, setLimit };
+    useEffect(() => {
+        fetchRooms();
+    }, [fetchRooms]);
+
+    return { rooms, setPage, setLimit, mutate: fetchRooms };
 };
