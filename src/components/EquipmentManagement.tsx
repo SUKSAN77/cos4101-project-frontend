@@ -527,6 +527,21 @@ export default function EquipmentManagement() {
         doc.save(`รายงานครุภัณฑ์_${format(new Date(), "dd-MM-yyyy")}.pdf`);
     };
 
+    // เพิ่มฟังก์ชันสำหรับดึงข้อมูลก่อนหน้า
+    const handleCopyPreviousData = (index: number) => {
+        if (index === 0 || !newEquipment[index - 1]) return;
+
+        setNewEquipment((prev) => {
+            const updated = [...prev];
+            // คัดลอกข้อมูลจากรายการก่อนหน้า ยกเว้น image
+            updated[index] = {
+                ...prev[index - 1],
+                image: prev[index].image, // คงค่ารูปภาพเดิมไว้
+            };
+            return updated;
+        });
+    };
+
     return (
         <div className="space-y-6">
             <div className="mb-6 flex flex-col items-start justify-between sm:flex-row sm:items-center">
@@ -754,21 +769,38 @@ export default function EquipmentManagement() {
                                                 {item.name ||
                                                     `ครุภัณฑ์ ${index + 1}`}
                                             </span>
-                                            {newEquipment.length > 1 && (
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    className="h-8 w-8 p-0 hover:bg-red-100 hover:text-red-600"
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        handleRemoveEquipment(
-                                                            index,
-                                                        );
-                                                    }}
-                                                >
-                                                    <Trash2 className="h-4 w-4" />
-                                                </Button>
-                                            )}
+                                            <div className="flex items-center gap-2">
+                                                {index > 0 && ( // แสดงปุ่มเฉพาะรายการที่ไม่ใช่รายการแรก
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        className="h-8 px-2 hover:bg-blue-100 hover:text-blue-600"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleCopyPreviousData(
+                                                                index,
+                                                            );
+                                                        }}
+                                                    >
+                                                        ดึงข้อมูลก่อนหน้า
+                                                    </Button>
+                                                )}
+                                                {newEquipment.length > 1 && (
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        className="h-8 w-8 p-0 hover:bg-red-100 hover:text-red-600"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleRemoveEquipment(
+                                                                index,
+                                                            );
+                                                        }}
+                                                    >
+                                                        <Trash2 className="h-4 w-4" />
+                                                    </Button>
+                                                )}
+                                            </div>
                                         </div>
                                     </AccordionTrigger>
                                     <AccordionContent className="space-y-4 p-4">
