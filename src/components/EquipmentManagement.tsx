@@ -6,6 +6,8 @@ import "@fontsource/sarabun/700.css"; // bold weight
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 import {
     ChevronLeft,
     ChevronRight,
@@ -17,7 +19,6 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import pdfMake from "pdfmake/build/pdfmake";
-import { TDocumentDefinitions } from "pdfmake/interfaces";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -114,6 +115,7 @@ interface NewEquipment {
     receipt: File | null;
     roomId: string;
     categoryId: string;
+    description: string;
 }
 
 // Update the type definition for UpdateEquipment to include all fields
@@ -170,6 +172,7 @@ export default function EquipmentManagement() {
             receipt: null,
             roomId: "",
             categoryId: "",
+            description: "",
         },
     ]);
 
@@ -317,6 +320,7 @@ export default function EquipmentManagement() {
                 receipt: null,
                 roomId: "",
                 categoryId: "",
+                description: "",
             },
         ]);
     };
@@ -331,7 +335,7 @@ export default function EquipmentManagement() {
             for (const equipment of newEquipment) {
                 const requestBody = {
                     name: equipment.name,
-                    description: "",
+                    description: equipment.description || "",
                     lifetime: "0",
                     price: Number(equipment.price),
                     status: Number(equipment.status),
@@ -397,6 +401,7 @@ export default function EquipmentManagement() {
                     receipt: null,
                     roomId: "",
                     categoryId: "",
+                    description: "",
                 },
             ]);
             toast.success("เพิ่มครุภัณฑ์สำเร็จ");
@@ -489,73 +494,80 @@ export default function EquipmentManagement() {
     });
 
     // เพิ่มฟังก์ชันสำหรับสร้าง PDF
-    const handlePrintPDF = () => {
-        const tableBody = filteredEquipments.map((item) => [
-            item.customId || "-",
-            item.name,
-            getRoleLabel(item.status),
-            `${Number(item.price).toLocaleString()} บาท`,
-            new Date(String(item.acquiredDate)).toLocaleDateString("th-TH"),
-            getCategoryName(item.categoryId),
-            getRoomNumber(item.roomId),
-        ]);
+    const handlePrintPDF = async () => {
+        const doc = new jsPDF({
+            orientation: "landscape",
+        });
 
-        tableBody.unshift([
-            "รหัสครุภัณฑ์",
-            "ชื่อครุภัณฑ์",
-            "สถานะ",
-            "ราคา",
-            "วันที่ได้มา",
-            "หมวดหมู่",
-            "ห้อง",
-        ]);
+        try {
+            const fontResponse = await fetch("/THSarabunNew.ttf");
+            const fontBuffer = await fontResponse.arrayBuffer();
+            const base64Font = Buffer.from(fontBuffer).toString("base64");
+            doc.addFileToVFS("THSarabunNew.ttf", base64Font);
+            doc.addFont("THSarabunNew.ttf", "THSarabunNew", "normal");
+            doc.addFont("THSarabunNew-Bold.ttf", "THSarabunNew", "bold");
+            doc.setFont("THSarabunNew");
 
-        const docDefinition: TDocumentDefinitions = {
-            pageSize: "A4",
-            pageOrientation: "landscape",
-            defaultStyle: {
-                font: "THSarabunNew",
-            },
-            header: {
-                text: "รายงานครุภัณฑ์",
-                alignment: "center",
-                fontSize: 18,
-                margin: [0, 20],
-            },
-            content: [
-                {
-                    table: {
-                        headerRows: 1,
-                        widths: [
-                            "auto",
-                            "*",
-                            "auto",
-                            "auto",
-                            "auto",
-                            "auto",
-                            "auto",
-                        ],
-                        body: tableBody,
-                    },
+            // หัวข้อเอกสาร
+            doc.setFontSize(18);
+            doc.text("รายงานครุภัณฑ์", 14, 22);
+
+            // สร้างตารางหลังจากโหลดฟอนต์เสร็จแล้ว
+            autoTable(doc, {
+                startY: 30,
+                head: [
+                    [
+                        "รหัสครุภัณฑ์",
+                        "ชื่อครุภัณฑ์",
+                        "สถานะ",
+                        "ราคา",
+                        "วันที่ได้มา",
+                        "หมวดหมู่",
+                        "ห้อง",
+                    ],
+                ],
+                body: filteredEquipments.map((item) => [
+                    item.customId || "-",
+                    item.name,
+                    getRoleLabel(item.status),
+                    `${Number(item.price).toLocaleString()} บาท`,
+                    new Date(String(item.acquiredDate)).toLocaleDateString(
+                        "th-TH",
+                    ),
+                    getCategoryName(item.categoryId),
+                    getRoomNumber(item.roomId),
+                ]),
+                styles: {
+                    font: "THSarabunNew",
+                    fontSize: 12,
                 },
-            ],
-            styles: {
-                header: {
-                    fontSize: 18,
-                    bold: true,
-                    margin: [0, 0, 0, 10],
+                headStyles: {
+                    fillColor: [71, 85, 105],
+                    font: "THSarabunNew", // เพิ่มการระบุฟอนต์สำหรับส่วนหัว
                 },
-            },
-            footer: (currentPage: number, pageCount: number) => ({
-                text: `หน้า ${currentPage} จาก ${pageCount}`,
-                alignment: "right",
-                margin: [0, 0, 40, 0],
-            }),
-        };
+                columnStyles: {
+                    0: { cellWidth: 30 }, // รหัสครุภัณฑ์
+                    1: { cellWidth: "auto" }, // ชื่อครุภัณฑ์
+                    2: { cellWidth: 20 }, // สถานะ
+                    3: { cellWidth: 30 }, // ราคา
+                    4: { cellWidth: 30 }, // วันที่ได้มา
+                    5: { cellWidth: 30 }, // หมวดหมู่
+                    6: { cellWidth: 30 }, // ห้อง
+                },
+            });
 
-        pdfMake
-            .createPdf(docDefinition)
-            .download(`รายงานครุภัณฑ์_${format(new Date(), "dd-MM-yyyy")}.pdf`);
+            // เพิ่มวันที่พิมพ์
+            const today = new Date();
+            const dateStr = `วันที่พิมพ์: ${today.toLocaleDateString("th-TH")}`;
+            doc.setFontSize(10);
+            doc.text(dateStr, 14, doc.internal.pageSize.height - 10);
+
+            // บันทึกไฟล์
+            doc.save(`รายงานครุภัณฑ์_${format(new Date(), "dd-MM-yyyy")}.pdf`);
+        } catch (error) {
+            console.error("Error loading font:", error);
+            toast.error("เกิดข้อผิดพลาดในการโหลดฟอนต์");
+        }
     };
 
     // เพิ่มฟังก์ชันสำหรับดึงข้อมูลก่อนหน้า
@@ -858,6 +870,22 @@ export default function EquipmentManagement() {
                                                         )
                                                     }
                                                     placeholder="ชื่อครุภัณฑ์"
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-sm font-medium">
+                                                    รายละเอียด
+                                                </label>
+                                                <Input
+                                                    value={item.description}
+                                                    onChange={(e) =>
+                                                        handleNewEquipmentChange(
+                                                            index,
+                                                            "description",
+                                                            e.target.value,
+                                                        )
+                                                    }
+                                                    placeholder="รายละเอียดครุภัณฑ์"
                                                 />
                                             </div>
                                             <div className="space-y-2">
@@ -1301,6 +1329,16 @@ export default function EquipmentManagement() {
                                 <div className="col-span-3">
                                     <span className="text-gray-500">
                                         ไม่มีรูปภาพ
+                                    </span>
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-4 items-center gap-4">
+                                <span className="font-medium">
+                                    รูปภาพใบเสร็จ:
+                                </span>
+                                <div className="col-span-3">
+                                    <span className="text-gray-500">
+                                        ไม่มีรูปภาพใบเสร็จ
                                     </span>
                                 </div>
                             </div>
