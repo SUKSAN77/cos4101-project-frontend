@@ -568,12 +568,16 @@ export default function UserManagement() {
                                                 </SelectTrigger>
                                             </FormControl>
                                             <SelectContent>
-                                                <SelectItem value="0">
-                                                    ผู้ใช้งานทั่วไป
-                                                </SelectItem>
-                                                <SelectItem value="1">
-                                                    ผู้ดูแลระบบ
-                                                </SelectItem>
+                                                {Object.entries(USER_ROLES).map(
+                                                    ([role, label]) => (
+                                                        <SelectItem
+                                                            key={role}
+                                                            value={role.toString()}
+                                                        >
+                                                            {label}
+                                                        </SelectItem>
+                                                    ),
+                                                )}
                                             </SelectContent>
                                         </Select>
                                         <FormMessage />
@@ -716,12 +720,16 @@ export default function UserManagement() {
                                                 </SelectTrigger>
                                             </FormControl>
                                             <SelectContent>
-                                                <SelectItem value="0">
-                                                    ผู้ใช้งานทั่วไป
-                                                </SelectItem>
-                                                <SelectItem value="1">
-                                                    ผู้ดูแลระบบ
-                                                </SelectItem>
+                                                {Object.entries(USER_ROLES).map(
+                                                    ([role, label]) => (
+                                                        <SelectItem
+                                                            key={role}
+                                                            value={role.toString()}
+                                                        >
+                                                            {label}
+                                                        </SelectItem>
+                                                    ),
+                                                )}
                                             </SelectContent>
                                         </Select>
                                         <FormMessage />

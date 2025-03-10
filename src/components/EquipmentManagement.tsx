@@ -2,13 +2,29 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
-import { ChevronLeft, ChevronRight, Plus, Search } from "lucide-react";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+import {
+    ChevronLeft,
+    ChevronRight,
+    Download,
+    Plus,
+    Search,
+    Trash2,
+    X,
+} from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
 import { EquipmentsService } from "@/client";
+import {
+    Accordion,
+    AccordionContent,
+    AccordionItem,
+    AccordionTrigger,
+} from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import {
     Dialog,
@@ -80,6 +96,18 @@ const equipmentUpdateSchema = z.object({
 type EquipmentCreateValues = z.infer<typeof equipmentCreateSchema>;
 type EquipmentUpdateValues = z.infer<typeof equipmentUpdateSchema>;
 
+interface NewEquipment {
+    name: string;
+    customId: string;
+    serialNumber: string;
+    status: string;
+    price: string;
+    acquisitionMethod: string;
+    acquiredDate: string;
+    notes: string;
+    image: File | null;
+}
+
 export default function EquipmentManagement() {
     const { equipments, mutate } = useEquipments();
     const { categories } = useCategories();
@@ -102,6 +130,21 @@ export default function EquipmentManagement() {
     const [equipmentToDelete, setEquipmentToDelete] = useState<string | null>(
         null,
     );
+    const [selectedImage, setSelectedImage] = useState<File | null>(null);
+    const [selectedReceipt, setSelectedReceipt] = useState<File | null>(null);
+    const [newEquipment, setNewEquipment] = useState<NewEquipment[]>([
+        {
+            name: "",
+            customId: "",
+            serialNumber: "",
+            status: "0",
+            price: "",
+            acquisitionMethod: "",
+            acquiredDate: new Date().toISOString().split("T")[0],
+            notes: "",
+            image: null,
+        },
+    ]);
 
     const addForm = useForm<EquipmentCreateValues>({
         resolver: zodResolver(equipmentCreateSchema),
@@ -216,32 +259,92 @@ export default function EquipmentManagement() {
         }
     };
 
-    const handleAdd = async (values: EquipmentCreateValues) => {
+    const handleNewEquipmentChange = (
+        index: number,
+        field: keyof NewEquipment,
+        value: any,
+    ) => {
+        setNewEquipment((prev) => {
+            const updated = [...prev];
+            updated[index] = {
+                ...updated[index],
+                [field]: value,
+            };
+            return updated;
+        });
+    };
+
+    const handleAddNewEquipmentField = () => {
+        setNewEquipment((prev) => [
+            ...prev,
+            {
+                name: "",
+                customId: "",
+                serialNumber: "",
+                status: "0",
+                price: "",
+                acquisitionMethod: "",
+                acquiredDate: new Date().toISOString().split("T")[0],
+                notes: "",
+                image: null,
+            },
+        ]);
+    };
+
+    const handleRemoveEquipment = (index: number) => {
+        setNewEquipment((prev) => prev.filter((_, i) => i !== index));
+    };
+
+    const handleSaveEquipment = async () => {
         setIsLoading(true);
         try {
-            const requestBody = {
-                ...values,
-                roomId: values.roomId || undefined,
-                categoryId: values.categoryId || undefined,
-                status: Number(values.status),
-                price: Number(values.price),
-                lifetime: Number(values.lifetime),
-            };
+            for (const equipment of newEquipment) {
+                const requestBody = {
+                    ...equipment,
+                    status: Number(equipment.status),
+                    price: Number(equipment.price),
+                    lifetime: 0, // ต้องเพิ่มฟิลด์นี้ในฟอร์มถ้าต้องการ
+                };
 
-            const { error } = await EquipmentsService.postApiV1Equipments({
-                body: requestBody,
-            });
+                const { data, error } =
+                    await EquipmentsService.postApiV1Equipments({
+                        body: requestBody,
+                    });
 
-            if (!error) {
-                setIsDialogOpen(false);
-                addForm.reset();
-                toast.success("เพิ่มครุภัณฑ์สำเร็จ");
-                await mutate();
-            } else {
-                throw new Error(
-                    error.message || "เกิดข้อผิดพลาดในการเพิ่มครุภัณฑ์",
-                );
+                if (error) {
+                    throw new Error(error.message);
+                }
+
+                // อัพโหลดรูปภาพ
+                if (data && equipment.image) {
+                    const { error: imageError } =
+                        await EquipmentsService.postApiV1EquipmentsByIdImages({
+                            path: { id: data.id },
+                            body: { file: equipment.image },
+                        });
+
+                    if (imageError) {
+                        toast.error("ไม่สามารถอัพโหลดรูปภาพได้");
+                    }
+                }
             }
+
+            setIsDialogOpen(false);
+            setNewEquipment([
+                {
+                    name: "",
+                    customId: "",
+                    serialNumber: "",
+                    status: "0",
+                    price: "",
+                    acquisitionMethod: "",
+                    acquiredDate: new Date().toISOString().split("T")[0],
+                    notes: "",
+                    image: null,
+                },
+            ]);
+            toast.success("เพิ่มครุภัณฑ์สำเร็จ");
+            await mutate();
         } catch (error) {
             if (error instanceof Error) {
                 toast.error(error.message);
@@ -329,18 +432,122 @@ export default function EquipmentManagement() {
         return matchesSearch && matchesCategory && matchesStatus && matchesRoom;
     });
 
+    // เพิ่มฟังก์ชันจัดการการเลือกไฟล์
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            setSelectedImage(e.target.files[0]);
+        }
+    };
+
+    const handleReceiptChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            setSelectedReceipt(e.target.files[0]);
+        }
+    };
+
+    // เพิ่มฟังก์ชันสำหรับสร้าง PDF
+    const handlePrintPDF = () => {
+        const doc = new jsPDF("p", "mm", "a4");
+
+        // เพิ่มฟอนต์
+        doc.addFont(
+            "https://fonts.gstatic.com/s/sarabun/v13/DtVmJx26TKEr37c9YL5.ttf",
+            "Sarabun",
+            "normal",
+        );
+        doc.setFont("Sarabun");
+        doc.setFontSize(16);
+
+        // เพิ่มหัวกระดาษ
+        doc.text("รายงานครุภัณฑ์", 14, 15);
+
+        // สร้างข้อมูลสำหรับตาราง
+        const tableData = filteredEquipments.map((item) => [
+            item.customId || "-",
+            item.name,
+            getRoleLabel(item.status),
+            `${(item.price as string).toLocaleString()} บาท`,
+            new Date(item.acquiredDate).toLocaleDateString("th-TH"),
+            getCategoryName(item.categoryId),
+            getRoomNumber(item.roomId),
+        ]);
+
+        // สร้างตาราง
+        autoTable(doc, {
+            head: [
+                [
+                    "รหัสครุภัณฑ์",
+                    "ชื่อครุภัณฑ์",
+                    "สถานะ",
+                    "ราคา",
+                    "วันที่ได้มา",
+                    "หมวดหมู่",
+                    "ห้อง",
+                ],
+            ],
+            body: tableData,
+            startY: 20,
+            styles: {
+                font: "Sarabun",
+                fontSize: 12,
+            },
+            headStyles: {
+                fillColor: [71, 85, 105],
+                textColor: [255, 255, 255],
+                font: "Sarabun",
+                fontSize: 12,
+                halign: "center",
+            },
+            theme: "grid",
+            columnStyles: {
+                0: { cellWidth: 25 },
+                1: { cellWidth: 40 },
+                2: { cellWidth: 20 },
+                3: { cellWidth: 25 },
+                4: { cellWidth: 25 },
+                5: { cellWidth: 30 },
+                6: { cellWidth: 25 },
+            },
+        });
+
+        // เพิ่มเลขหน้า
+        const pageCount = doc.internal.getNumberOfPages();
+        for (let i = 1; i <= pageCount; i++) {
+            doc.setPage(i);
+            doc.setFontSize(10);
+            doc.text(
+                `หน้า ${i} จาก ${pageCount}`,
+                doc.internal.pageSize.width - 20,
+                doc.internal.pageSize.height - 10,
+                { align: "right" },
+            );
+        }
+
+        // บันทึกไฟล์
+        doc.save(`รายงานครุภัณฑ์_${format(new Date(), "dd-MM-yyyy")}.pdf`);
+    };
+
     return (
         <div className="space-y-6">
             <div className="mb-6 flex flex-col items-start justify-between sm:flex-row sm:items-center">
                 <h1 className="mb-4 text-3xl font-bold sm:mb-0">
                     จัดการครุภัณฑ์
                 </h1>
-                <Button
-                    onClick={() => setIsDialogOpen(true)}
-                    className="bg-blue-500 hover:bg-blue-600"
-                >
-                    <Plus className="mr-2 h-4 w-4" /> เพิ่มครุภัณฑ์
-                </Button>
+                <div className="flex space-x-2">
+                    <Button
+                        variant="outline"
+                        onClick={handlePrintPDF}
+                        className="bg-green-500 text-white hover:bg-green-600"
+                    >
+                        <Download className="mr-2 h-4 w-4" /> พิมพ์รายงาน
+                    </Button>
+                    <Button
+                        onClick={() => setIsDialogOpen(true)}
+                        className="bg-blue-500 hover:bg-blue-600"
+                    >
+                        <Plus className="mr-2 h-4 w-4" /> เพิ่มครุภัณฑ์
+                    </Button>
+                </div>
             </div>
 
             <div className="mb-6 flex flex-col space-y-4">
@@ -524,195 +731,267 @@ export default function EquipmentManagement() {
 
             <Dialog open={isDialogOpen} onOpenChange={handleCloseDialog}>
                 <DialogContent className="max-h-[80vh] overflow-y-auto sm:max-w-[600px]">
-                    <form onSubmit={addForm.handleSubmit(handleAdd)}>
-                        <DialogHeader>
-                            <DialogTitle className="text-xl font-semibold">
-                                เพิ่มครุภัณฑ์
-                            </DialogTitle>
-                        </DialogHeader>
+                    <DialogHeader>
+                        <DialogTitle className="text-xl font-semibold">
+                            เพิ่มครุภัณฑ์
+                        </DialogTitle>
+                    </DialogHeader>
 
-                        <div className="space-y-4">
-                            <div className="grid gap-4">
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium">
-                                        ชื่อครุภัณฑ์
-                                    </label>
-                                    <Input
-                                        {...addForm.register("name")}
-                                        placeholder="ชื่อครุภัณฑ์"
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium">
-                                        รหัสครุภัณฑ์
-                                    </label>
-                                    <Input
-                                        {...addForm.register("customId")}
-                                        placeholder="รหัสครุภัณฑ์"
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium">
-                                        Serial Number
-                                    </label>
-                                    <Input
-                                        {...addForm.register("serialNumber")}
-                                        placeholder="Serial Number"
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium">
-                                        สถานะ
-                                    </label>
-                                    <Select
-                                        onValueChange={(value) =>
-                                            addForm.setValue(
-                                                "status",
-                                                Number(value),
-                                            )
-                                        }
-                                        defaultValue="0"
-                                    >
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="เลือกสถานะ" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="0">
-                                                ปกติ
-                                            </SelectItem>
-                                            <SelectItem value="1">
-                                                ชำรุด
-                                            </SelectItem>
-                                            <SelectItem value="2">
-                                                จำหน่าย
-                                            </SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium">
-                                        ราคา
-                                    </label>
-                                    <Input
-                                        type="number"
-                                        {...addForm.register("price", {
-                                            valueAsNumber: true,
-                                        })}
-                                        placeholder="ราคา"
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium">
-                                        อายุการใช้งาน (ปี)
-                                    </label>
-                                    <Input
-                                        type="number"
-                                        {...addForm.register("lifetime", {
-                                            valueAsNumber: true,
-                                        })}
-                                        placeholder="อายุการใช้งาน"
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium">
-                                        วิธีการได้มา
-                                    </label>
-                                    <Input
-                                        {...addForm.register(
-                                            "acquisitionMethod",
-                                        )}
-                                        placeholder="วิธีการได้มา"
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium">
-                                        วันที่ได้รับ
-                                    </label>
-                                    <Input
-                                        type="date"
-                                        {...addForm.register("acquiredDate")}
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium">
-                                        หมายเหตุ
-                                    </label>
-                                    <Input
-                                        {...addForm.register("notes")}
-                                        placeholder="หมายเหตุ"
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium">
-                                        ห้อง
-                                    </label>
-                                    <Select
-                                        onValueChange={(value) =>
-                                            addForm.setValue("roomId", value)
-                                        }
-                                    >
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="เลือกห้อง" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {rooms.map((room) => (
-                                                <SelectItem
-                                                    key={room.id}
-                                                    value={room.id}
+                    <div className="space-y-4">
+                        <Accordion
+                            type="single"
+                            collapsible
+                            className="space-y-4"
+                        >
+                            {newEquipment.map((item, index) => (
+                                <AccordionItem
+                                    key={index}
+                                    value={`item-${index}`}
+                                >
+                                    <AccordionTrigger className="rounded-lg px-4 py-2 hover:bg-gray-50/50">
+                                        <div className="flex w-full items-center justify-between">
+                                            <span>
+                                                {item.name ||
+                                                    `ครุภัณฑ์ ${index + 1}`}
+                                            </span>
+                                            {newEquipment.length > 1 && (
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    className="h-8 w-8 p-0 hover:bg-red-100 hover:text-red-600"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleRemoveEquipment(
+                                                            index,
+                                                        );
+                                                    }}
                                                 >
-                                                    ห้อง {room.roomNumber}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium">
-                                        หมวดหมู่
-                                    </label>
-                                    <Select
-                                        onValueChange={(value) =>
-                                            addForm.setValue(
-                                                "categoryId",
-                                                value,
-                                            )
-                                        }
-                                    >
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="เลือกหมวดหมู่" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {categories.map((category) => (
-                                                <SelectItem
-                                                    key={category.id}
-                                                    value={category.id}
+                                                    <Trash2 className="h-4 w-4" />
+                                                </Button>
+                                            )}
+                                        </div>
+                                    </AccordionTrigger>
+                                    <AccordionContent className="space-y-4 p-4">
+                                        <div className="grid gap-4">
+                                            <div className="space-y-2">
+                                                <label className="text-sm font-medium">
+                                                    ชื่อครุภัณฑ์
+                                                </label>
+                                                <Input
+                                                    value={item.name}
+                                                    onChange={(e) =>
+                                                        handleNewEquipmentChange(
+                                                            index,
+                                                            "name",
+                                                            e.target.value,
+                                                        )
+                                                    }
+                                                    placeholder="ชื่อครุภัณฑ์"
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-sm font-medium">
+                                                    รหัสครุภัณฑ์
+                                                </label>
+                                                <Input
+                                                    value={item.customId}
+                                                    onChange={(e) =>
+                                                        handleNewEquipmentChange(
+                                                            index,
+                                                            "customId",
+                                                            e.target.value,
+                                                        )
+                                                    }
+                                                    placeholder="รหัสครุภัณฑ์"
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-sm font-medium">
+                                                    Serial Number
+                                                </label>
+                                                <Input
+                                                    value={item.serialNumber}
+                                                    onChange={(e) =>
+                                                        handleNewEquipmentChange(
+                                                            index,
+                                                            "serialNumber",
+                                                            e.target.value,
+                                                        )
+                                                    }
+                                                    placeholder="Serial Number"
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-sm font-medium">
+                                                    สถานะ
+                                                </label>
+                                                <Select
+                                                    value={item.status}
+                                                    onValueChange={(value) =>
+                                                        handleNewEquipmentChange(
+                                                            index,
+                                                            "status",
+                                                            value,
+                                                        )
+                                                    }
                                                 >
-                                                    {category.name}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                            </div>
-                        </div>
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder="เลือกสถานะ" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="0">
+                                                            ปกติ
+                                                        </SelectItem>
+                                                        <SelectItem value="1">
+                                                            ชำรุด
+                                                        </SelectItem>
+                                                        <SelectItem value="2">
+                                                            จำหน่าย
+                                                        </SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-sm font-medium">
+                                                    ราคา
+                                                </label>
+                                                <Input
+                                                    type="number"
+                                                    value={item.price}
+                                                    onChange={(e) =>
+                                                        handleNewEquipmentChange(
+                                                            index,
+                                                            "price",
+                                                            e.target.value,
+                                                        )
+                                                    }
+                                                    placeholder="ราคา"
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-sm font-medium">
+                                                    วิธีการได้มา
+                                                </label>
+                                                <Input
+                                                    value={
+                                                        item.acquisitionMethod
+                                                    }
+                                                    onChange={(e) =>
+                                                        handleNewEquipmentChange(
+                                                            index,
+                                                            "acquisitionMethod",
+                                                            e.target.value,
+                                                        )
+                                                    }
+                                                    placeholder="วิธีการได้มา"
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-sm font-medium">
+                                                    วันที่ได้รับ
+                                                </label>
+                                                <Input
+                                                    type="date"
+                                                    value={item.acquiredDate}
+                                                    onChange={(e) =>
+                                                        handleNewEquipmentChange(
+                                                            index,
+                                                            "acquiredDate",
+                                                            e.target.value,
+                                                        )
+                                                    }
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-sm font-medium">
+                                                    หมายเหตุ
+                                                </label>
+                                                <Input
+                                                    value={item.notes}
+                                                    onChange={(e) =>
+                                                        handleNewEquipmentChange(
+                                                            index,
+                                                            "notes",
+                                                            e.target.value,
+                                                        )
+                                                    }
+                                                    placeholder="หมายเหตุ"
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-sm font-medium">
+                                                    รูปภาพครุภัณฑ์
+                                                </label>
+                                                <div className="flex items-center gap-4">
+                                                    <Input
+                                                        type="file"
+                                                        accept="image/*"
+                                                        onChange={(e) => {
+                                                            const file =
+                                                                e.target
+                                                                    .files?.[0];
+                                                            handleNewEquipmentChange(
+                                                                index,
+                                                                "image",
+                                                                file || null,
+                                                            );
+                                                        }}
+                                                        className="flex-1"
+                                                    />
+                                                    {item.image && (
+                                                        <div className="relative h-20 w-20">
+                                                            <img
+                                                                src={URL.createObjectURL(
+                                                                    item.image,
+                                                                )}
+                                                                alt="Equipment preview"
+                                                                className="h-full w-full rounded-md object-cover"
+                                                            />
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="sm"
+                                                                className="absolute -right-2 -top-2 h-6 w-6 rounded-full p-0"
+                                                                onClick={() =>
+                                                                    handleNewEquipmentChange(
+                                                                        index,
+                                                                        "image",
+                                                                        null,
+                                                                    )
+                                                                }
+                                                            >
+                                                                <X className="h-4 w-4" />
+                                                            </Button>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </AccordionContent>
+                                </AccordionItem>
+                            ))}
+                        </Accordion>
 
-                        <DialogFooter className="mt-6">
-                            <Button
-                                variant="outline"
-                                onClick={handleCloseDialog}
-                                type="button"
-                            >
-                                ยกเลิก
-                            </Button>
-                            <Button
-                                type="submit"
-                                disabled={isLoading}
-                                className="bg-blue-500 hover:bg-blue-600"
-                            >
-                                {isLoading ? "กำลังบันทึก..." : "บันทึก"}
-                            </Button>
-                        </DialogFooter>
-                    </form>
+                        <Button
+                            variant="outline"
+                            onClick={handleAddNewEquipmentField}
+                            className="mt-4 w-full"
+                        >
+                            <Plus className="mr-2 h-4 w-4" /> เพิ่มรายการใหม่
+                        </Button>
+                    </div>
+
+                    <DialogFooter className="mt-6">
+                        <Button variant="outline" onClick={handleCloseDialog}>
+                            ยกเลิก
+                        </Button>
+                        <Button
+                            onClick={handleSaveEquipment}
+                            className="bg-blue-500 hover:bg-blue-600"
+                            disabled={isLoading}
+                        >
+                            {isLoading ? "กำลังบันทึก..." : "บันทึก"}
+                        </Button>
+                    </DialogFooter>
                 </DialogContent>
             </Dialog>
 
@@ -1015,7 +1294,7 @@ export default function EquipmentManagement() {
                                     หมวดหมู่
                                 </label>
                                 <Select
-                                    value={editingEquipment.categoryId}
+                                    value={editingEquipment.categoryId ?? ""}
                                     onValueChange={(value) =>
                                         handleEditChange("categoryId", value)
                                     }
