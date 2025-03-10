@@ -1,10 +1,13 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
 import { format, formatDistanceToNow } from "date-fns";
 import { th } from "date-fns/locale";
 import { Edit, Loader2, Plus, Search, Trash2 } from "lucide-react";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import * as z from "zod";
 
 import { UsersService } from "@/client";
 import {
@@ -28,12 +31,19 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog";
 import {
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from "@/components/ui/form";
+import {
     HoverCard,
     HoverCardContent,
     HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
     Select,
     SelectContent,
@@ -51,6 +61,41 @@ import {
 } from "@/components/ui/table";
 import { useUsers } from "@/hooks/api";
 import type { UpdateUser, User } from "@/types/users";
+
+const userCreateSchema = z.object({
+    email: z.string().email({ message: "กรุณากรอกอีเมลให้ถูกต้อง" }).max(320, {
+        message: "อีเมลต้องมีความยาวไม่เกิน 320 ตัวอักษร",
+    }),
+    password: z.string().min(1, { message: "กรุณากรอกรหัสผ่าน" }),
+    firstName: z.string().min(1, { message: "กรุณากรอกชื่อ" }).max(128, {
+        message: "ชื่อต้องมีความยาวไม่เกิน 128 ตัวอักษร",
+    }),
+    lastName: z.string().min(1, { message: "กรุณากรอกนามสกุล" }).max(128, {
+        message: "นามสกุลต้องมีความยาวไม่เกิน 128 ตัวอักษร",
+    }),
+    role: z.string(),
+    isActive: z.boolean(),
+    emailVerified: z.boolean(),
+});
+
+const userUpdateSchema = z.object({
+    email: z.string().email({ message: "กรุณากรอกอีเมลให้ถูกต้อง" }).max(320, {
+        message: "อีเมลต้องมีความยาวไม่เกิน 320 ตัวอักษร",
+    }),
+    password: z.string().optional(),
+    firstName: z.string().min(1, { message: "กรุณากรอกชื่อ" }).max(128, {
+        message: "ชื่อต้องมีความยาวไม่เกิน 128 ตัวอักษร",
+    }),
+    lastName: z.string().min(1, { message: "กรุณากรอกนามสกุล" }).max(128, {
+        message: "นามสกุลต้องมีความยาวไม่เกิน 128 ตัวอักษร",
+    }),
+    role: z.string(),
+    isActive: z.boolean(),
+    emailVerified: z.boolean(),
+});
+
+type UserCreateValues = z.infer<typeof userCreateSchema>;
+type UserUpdateValues = z.infer<typeof userUpdateSchema>;
 
 const DateDisplay = ({ dateString }: { dateString: string }) => {
     if (typeof dateString !== "string") return <span>ไม่ระบุ</span>;
@@ -98,78 +143,86 @@ export default function UserManagement() {
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState(false);
-    const [newUser, setNewUser] = useState({
-        email: "",
-        password: "",
-        firstName: "",
-        lastName: "",
-        role: "0",
-        isActive: true,
-        emailVerified: false,
-    });
     const [editingUser, setEditingUser] = useState<User | null>(null);
     const [userToDelete, setUserToDelete] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
 
     const { users, mutate } = useUsers();
 
-    const handleAdd = async () => {
-        if (!newUser.email.trim() || !newUser.password.trim()) {
-            toast.error("กรุณากรอกอีเมลและรหัสผ่าน");
-            return;
-        }
+    // Create form for adding users
+    const addForm = useForm<UserCreateValues>({
+        resolver: zodResolver(userCreateSchema),
+        defaultValues: {
+            email: "",
+            password: "",
+            firstName: "",
+            lastName: "",
+            role: "0",
+            isActive: true,
+            emailVerified: false,
+        },
+    });
 
+    // Create form for editing users
+    const editForm = useForm<UserUpdateValues>({
+        resolver: zodResolver(userUpdateSchema),
+        defaultValues: {
+            email: "",
+            password: "",
+            firstName: "",
+            lastName: "",
+            role: "0",
+            isActive: true,
+            emailVerified: false,
+        },
+    });
+
+    const handleAdd = async (values: UserCreateValues) => {
         setIsLoading(true);
         try {
             const { error } = await UsersService.postApiV1Users({
                 body: {
-                    ...newUser,
-                    role: parseInt(newUser.role),
+                    ...values,
+                    role: parseInt(values.role),
                 },
             });
             if (!error) {
                 setIsAddModalOpen(false);
-                setNewUser({
-                    email: "",
-                    password: "",
-                    firstName: "",
-                    lastName: "",
-                    role: "0",
-                    isActive: true,
-                    emailVerified: false,
-                });
+                addForm.reset();
                 toast.success("เพิ่มผู้ใช้งานสำเร็จ");
                 await mutate();
             } else {
-                toast.error(error.message);
-                // console.error("Error adding user:", error);
+                toast.error(
+                    error.message || "เกิดข้อผิดพลาดในการเพิ่มผู้ใช้งาน",
+                );
             }
         } finally {
             setIsLoading(false);
         }
     };
 
-    const handleEdit = async () => {
+    const handleEdit = async (values: UserUpdateValues) => {
         if (!editingUser) return;
 
         setIsLoading(true);
         try {
+            console.log("values:", values);
             const editPayload: UpdateUser = {};
 
-            if (newUser.email !== editingUser.email && newUser.email.trim())
-                editPayload.email = newUser.email.trim();
-            if (newUser.password?.trim())
-                editPayload.password = newUser.password.trim();
-            if (newUser.firstName?.trim() !== editingUser.firstName)
-                editPayload.firstName = newUser.firstName?.trim();
-            if (newUser.lastName?.trim() !== editingUser.lastName)
-                editPayload.lastName = newUser.lastName?.trim();
-            if (newUser.role !== editingUser.role?.toString())
-                editPayload.role = parseInt(newUser.role);
-            if (newUser.isActive !== editingUser.isActive)
-                editPayload.isActive = newUser.isActive;
-            if (newUser.emailVerified !== editingUser.emailVerified)
-                editPayload.emailVerified = newUser.emailVerified;
+            if (values.email !== editingUser.email && values.email.trim())
+                editPayload.email = values.email.trim();
+            if (values.password?.trim())
+                editPayload.password = values.password.trim();
+            if (values.firstName?.trim() !== editingUser.firstName)
+                editPayload.firstName = values.firstName?.trim();
+            if (values.lastName?.trim() !== editingUser.lastName)
+                editPayload.lastName = values.lastName?.trim();
+            if (values.role !== editingUser.role?.toString())
+                editPayload.role = parseInt(values.role);
+            if (values.isActive !== editingUser.isActive)
+                editPayload.isActive = values.isActive;
+            if (values.emailVerified !== editingUser.emailVerified)
+                editPayload.emailVerified = values.emailVerified;
 
             // Only proceed if there are actual changes
             if (Object.keys(editPayload).length === 0) {
@@ -178,7 +231,6 @@ export default function UserManagement() {
                 return;
             }
 
-            console.log("Edit payload:", editPayload);
             const { error } = await UsersService.patchApiV1UsersById({
                 path: { id: editingUser.id },
                 body: editPayload,
@@ -186,19 +238,13 @@ export default function UserManagement() {
             if (!error) {
                 setIsEditModalOpen(false);
                 setEditingUser(null);
-                setNewUser({
-                    email: "",
-                    password: "",
-                    firstName: "",
-                    lastName: "",
-                    role: "0",
-                    isActive: true,
-                    emailVerified: false,
-                });
+                editForm.reset();
                 toast.success("แก้ไขผู้ใช้งานสำเร็จ");
                 await mutate();
             } else {
-                toast.error(error.message);
+                toast.error(
+                    error.message || "เกิดข้อผิดพลาดในการแก้ไขผู้ใช้งาน",
+                );
             }
         } finally {
             setIsLoading(false);
@@ -220,7 +266,7 @@ export default function UserManagement() {
                 toast.success("ลบผู้ใช้งานสำเร็จ");
                 await mutate();
             } else {
-                toast.error(error.message);
+                toast.error(error.message || "เกิดข้อผิดพลาดในการลบผู้ใช้งาน");
             }
         } finally {
             setIsLoading(false);
@@ -352,29 +398,31 @@ export default function UserManagement() {
                                                                     setEditingUser(
                                                                         user,
                                                                     );
-                                                                    setNewUser({
-                                                                        email: user.email,
-                                                                        password:
-                                                                            "",
-                                                                        firstName:
-                                                                            user.firstName ||
-                                                                            "",
-                                                                        lastName:
-                                                                            user.lastName ||
-                                                                            "",
-                                                                        role:
-                                                                            typeof user.role ===
-                                                                            "string"
-                                                                                ? user.role
-                                                                                : user.role?.toString() ||
-                                                                                  "0",
-                                                                        isActive:
-                                                                            user.isActive ??
-                                                                            true,
-                                                                        emailVerified:
-                                                                            user.emailVerified ??
-                                                                            false,
-                                                                    });
+                                                                    editForm.reset(
+                                                                        {
+                                                                            email: user.email,
+                                                                            password:
+                                                                                "",
+                                                                            firstName:
+                                                                                user.firstName ||
+                                                                                "",
+                                                                            lastName:
+                                                                                user.lastName ||
+                                                                                "",
+                                                                            role:
+                                                                                typeof user.role ===
+                                                                                "string"
+                                                                                    ? user.role
+                                                                                    : user.role?.toString() ||
+                                                                                      "0",
+                                                                            isActive:
+                                                                                user.isActive ??
+                                                                                true,
+                                                                            emailVerified:
+                                                                                user.emailVerified ??
+                                                                                false,
+                                                                        },
+                                                                    );
                                                                     setIsEditModalOpen(
                                                                         true,
                                                                     );
@@ -413,7 +461,15 @@ export default function UserManagement() {
             </Card>
 
             {/* Add User Modal */}
-            <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
+            <Dialog
+                open={isAddModalOpen}
+                onOpenChange={(open) => {
+                    if (!open) {
+                        addForm.reset();
+                    }
+                    setIsAddModalOpen(open);
+                }}
+            >
                 <DialogContent className="sm:max-w-[425px]">
                     <DialogHeader>
                         <DialogTitle className="text-xl">
@@ -423,121 +479,142 @@ export default function UserManagement() {
                             กรอกข้อมูลผู้ใช้งานที่ต้องการเพิ่ม
                         </DialogDescription>
                     </DialogHeader>
-                    <div className="space-y-4 py-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="email">อีเมล</Label>
-                            <Input
-                                id="email"
-                                type="email"
-                                value={newUser.email}
-                                onChange={(e) =>
-                                    setNewUser({
-                                        ...newUser,
-                                        email: e.target.value,
-                                    })
-                                }
-                                placeholder="กรอกอีเมล"
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="password">รหัสผ่าน</Label>
-                            <Input
-                                id="password"
-                                type="password"
-                                value={newUser.password}
-                                onChange={(e) =>
-                                    setNewUser({
-                                        ...newUser,
-                                        password: e.target.value,
-                                    })
-                                }
-                                placeholder="กรอกรหัสผ่าน"
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="firstName">ชื่อ</Label>
-                            <Input
-                                id="firstName"
-                                value={newUser.firstName}
-                                onChange={(e) =>
-                                    setNewUser({
-                                        ...newUser,
-                                        firstName: e.target.value,
-                                    })
-                                }
-                                placeholder="กรอกชื่อ"
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="lastName">นามสกุล</Label>
-                            <Input
-                                id="lastName"
-                                value={newUser.lastName}
-                                onChange={(e) =>
-                                    setNewUser({
-                                        ...newUser,
-                                        lastName: e.target.value,
-                                    })
-                                }
-                                placeholder="กรอกนามสกุล"
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="role">บทบาท</Label>
-                            <Select
-                                value={newUser.role}
-                                onValueChange={(value) =>
-                                    setNewUser({ ...newUser, role: value })
-                                }
-                            >
-                                <SelectTrigger>
-                                    <SelectValue placeholder="เลือกบทบาท" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="0">
-                                        ผู้ใช้งานทั่วไป
-                                    </SelectItem>
-                                    <SelectItem value="1">
-                                        ผู้ดูแลระบบ
-                                    </SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-                    </div>
-                    <DialogFooter>
-                        <Button
-                            variant="outline"
-                            onClick={() => {
-                                setIsAddModalOpen(false);
-                                setNewUser({
-                                    email: "",
-                                    password: "",
-                                    firstName: "",
-                                    lastName: "",
-                                    role: "0",
-                                    isActive: true,
-                                    emailVerified: false,
-                                });
-                            }}
+                    <Form {...addForm}>
+                        <form
+                            onSubmit={addForm.handleSubmit(handleAdd)}
+                            className="space-y-4 py-4"
                         >
-                            ยกเลิก
-                        </Button>
-                        <Button onClick={handleAdd} disabled={isLoading}>
-                            {isLoading ? (
-                                <>
-                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                    กำลังเพิ่ม...
-                                </>
-                            ) : (
-                                "เพิ่ม"
-                            )}
-                        </Button>
-                    </DialogFooter>
+                            <FormField
+                                control={addForm.control}
+                                name="email"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>อีเมล</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                placeholder="กรอกอีเมล"
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={addForm.control}
+                                name="password"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>รหัสผ่าน</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                type="password"
+                                                placeholder="กรอกรหัสผ่าน"
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={addForm.control}
+                                name="firstName"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>ชื่อ</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                placeholder="กรอกชื่อ"
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={addForm.control}
+                                name="lastName"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>นามสกุล</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                placeholder="กรอกนามสกุล"
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={addForm.control}
+                                name="role"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>บทบาท</FormLabel>
+                                        <Select
+                                            onValueChange={field.onChange}
+                                            defaultValue={field.value}
+                                        >
+                                            <FormControl>
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="เลือกบทบาท" />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                <SelectItem value="0">
+                                                    ผู้ใช้งานทั่วไป
+                                                </SelectItem>
+                                                <SelectItem value="1">
+                                                    ผู้ดูแลระบบ
+                                                </SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <DialogFooter>
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    onClick={() => {
+                                        setIsAddModalOpen(false);
+                                        addForm.reset();
+                                    }}
+                                >
+                                    ยกเลิก
+                                </Button>
+                                <Button type="submit" disabled={isLoading}>
+                                    {isLoading ? (
+                                        <>
+                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                            กำลังเพิ่ม...
+                                        </>
+                                    ) : (
+                                        "เพิ่ม"
+                                    )}
+                                </Button>
+                            </DialogFooter>
+                        </form>
+                    </Form>
                 </DialogContent>
             </Dialog>
 
             {/* Edit User Modal */}
-            <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
+            <Dialog
+                open={isEditModalOpen}
+                onOpenChange={(open) => {
+                    if (!open) {
+                        editForm.reset();
+                        setEditingUser(null);
+                    }
+                    setIsEditModalOpen(open);
+                }}
+            >
                 <DialogContent className="sm:max-w-[425px]">
                     <DialogHeader>
                         <DialogTitle className="text-xl">
@@ -547,169 +624,198 @@ export default function UserManagement() {
                             แก้ไขข้อมูลผู้ใช้งานที่ต้องการเปลี่ยน
                         </DialogDescription>
                     </DialogHeader>
-                    <div className="space-y-4 py-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="edit-email">อีเมล</Label>
-                            <Input
-                                id="edit-email"
-                                type="email"
-                                value={newUser.email}
-                                onChange={(e) =>
-                                    setNewUser({
-                                        ...newUser,
-                                        email: e.target.value,
-                                    })
-                                }
-                                placeholder="กรอกอีเมล"
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="edit-password">
-                                รหัสผ่าน (ไม่ต้องกรอกถ้าไม่ต้องการเปลี่ยน)
-                            </Label>
-                            <Input
-                                id="edit-password"
-                                type="password"
-                                value={newUser.password}
-                                onChange={(e) =>
-                                    setNewUser({
-                                        ...newUser,
-                                        password: e.target.value,
-                                    })
-                                }
-                                placeholder="กรอกรหัสผ่านใหม่"
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="edit-firstName">ชื่อ</Label>
-                            <Input
-                                id="edit-firstName"
-                                value={newUser.firstName}
-                                onChange={(e) =>
-                                    setNewUser({
-                                        ...newUser,
-                                        firstName: e.target.value,
-                                    })
-                                }
-                                placeholder="กรอกชื่อ"
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="edit-lastName">นามสกุล</Label>
-                            <Input
-                                id="edit-lastName"
-                                value={newUser.lastName}
-                                onChange={(e) =>
-                                    setNewUser({
-                                        ...newUser,
-                                        lastName: e.target.value,
-                                    })
-                                }
-                                placeholder="กรอกนามสกุล"
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="edit-role">บทบาท</Label>
-                            <Select
-                                value={newUser.role}
-                                onValueChange={(value) =>
-                                    setNewUser({ ...newUser, role: value })
-                                }
-                            >
-                                <SelectTrigger>
-                                    <SelectValue placeholder="เลือกบทบาท" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="0">
-                                        ผู้ใช้งานทั่วไป
-                                    </SelectItem>
-                                    <SelectItem value="1">
-                                        ผู้ดูแลระบบ
-                                    </SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="edit-isActive">
-                                สถานะการใช้งาน
-                            </Label>
-                            <Select
-                                value={newUser.isActive ? "true" : "false"}
-                                onValueChange={(value) =>
-                                    setNewUser({
-                                        ...newUser,
-                                        isActive: value === "true",
-                                    })
-                                }
-                            >
-                                <SelectTrigger>
-                                    <SelectValue placeholder="เลือกสถานะการใช้งาน" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="true">ใช้งาน</SelectItem>
-                                    <SelectItem value="false">
-                                        ไม่ใช้งาน
-                                    </SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="edit-emailVerified">
-                                สถานะการยืนยันอีเมล
-                            </Label>
-                            <Select
-                                value={newUser.emailVerified ? "true" : "false"}
-                                onValueChange={(value) =>
-                                    setNewUser({
-                                        ...newUser,
-                                        emailVerified: value === "true",
-                                    })
-                                }
-                            >
-                                <SelectTrigger>
-                                    <SelectValue placeholder="เลือกสถานะการยืนยันอีเมล" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="true">
-                                        ยืนยันแล้ว
-                                    </SelectItem>
-                                    <SelectItem value="false">
-                                        ยังไม่ยืนยัน
-                                    </SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-                    </div>
-                    <DialogFooter>
-                        <Button
-                            variant="outline"
-                            onClick={() => {
-                                setIsEditModalOpen(false);
-                                setEditingUser(null);
-                                setNewUser({
-                                    email: "",
-                                    password: "",
-                                    firstName: "",
-                                    lastName: "",
-                                    role: "0",
-                                    isActive: true,
-                                    emailVerified: false,
-                                });
-                            }}
+                    <Form {...editForm}>
+                        <form
+                            onSubmit={editForm.handleSubmit(handleEdit)}
+                            className="space-y-4 py-4"
                         >
-                            ยกเลิก
-                        </Button>
-                        <Button onClick={handleEdit} disabled={isLoading}>
-                            {isLoading ? (
-                                <>
-                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                    กำลังบันทึก...
-                                </>
-                            ) : (
-                                "บันทึก"
-                            )}
-                        </Button>
-                    </DialogFooter>
+                            <FormField
+                                control={editForm.control}
+                                name="email"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>อีเมล</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                placeholder="กรอกอีเมล"
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={editForm.control}
+                                name="password"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>
+                                            รหัสผ่าน
+                                            (ไม่ต้องกรอกถ้าไม่ต้องการเปลี่ยน)
+                                        </FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                type="password"
+                                                placeholder="กรอกรหัสผ่านใหม่"
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={editForm.control}
+                                name="firstName"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>ชื่อ</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                placeholder="กรอกชื่อ"
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={editForm.control}
+                                name="lastName"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>นามสกุล</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                placeholder="กรอกนามสกุล"
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={editForm.control}
+                                name="role"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>บทบาท</FormLabel>
+                                        <Select
+                                            onValueChange={field.onChange}
+                                            defaultValue={field.value}
+                                        >
+                                            <FormControl>
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="เลือกบทบาท" />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                <SelectItem value="0">
+                                                    ผู้ใช้งานทั่วไป
+                                                </SelectItem>
+                                                <SelectItem value="1">
+                                                    ผู้ดูแลระบบ
+                                                </SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={editForm.control}
+                                name="isActive"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>สถานะการใช้งาน</FormLabel>
+                                        <Select
+                                            onValueChange={(value) =>
+                                                field.onChange(value === "true")
+                                            }
+                                            defaultValue={
+                                                field.value ? "true" : "false"
+                                            }
+                                        >
+                                            <FormControl>
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="เลือกสถานะการใช้งาน" />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                <SelectItem value="true">
+                                                    ใช้งาน
+                                                </SelectItem>
+                                                <SelectItem value="false">
+                                                    ไม่ใช้งาน
+                                                </SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={editForm.control}
+                                name="emailVerified"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>
+                                            สถานะการยืนยันอีเมล
+                                        </FormLabel>
+                                        <Select
+                                            onValueChange={(value) =>
+                                                field.onChange(value === "true")
+                                            }
+                                            defaultValue={
+                                                field.value ? "true" : "false"
+                                            }
+                                        >
+                                            <FormControl>
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="เลือกสถานะการยืนยันอีเมล" />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                <SelectItem value="true">
+                                                    ยืนยันแล้ว
+                                                </SelectItem>
+                                                <SelectItem value="false">
+                                                    ยังไม่ยืนยัน
+                                                </SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <DialogFooter>
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    onClick={() => {
+                                        setIsEditModalOpen(false);
+                                        setEditingUser(null);
+                                        editForm.reset();
+                                    }}
+                                >
+                                    ยกเลิก
+                                </Button>
+                                <Button type="submit" disabled={isLoading}>
+                                    {isLoading ? (
+                                        <>
+                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                            กำลังบันทึก...
+                                        </>
+                                    ) : (
+                                        "บันทึก"
+                                    )}
+                                </Button>
+                            </DialogFooter>
+                        </form>
+                    </Form>
                 </DialogContent>
             </Dialog>
 
