@@ -66,7 +66,9 @@ const userCreateSchema = z.object({
     email: z.string().email({ message: "กรุณากรอกอีเมลให้ถูกต้อง" }).max(320, {
         message: "อีเมลต้องมีความยาวไม่เกิน 320 ตัวอักษร",
     }),
-    password: z.string().min(1, { message: "กรุณากรอกรหัสผ่าน" }),
+    password: z.string().min(1, { message: "กรุณากรอกรหัสผ่าน" }).max(256, {
+        message: "รหัสผ่านต้องมีความยาวไม่เกิน 256 ตัวอักษร",
+    }),
     firstName: z.string().min(1, { message: "กรุณากรอกชื่อ" }).max(128, {
         message: "ชื่อต้องมีความยาวไม่เกิน 128 ตัวอักษร",
     }),
