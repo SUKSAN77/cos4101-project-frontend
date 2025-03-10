@@ -1,9 +1,11 @@
 "use client";
 
+import "@fontsource/sarabun/thai.css";
+import "@fontsource/sarabun/400.css"; // normal weight
+import "@fontsource/sarabun/700.css"; // bold weight
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
 import {
     ChevronLeft,
     ChevronRight,
@@ -14,6 +16,8 @@ import {
     X,
 } from "lucide-react";
 import Image from "next/image";
+import pdfMake from "pdfmake/build/pdfmake";
+import { TDocumentDefinitions } from "pdfmake/interfaces";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -112,6 +116,24 @@ interface NewEquipment {
     categoryId: string;
 }
 
+// Update the type definition for UpdateEquipment to include all fields
+interface UpdateEquipmentForm extends UpdateEquipment {
+    acquiredDate?: string;
+    status?: number;
+    price?: number;
+}
+
+// กำหนดฟอนต์ Sarabun
+
+pdfMake.fonts = {
+    THSarabunNew: {
+        normal: "THSarabunNew",
+        bold: "THSarabunNew",
+        italics: "THSarabunNew",
+        bolditalics: "THSarabunNew",
+    },
+};
+
 export default function EquipmentManagement() {
     const { equipments, mutate } = useEquipments();
     const { categories } = useCategories();
@@ -198,7 +220,7 @@ export default function EquipmentManagement() {
     };
 
     const handleEditChange = (
-        field: keyof UpdateEquipment,
+        field: keyof UpdateEquipmentForm,
         value: string | number | null,
     ) => {
         if (!editingEquipment) return;
@@ -267,7 +289,7 @@ export default function EquipmentManagement() {
     const handleNewEquipmentChange = (
         index: number,
         field: keyof NewEquipment,
-        value: any,
+        value: string | number | File | null,
     ) => {
         setNewEquipment((prev) => {
             const updated = [...prev];
@@ -308,12 +330,18 @@ export default function EquipmentManagement() {
         try {
             for (const equipment of newEquipment) {
                 const requestBody = {
-                    ...equipment,
-                    status: Number(equipment.status),
+                    name: equipment.name,
+                    description: "",
+                    lifetime: "0",
                     price: Number(equipment.price),
-                    lifetime: 0,
-                    roomId: equipment.roomId || null,
-                    categoryId: equipment.categoryId || null,
+                    status: Number(equipment.status),
+                    customId: equipment.customId,
+                    acquiredDate: equipment.acquiredDate,
+                    serialNumber: equipment.serialNumber || "",
+                    acquisitionMethod: equipment.acquisitionMethod,
+                    notes: equipment.notes || "",
+                    roomId: equipment.roomId || undefined,
+                    categoryId: equipment.categoryId || undefined,
                 };
 
                 const { data, error } =
@@ -335,21 +363,21 @@ export default function EquipmentManagement() {
 
                     if (imageError) {
                         toast.error("ไม่สามารถอัพโหลดรูปภาพครุภัณฑ์ได้");
+                        console.error("Image upload error:", imageError);
                     }
                 }
 
                 // อัพโหลดรูปภาพใบเสร็จ
                 if (data && equipment.receipt) {
                     const { error: receiptError } =
-                        await EquipmentsService.postApiV1EquipmentsByIdReceipts(
-                            {
-                                path: { id: data.id },
-                                body: { file: equipment.receipt },
-                            },
-                        );
+                        await EquipmentsService.postApiV1EquipmentsByIdReceipt({
+                            path: { id: data.id },
+                            body: { file: equipment.receipt },
+                        });
 
                     if (receiptError) {
                         toast.error("ไม่สามารถอัพโหลดรูปภาพใบเสร็จได้");
+                        console.error("Receipt upload error:", receiptError);
                     }
                 }
             }
@@ -460,99 +488,74 @@ export default function EquipmentManagement() {
         return matchesSearch && matchesCategory && matchesStatus && matchesRoom;
     });
 
-    // เพิ่มฟังก์ชันจัดการการเลือกไฟล์
-    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files[0]) {
-            setSelectedImage(e.target.files[0]);
-        }
-    };
-
-    const handleReceiptChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files[0]) {
-            setSelectedReceipt(e.target.files[0]);
-        }
-    };
-
     // เพิ่มฟังก์ชันสำหรับสร้าง PDF
     const handlePrintPDF = () => {
-        const doc = new jsPDF("p", "mm", "a4");
-
-        // เพิ่มฟอนต์
-        doc.addFont(
-            "https://fonts.gstatic.com/s/sarabun/v13/DtVmJx26TKEr37c9YL5.ttf",
-            "Sarabun",
-            "normal",
-        );
-        doc.setFont("Sarabun");
-        doc.setFontSize(16);
-
-        // เพิ่มหัวกระดาษ
-        doc.text("รายงานครุภัณฑ์", 14, 15);
-
-        // สร้างข้อมูลสำหรับตาราง
-        const tableData = filteredEquipments.map((item) => [
+        const tableBody = filteredEquipments.map((item) => [
             item.customId || "-",
             item.name,
             getRoleLabel(item.status),
-            `${(item.price as string).toLocaleString()} บาท`,
-            new Date(item.acquiredDate).toLocaleDateString("th-TH"),
+            `${Number(item.price).toLocaleString()} บาท`,
+            new Date(String(item.acquiredDate)).toLocaleDateString("th-TH"),
             getCategoryName(item.categoryId),
             getRoomNumber(item.roomId),
         ]);
 
-        // สร้างตาราง
-        autoTable(doc, {
-            head: [
-                [
-                    "รหัสครุภัณฑ์",
-                    "ชื่อครุภัณฑ์",
-                    "สถานะ",
-                    "ราคา",
-                    "วันที่ได้มา",
-                    "หมวดหมู่",
-                    "ห้อง",
-                ],
+        tableBody.unshift([
+            "รหัสครุภัณฑ์",
+            "ชื่อครุภัณฑ์",
+            "สถานะ",
+            "ราคา",
+            "วันที่ได้มา",
+            "หมวดหมู่",
+            "ห้อง",
+        ]);
+
+        const docDefinition: TDocumentDefinitions = {
+            pageSize: "A4",
+            pageOrientation: "landscape",
+            defaultStyle: {
+                font: "THSarabunNew",
+            },
+            header: {
+                text: "รายงานครุภัณฑ์",
+                alignment: "center",
+                fontSize: 18,
+                margin: [0, 20],
+            },
+            content: [
+                {
+                    table: {
+                        headerRows: 1,
+                        widths: [
+                            "auto",
+                            "*",
+                            "auto",
+                            "auto",
+                            "auto",
+                            "auto",
+                            "auto",
+                        ],
+                        body: tableBody,
+                    },
+                },
             ],
-            body: tableData,
-            startY: 20,
             styles: {
-                font: "Sarabun",
-                fontSize: 12,
+                header: {
+                    fontSize: 18,
+                    bold: true,
+                    margin: [0, 0, 0, 10],
+                },
             },
-            headStyles: {
-                fillColor: [71, 85, 105],
-                textColor: [255, 255, 255],
-                font: "Sarabun",
-                fontSize: 12,
-                halign: "center",
-            },
-            theme: "grid",
-            columnStyles: {
-                0: { cellWidth: 25 },
-                1: { cellWidth: 40 },
-                2: { cellWidth: 20 },
-                3: { cellWidth: 25 },
-                4: { cellWidth: 25 },
-                5: { cellWidth: 30 },
-                6: { cellWidth: 25 },
-            },
-        });
+            footer: (currentPage: number, pageCount: number) => ({
+                text: `หน้า ${currentPage} จาก ${pageCount}`,
+                alignment: "right",
+                margin: [0, 0, 40, 0],
+            }),
+        };
 
-        // เพิ่มเลขหน้า
-        const pageCount = doc.internal.getNumberOfPages();
-        for (let i = 1; i <= pageCount; i++) {
-            doc.setPage(i);
-            doc.setFontSize(10);
-            doc.text(
-                `หน้า ${i} จาก ${pageCount}`,
-                doc.internal.pageSize.width - 20,
-                doc.internal.pageSize.height - 10,
-                { align: "right" },
-            );
-        }
-
-        // บันทึกไฟล์
-        doc.save(`รายงานครุภัณฑ์_${format(new Date(), "dd-MM-yyyy")}.pdf`);
+        pdfMake
+            .createPdf(docDefinition)
+            .download(`รายงานครุภัณฑ์_${format(new Date(), "dd-MM-yyyy")}.pdf`);
     };
 
     // เพิ่มฟังก์ชันสำหรับดึงข้อมูลก่อนหน้า
@@ -666,6 +669,8 @@ export default function EquipmentManagement() {
                                             <TableHead>สถานะ</TableHead>
                                             <TableHead>ราคา</TableHead>
                                             <TableHead>วันที่ได้มา</TableHead>
+                                            <TableHead>ห้อง</TableHead>
+                                            <TableHead>ประเภท</TableHead>
                                             <TableHead>การจัดการ</TableHead>
                                         </TableRow>
                                     </TableHeader>
@@ -691,19 +696,26 @@ export default function EquipmentManagement() {
                                                     {getRoleLabel(item.status)}
                                                 </TableCell>
                                                 <TableCell>
-                                                    {(
-                                                        item.price as string
+                                                    {Number(
+                                                        item.price,
                                                     ).toLocaleString()}{" "}
                                                     บาท
                                                 </TableCell>
                                                 <TableCell>
                                                     {new Date(
-                                                        item.acquiredDate as
-                                                            | string
-                                                            | number
-                                                            | Date,
+                                                        String(
+                                                            item.acquiredDate,
+                                                        ),
                                                     ).toLocaleDateString(
                                                         "th-TH",
+                                                    )}
+                                                </TableCell>
+                                                <TableCell>
+                                                    {getRoomNumber(item.roomId)}
+                                                </TableCell>
+                                                <TableCell>
+                                                    {getCategoryName(
+                                                        item.categoryId,
                                                     )}
                                                 </TableCell>
                                                 <TableCell>
@@ -797,36 +809,35 @@ export default function EquipmentManagement() {
                                                 {item.name ||
                                                     `ครุภัณฑ์ ${index + 1}`}
                                             </span>
-                                            <div className="flex items-center gap-2">
-                                                {index > 0 && ( // แสดงปุ่มเฉพาะรายการที่ไม่ใช่รายการแรก
-                                                    <Button
-                                                        variant="outline"
-                                                        size="sm"
-                                                        className="h-8 px-2 hover:bg-blue-100 hover:text-blue-600"
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
+                                            <div
+                                                className="flex items-center gap-2"
+                                                onClick={(e) =>
+                                                    e.stopPropagation()
+                                                }
+                                            >
+                                                {index > 0 && (
+                                                    <div
+                                                        className="flex h-8 cursor-pointer items-center rounded px-2 text-sm hover:bg-blue-100 hover:text-blue-600"
+                                                        onClick={() =>
                                                             handleCopyPreviousData(
                                                                 index,
-                                                            );
-                                                        }}
+                                                            )
+                                                        }
                                                     >
                                                         ดึงข้อมูลก่อนหน้า
-                                                    </Button>
+                                                    </div>
                                                 )}
                                                 {newEquipment.length > 1 && (
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        className="h-8 w-8 p-0 hover:bg-red-100 hover:text-red-600"
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
+                                                    <div
+                                                        className="flex h-8 w-8 cursor-pointer items-center justify-center rounded p-0 hover:bg-red-100 hover:text-red-600"
+                                                        onClick={() =>
                                                             handleRemoveEquipment(
                                                                 index,
-                                                            );
-                                                        }}
+                                                            )
+                                                        }
                                                     >
                                                         <Trash2 className="h-4 w-4" />
-                                                    </Button>
+                                                    </div>
                                                 )}
                                             </div>
                                         </div>
@@ -1239,7 +1250,9 @@ export default function EquipmentManagement() {
                             <div className="grid grid-cols-4 items-center gap-4">
                                 <span className="font-medium">ราคา:</span>
                                 <span className="col-span-3">
-                                    {selectedEquipment.price.toLocaleString()}{" "}
+                                    {(
+                                        selectedEquipment.price as number
+                                    ).toLocaleString()}{" "}
                                     บาท
                                 </span>
                             </div>
@@ -1265,7 +1278,7 @@ export default function EquipmentManagement() {
                                 </span>
                                 <span className="col-span-3">
                                     {new Date(
-                                        selectedEquipment.acquiredDate,
+                                        String(selectedEquipment.acquiredDate),
                                     ).toLocaleDateString("th-TH")}
                                 </span>
                             </div>
@@ -1329,28 +1342,14 @@ export default function EquipmentManagement() {
                             </div>
                             <div className="grid gap-2">
                                 <label className="text-sm font-medium">
-                                    รหัสครุภัณฑ์
-                                </label>
-                                <Input
-                                    value={editingEquipment.customId}
-                                    onChange={(e) =>
-                                        handleEditChange(
-                                            "customId",
-                                            e.target.value,
-                                        )
-                                    }
-                                />
-                            </div>
-                            <div className="grid gap-2">
-                                <label className="text-sm font-medium">
                                     รายละเอียด
                                 </label>
                                 <Input
-                                    value={editingEquipment.description}
+                                    value={editingEquipment.description || ""}
                                     onChange={(e) =>
                                         handleEditChange(
                                             "description",
-                                            e.target.value,
+                                            e.target.value || null,
                                         )
                                     }
                                 />
@@ -1360,11 +1359,11 @@ export default function EquipmentManagement() {
                                     Serial Number
                                 </label>
                                 <Input
-                                    value={editingEquipment.serialNumber}
+                                    value={editingEquipment.serialNumber || ""}
                                     onChange={(e) =>
                                         handleEditChange(
                                             "serialNumber",
-                                            e.target.value,
+                                            e.target.value || null,
                                         )
                                     }
                                 />
@@ -1374,11 +1373,11 @@ export default function EquipmentManagement() {
                                     สถานะ
                                 </label>
                                 <Select
-                                    value={editingEquipment.status.toString()}
+                                    value={String(editingEquipment.status)}
                                     onValueChange={(value) =>
                                         handleEditChange(
                                             "status",
-                                            Number.parseInt(value),
+                                            Number(value),
                                         )
                                     }
                                 >
@@ -1400,40 +1399,11 @@ export default function EquipmentManagement() {
                                 </label>
                                 <Input
                                     type="number"
-                                    value={editingEquipment.price}
+                                    value={String(editingEquipment.price)}
                                     onChange={(e) =>
                                         handleEditChange(
                                             "price",
-                                            Number.parseFloat(e.target.value),
-                                        )
-                                    }
-                                />
-                            </div>
-                            <div className="grid gap-2">
-                                <label className="text-sm font-medium">
-                                    อายุการใช้งาน (ปี)
-                                </label>
-                                <Input
-                                    type="number"
-                                    value={editingEquipment.lifetime}
-                                    onChange={(e) =>
-                                        handleEditChange(
-                                            "lifetime",
-                                            Number.parseInt(e.target.value),
-                                        )
-                                    }
-                                />
-                            </div>
-                            <div className="grid gap-2">
-                                <label className="text-sm font-medium">
-                                    วิธีการได้มา
-                                </label>
-                                <Input
-                                    value={editingEquipment.acquisitionMethod}
-                                    onChange={(e) =>
-                                        handleEditChange(
-                                            "acquisitionMethod",
-                                            e.target.value,
+                                            Number(e.target.value),
                                         )
                                     }
                                 />
@@ -1445,9 +1415,9 @@ export default function EquipmentManagement() {
                                 <Input
                                     type="date"
                                     value={
-                                        editingEquipment.acquiredDate.split(
-                                            "T",
-                                        )[0]
+                                        String(
+                                            editingEquipment.acquiredDate,
+                                        ).split("T")[0]
                                     }
                                     onChange={(e) =>
                                         handleEditChange(
@@ -1462,9 +1432,12 @@ export default function EquipmentManagement() {
                                     ห้อง
                                 </label>
                                 <Select
-                                    value={editingEquipment.roomId}
+                                    value={editingEquipment.roomId || ""}
                                     onValueChange={(value) =>
-                                        handleEditChange("roomId", value)
+                                        handleEditChange(
+                                            "roomId",
+                                            value || null,
+                                        )
                                     }
                                 >
                                     <SelectTrigger>
@@ -1477,31 +1450,6 @@ export default function EquipmentManagement() {
                                                 value={room.id}
                                             >
                                                 ห้อง {room.roomNumber}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                            <div className="grid gap-2">
-                                <label className="text-sm font-medium">
-                                    หมวดหมู่
-                                </label>
-                                <Select
-                                    value={editingEquipment.categoryId ?? ""}
-                                    onValueChange={(value) =>
-                                        handleEditChange("categoryId", value)
-                                    }
-                                >
-                                    <SelectTrigger>
-                                        <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {categories.map((category) => (
-                                            <SelectItem
-                                                key={category.id}
-                                                value={category.id}
-                                            >
-                                                {category.name}
                                             </SelectItem>
                                         ))}
                                     </SelectContent>
