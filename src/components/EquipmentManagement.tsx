@@ -454,8 +454,7 @@ export default function EquipmentManagement() {
                                     <AccordionTrigger className="rounded-lg px-4 py-2 hover:bg-gray-50/50">
                                         <div className="flex w-full items-center justify-between">
                                             <span>
-                                                {item.name ||
-                                                    `ครุภัณฑ์ ${index + 1}`}
+                                                {`ครุภัณฑ์ ${index + 1}`}
                                             </span>
                                             {newEquipment.length > 1 && (
                                                 <Button
