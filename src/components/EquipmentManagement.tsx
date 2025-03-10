@@ -13,6 +13,7 @@ import {
     Trash2,
     X,
 } from "lucide-react";
+import Image from "next/image";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -1083,17 +1084,18 @@ export default function EquipmentManagement() {
                                                     />
                                                     {item.image && (
                                                         <div className="relative h-20 w-20">
-                                                            <img
+                                                            <Image
                                                                 src={URL.createObjectURL(
                                                                     item.image,
                                                                 )}
                                                                 alt="Equipment preview"
-                                                                className="h-full w-full rounded-md object-cover"
+                                                                fill
+                                                                className="rounded-md object-cover"
                                                             />
                                                             <Button
                                                                 variant="ghost"
                                                                 size="sm"
-                                                                className="absolute -right-2 -top-2 h-6 w-6 rounded-full p-0"
+                                                                className="absolute -right-2 -top-2 z-10 h-6 w-6 rounded-full p-0"
                                                                 onClick={() =>
                                                                     handleNewEquipmentChange(
                                                                         index,
@@ -1130,17 +1132,18 @@ export default function EquipmentManagement() {
                                                     />
                                                     {item.receipt && (
                                                         <div className="relative h-20 w-20">
-                                                            <img
+                                                            <Image
                                                                 src={URL.createObjectURL(
                                                                     item.receipt,
                                                                 )}
                                                                 alt="Receipt preview"
-                                                                className="h-full w-full rounded-md object-cover"
+                                                                fill
+                                                                className="rounded-md object-cover"
                                                             />
                                                             <Button
                                                                 variant="ghost"
                                                                 size="sm"
-                                                                className="absolute -right-2 -top-2 h-6 w-6 rounded-full p-0"
+                                                                className="absolute -right-2 -top-2 z-10 h-6 w-6 rounded-full p-0"
                                                                 onClick={() =>
                                                                     handleNewEquipmentChange(
                                                                         index,
