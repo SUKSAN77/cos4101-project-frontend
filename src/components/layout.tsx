@@ -36,7 +36,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     }, [isSidebarOpen]);
 
     const navItems = [
-        { href: "/", icon: Home, label: "หน้าหลัก" },
+        { href: "/home", icon: Home, label: "หน้าหลัก" },
         { href: "/equipment", icon: Box, label: "จัดการครุภัณฑ์" },
         { href: "/users", icon: Users, label: "จัดการผู้ใช้" },
         { href: "/rooms", icon: Home, label: "จัดการห้อง" },

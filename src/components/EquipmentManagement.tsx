@@ -12,6 +12,7 @@ import {
     ChevronLeft,
     ChevronRight,
     Download,
+    Edit,
     Plus,
     Search,
     Trash2,
@@ -32,6 +33,7 @@ import {
     AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
     Dialog,
     DialogContent,
@@ -587,92 +589,100 @@ export default function EquipmentManagement() {
 
     return (
         <div className="space-y-6">
-            <div className="mb-6 flex flex-col items-start justify-between sm:flex-row sm:items-center">
-                <h1 className="mb-4 text-3xl font-bold sm:mb-0">
-                    จัดการครุภัณฑ์
-                </h1>
-                <div className="flex space-x-2">
-                    <Button
-                        variant="outline"
-                        onClick={handlePrintPDF}
-                        className="bg-green-500 text-white hover:bg-green-600"
-                    >
-                        <Download className="mr-2 h-4 w-4" /> พิมพ์รายงาน
-                    </Button>
-                    <Button
-                        onClick={() => setIsDialogOpen(true)}
-                        className="bg-blue-500 hover:bg-blue-600"
-                    >
-                        <Plus className="mr-2 h-4 w-4" /> เพิ่มครุภัณฑ์
-                    </Button>
-                </div>
-            </div>
+            <Card className="mb-6">
+                <CardHeader>
+                    <div className="flex flex-col items-start justify-between sm:flex-row sm:items-center">
+                        <CardTitle className="text-3xl font-bold">
+                            จัดการครุภัณฑ์
+                        </CardTitle>
+                        <div className="flex space-x-2">
+                            <Button
+                                variant="outline"
+                                onClick={handlePrintPDF}
+                                className="bg-green-500 text-white hover:bg-green-600"
+                            >
+                                <Download className="mr-2 h-4 w-4" />{" "}
+                                พิมพ์รายงาน
+                            </Button>
+                            <Button
+                                onClick={() => setIsDialogOpen(true)}
+                                className="bg-blue-500 hover:bg-blue-600"
+                            >
+                                <Plus className="mr-2 h-4 w-4" /> เพิ่มครุภัณฑ์
+                            </Button>
+                        </div>
+                    </div>
+                </CardHeader>
+                <CardContent>
+                    <div className="mb-6 flex flex-col space-y-4">
+                        <div className="relative">
+                            <Search className="absolute left-2 top-1/2 -translate-y-1/2 transform text-gray-400" />
+                            <Input
+                                placeholder="ค้นหาครุภัณฑ์..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="pl-8"
+                            />
+                        </div>
+                        <div className="flex flex-col space-y-2 sm:flex-row sm:space-x-4 sm:space-y-0">
+                            <Select
+                                value={filterCategory}
+                                onValueChange={setFilterCategory}
+                            >
+                                <SelectTrigger>
+                                    <SelectValue placeholder="ประเภทครุภัณฑ์" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">ทั้งหมด</SelectItem>
+                                    {categories.map((category) => (
+                                        <SelectItem
+                                            key={category.id}
+                                            value={category.id}
+                                        >
+                                            {category.name}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                            <Select
+                                value={filterRoom}
+                                onValueChange={setFilterRoom}
+                            >
+                                <SelectTrigger>
+                                    <SelectValue placeholder="ห้อง" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">ทั้งหมด</SelectItem>
+                                    {rooms.map((room) => (
+                                        <SelectItem
+                                            key={room.id}
+                                            value={room.id}
+                                        >
+                                            ห้อง {room.roomNumber}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                            <Select
+                                value={filterStatus}
+                                onValueChange={setFilterStatus}
+                            >
+                                <SelectTrigger className="w-full sm:w-[180px]">
+                                    <SelectValue placeholder="สถานะ" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">ทั้งหมด</SelectItem>
+                                    <SelectItem value="0">ปกติ</SelectItem>
+                                    <SelectItem value="1">ชำรุด</SelectItem>
+                                    <SelectItem value="2">จำหน่าย</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </div>
 
-            <div className="mb-6 flex flex-col space-y-4">
-                <div className="relative">
-                    <Search className="absolute left-2 top-1/2 -translate-y-1/2 transform text-gray-400" />
-                    <Input
-                        placeholder="ค้นหาครุภัณฑ์..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="pl-8"
-                    />
-                </div>
-                <div className="flex flex-col space-y-2 sm:flex-row sm:space-x-4 sm:space-y-0">
-                    <Select
-                        value={filterCategory}
-                        onValueChange={setFilterCategory}
-                    >
-                        <SelectTrigger>
-                            <SelectValue placeholder="ประเภทครุภัณฑ์" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="all">ทั้งหมด</SelectItem>
-                            {categories.map((category) => (
-                                <SelectItem
-                                    key={category.id}
-                                    value={category.id}
-                                >
-                                    {category.name}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                    <Select value={filterRoom} onValueChange={setFilterRoom}>
-                        <SelectTrigger>
-                            <SelectValue placeholder="ห้อง" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="all">ทั้งหมด</SelectItem>
-                            {rooms.map((room) => (
-                                <SelectItem key={room.id} value={room.id}>
-                                    ห้อง {room.roomNumber}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                    <Select
-                        value={filterStatus}
-                        onValueChange={setFilterStatus}
-                    >
-                        <SelectTrigger className="w-full sm:w-[180px]">
-                            <SelectValue placeholder="สถานะ" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="all">ทั้งหมด</SelectItem>
-                            <SelectItem value="0">ปกติ</SelectItem>
-                            <SelectItem value="1">ชำรุด</SelectItem>
-                            <SelectItem value="2">จำหน่าย</SelectItem>
-                        </SelectContent>
-                    </Select>
-                </div>
-            </div>
-
-            <div className="grid gap-6 md:grid-cols-1">
-                <div className="space-y-6">
                     <div className="-mx-4 overflow-x-auto sm:mx-0">
                         <div className="inline-block min-w-full align-middle">
-                            <div className="overflow-hidden border border-gray-200 sm:rounded-lg">
+                            <div className="overflow-hidden rounded-lg border border-gray-200">
                                 <Table>
                                     <TableHeader>
                                         <TableRow>
@@ -687,114 +697,134 @@ export default function EquipmentManagement() {
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
-                                        {filteredEquipments.map((item) => (
-                                            <TableRow key={item.id}>
-                                                <TableCell>
-                                                    {item.customId || "NULL"}
-                                                </TableCell>
-                                                <TableCell>
-                                                    <button
-                                                        onClick={() =>
-                                                            handleShowDetails(
-                                                                item,
-                                                            )
-                                                        }
-                                                        className="text-left hover:text-blue-600 hover:underline"
-                                                    >
-                                                        {item.name}
-                                                    </button>
-                                                </TableCell>
-                                                <TableCell>
-                                                    {getRoleLabel(item.status)}
-                                                </TableCell>
-                                                <TableCell>
-                                                    {Number(
-                                                        item.price,
-                                                    ).toLocaleString()}{" "}
-                                                    บาท
-                                                </TableCell>
-                                                <TableCell>
-                                                    {new Date(
-                                                        String(
-                                                            item.acquiredDate,
-                                                        ),
-                                                    ).toLocaleDateString(
-                                                        "th-TH",
-                                                    )}
-                                                </TableCell>
-                                                <TableCell>
-                                                    {getRoomNumber(item.roomId)}
-                                                </TableCell>
-                                                <TableCell>
-                                                    {getCategoryName(
-                                                        item.categoryId,
-                                                    )}
-                                                </TableCell>
-                                                <TableCell>
-                                                    <Button
-                                                        variant="outline"
-                                                        size="sm"
-                                                        className="mr-2"
-                                                        onClick={() =>
-                                                            handleEditEquipment(
-                                                                item,
-                                                            )
-                                                        }
-                                                    >
-                                                        แก้ไข
-                                                    </Button>
-                                                    <Button
-                                                        variant="destructive"
-                                                        size="sm"
-                                                        onClick={() => {
-                                                            setEquipmentToDelete(
-                                                                item.id,
-                                                            );
-                                                            setIsDeleteAlertOpen(
-                                                                true,
-                                                            );
-                                                        }}
-                                                    >
-                                                        ลบ
-                                                    </Button>
+                                        {filteredEquipments.length === 0 ? (
+                                            <TableRow>
+                                                <TableCell
+                                                    colSpan={8}
+                                                    className="py-4 text-center"
+                                                >
+                                                    <p className="text-gray-500">
+                                                        ไม่พบครุภัณฑ์ที่ตรงกับเงื่อนไขที่กำหนด
+                                                    </p>
                                                 </TableCell>
                                             </TableRow>
-                                        ))}
+                                        ) : (
+                                            filteredEquipments.map((item) => (
+                                                <TableRow key={item.id}>
+                                                    <TableCell>
+                                                        {item.customId ||
+                                                            "NULL"}
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        <button
+                                                            onClick={() =>
+                                                                handleShowDetails(
+                                                                    item,
+                                                                )
+                                                            }
+                                                            className="text-left hover:text-blue-600 hover:underline"
+                                                        >
+                                                            {item.name}
+                                                        </button>
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        {getRoleLabel(
+                                                            item.status,
+                                                        )}
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        {Number(
+                                                            item.price,
+                                                        ).toLocaleString()}{" "}
+                                                        บาท
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        {new Date(
+                                                            String(
+                                                                item.acquiredDate,
+                                                            ),
+                                                        ).toLocaleDateString(
+                                                            "th-TH",
+                                                        )}
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        {getRoomNumber(
+                                                            item.roomId,
+                                                        )}
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        {getCategoryName(
+                                                            item.categoryId,
+                                                        )}
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        <div className="flex gap-2">
+                                                            <Button
+                                                                variant="outline"
+                                                                size="sm"
+                                                                className="flex items-center gap-1"
+                                                                onClick={() =>
+                                                                    handleEditEquipment(
+                                                                        item,
+                                                                    )
+                                                                }
+                                                            >
+                                                                <Edit className="h-4 w-4" />{" "}
+                                                                แก้ไข
+                                                            </Button>
+                                                            <Button
+                                                                variant="destructive"
+                                                                size="sm"
+                                                                className="flex items-center gap-1"
+                                                                onClick={() => {
+                                                                    setEquipmentToDelete(
+                                                                        item.id,
+                                                                    );
+                                                                    setIsDeleteAlertOpen(
+                                                                        true,
+                                                                    );
+                                                                }}
+                                                            >
+                                                                <Trash2 className="h-4 w-4" />{" "}
+                                                                ลบ
+                                                            </Button>
+                                                        </div>
+                                                    </TableCell>
+                                                </TableRow>
+                                            ))
+                                        )}
                                     </TableBody>
                                 </Table>
                             </div>
                         </div>
                     </div>
 
-                    {/* Show message when no equipment matches the filters */}
-                    {filteredEquipments.length === 0 && (
-                        <div className="mt-4 text-center">
-                            <p className="text-gray-500">
-                                ไม่พบครุภัณฑ์ที่ตรงกับเงื่อนไขที่กำหนด
-                            </p>
+                    <div className="flex flex-col items-end justify-between space-y-2 py-4 sm:flex-row sm:items-center sm:space-y-0">
+                        <div className="text-sm text-gray-600">
+                            แสดง 1 ถึง {Math.min(10, filteredEquipments.length)}{" "}
+                            จากทั้งหมด {filteredEquipments.length} รายการ
                         </div>
-                    )}
-
-                    <div className="flex items-center justify-end space-x-2 py-4">
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            className="w-[100px]"
-                        >
-                            <ChevronLeft className="mr-2 h-4 w-4" />
-                            ก่อนหน้า
-                        </Button>
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            className="w-[100px]"
-                        >
-                            ถัดไป
-                            <ChevronRight className="ml-2 h-4 w-4" />
-                        </Button>
+                        <div className="flex items-center space-x-2">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                className="w-[100px]"
+                            >
+                                <ChevronLeft className="mr-2 h-4 w-4" />
+                                ก่อนหน้า
+                            </Button>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                className="w-[100px]"
+                            >
+                                ถัดไป
+                                <ChevronRight className="ml-2 h-4 w-4" />
+                            </Button>
+                        </div>
                     </div>
-                </div>
-            </div>
+                </CardContent>
+            </Card>
 
             <Dialog open={isDialogOpen} onOpenChange={handleCloseDialog}>
                 <DialogContent className="max-h-[80vh] overflow-y-auto sm:max-w-[600px]">

@@ -3,7 +3,6 @@
 import * as React from "react";
 import { Label, Pie, PieChart } from "recharts";
 
-import { mockEquipment } from "@/app/MockData";
 import {
     Card,
     CardContent,
@@ -18,12 +17,14 @@ import {
     ChartTooltip,
     ChartTooltipContent,
 } from "@/components/ui/chart";
+import { useEquipments } from "@/hooks/api";
+import { Equipment } from "@/types/equipments";
 
-// คำนวณข้อมูลจาก mockEquipment
-const calculateChartData = () => {
-    const statusCount = mockEquipment.reduce(
+// แก้ไขฟังก์ชัน calculateChartData รับพารามิเตอร์ equipments
+const calculateChartData = (equipments: Equipment[] = []) => {
+    const statusCount = equipments.reduce(
         (acc, item) => {
-            acc[item.status] = (acc[item.status] || 0) + 1;
+            acc[item.status as number] = (acc[item.status as number] || 0) + 1;
             return acc;
         },
         {} as Record<number, number>,
@@ -55,8 +56,13 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 export function PieChartComponent() {
-    const chartData = React.useMemo(() => calculateChartData(), []);
-    const totalItems = React.useMemo(() => mockEquipment.length, []);
+    const { equipments } = useEquipments();
+
+    const chartData = React.useMemo(
+        () => calculateChartData(equipments),
+        [equipments],
+    );
+    const totalItems = React.useMemo(() => equipments.length, [equipments]);
 
     return (
         <Card className="flex flex-col">

@@ -1,14 +1,9 @@
-import { BarChartComponent } from "@/components/chart-bar-multiple";
-import { PieChartComponent } from "@/components/chart-pie-donut-text";
-import Layout from "@/components/layout";
+import { Login } from "./(routes)/login/page";
 
-export default async function Page() {
+export default function App() {
     return (
-        <div>
-            <Layout>
-                <PieChartComponent />
-                <BarChartComponent />
-            </Layout>
-        </div>
+        <>
+            <Login />;
+        </>
     );
 }

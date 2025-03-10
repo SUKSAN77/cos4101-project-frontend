@@ -3,7 +3,6 @@
 import React from "react";
 import { Bar, BarChart, CartesianGrid, Legend, XAxis, YAxis } from "recharts";
 
-import { mockEquipment } from "@/app/MockData";
 import {
     Card,
     CardContent,
@@ -18,9 +17,11 @@ import {
     ChartTooltip,
     ChartTooltipContent,
 } from "@/components/ui/chart";
+import { useEquipments } from "@/hooks/api";
+import { Equipment } from "@/types/equipments";
 
 // คำนวณข้อมูลรายเดือน
-const calculateMonthlyData = () => {
+const calculateMonthlyData = (equipments: Equipment[] = []) => {
     const monthlyData = new Array(12).fill(null).map((_, index) => ({
         month: new Date(2023, index).toLocaleString("th-TH", {
             month: "short",
@@ -30,8 +31,8 @@ const calculateMonthlyData = () => {
         จำหน่าย: 0,
     }));
 
-    mockEquipment.forEach((item) => {
-        const date = new Date(item.acquiredDate);
+    equipments.forEach((item) => {
+        const date = new Date(item.acquiredDate as string);
         const monthIndex = date.getMonth();
         const status = item.status;
 
@@ -59,7 +60,12 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 export function BarChartComponent() {
-    const chartData = React.useMemo(() => calculateMonthlyData(), []);
+    const { equipments } = useEquipments();
+
+    const chartData = React.useMemo(
+        () => calculateMonthlyData(equipments),
+        [equipments],
+    );
 
     return (
         <Card className="mt-6">

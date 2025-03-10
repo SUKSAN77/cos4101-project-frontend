@@ -2,7 +2,7 @@ import Image from "next/image";
 
 import { LoginForm } from "@/components/LoginForm";
 
-const Login = () => {
+export const Login = () => {
     return (
         <div>
             <div className="flex min-h-screen items-center justify-center p-4">

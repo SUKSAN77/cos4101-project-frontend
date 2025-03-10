@@ -59,7 +59,7 @@ export function LoginFormHandle() {
 
         if (response.ok) {
             toast("Logged in successfully.");
-            router.push("/");
+            router.push("/home");
             router.refresh();
         } else {
             toast(error?.message ?? "An error occurred.");
