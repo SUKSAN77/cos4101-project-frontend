@@ -13,6 +13,12 @@ import type {
     DeleteApiV1CategoriesByIdResponse,
     DeleteApiV1EquipmentsByIdData,
     DeleteApiV1EquipmentsByIdError,
+    DeleteApiV1EquipmentsByIdImagesByImageIdData,
+    DeleteApiV1EquipmentsByIdImagesByImageIdError,
+    DeleteApiV1EquipmentsByIdImagesByImageIdResponse,
+    DeleteApiV1EquipmentsByIdReceiptData,
+    DeleteApiV1EquipmentsByIdReceiptError,
+    DeleteApiV1EquipmentsByIdReceiptResponse,
     DeleteApiV1EquipmentsByIdResponse,
     DeleteApiV1RoomsByIdData,
     DeleteApiV1RoomsByIdError,
@@ -54,6 +60,9 @@ import type {
     PatchApiV1CategoriesByIdResponse,
     PatchApiV1EquipmentsByIdData,
     PatchApiV1EquipmentsByIdError,
+    PatchApiV1EquipmentsByIdImagesByImageIdData,
+    PatchApiV1EquipmentsByIdImagesByImageIdError,
+    PatchApiV1EquipmentsByIdImagesByImageIdResponse,
     PatchApiV1EquipmentsByIdResponse,
     PatchApiV1RoomsByIdData,
     PatchApiV1RoomsByIdError,
@@ -80,6 +89,10 @@ import type {
     PostApiV1CategoriesResponse,
     PostApiV1EquipmentsByIdImagesData,
     PostApiV1EquipmentsByIdImagesError,
+    PostApiV1EquipmentsByIdImagesResponse,
+    PostApiV1EquipmentsByIdReceiptData,
+    PostApiV1EquipmentsByIdReceiptError,
+    PostApiV1EquipmentsByIdReceiptResponse,
     PostApiV1EquipmentsData,
     PostApiV1EquipmentsError,
     PostApiV1EquipmentsResponse,
@@ -540,11 +553,81 @@ export class EquipmentsService {
         ThrowOnError extends boolean = false,
     >(options: Options<PostApiV1EquipmentsByIdImagesData, ThrowOnError>) {
         return (options.client ?? _heyApiClient).post<
-            unknown,
+            PostApiV1EquipmentsByIdImagesResponse,
             PostApiV1EquipmentsByIdImagesError,
             ThrowOnError
         >({
             url: "/api/v1/equipments/{id}/images",
+            ...options,
+            headers: {
+                "Content-Type": "application/json",
+                ...options?.headers,
+            },
+        });
+    }
+
+    public static deleteApiV1EquipmentsByIdImagesByImageId<
+        ThrowOnError extends boolean = false,
+    >(
+        options: Options<
+            DeleteApiV1EquipmentsByIdImagesByImageIdData,
+            ThrowOnError
+        >,
+    ) {
+        return (options.client ?? _heyApiClient).delete<
+            DeleteApiV1EquipmentsByIdImagesByImageIdResponse,
+            DeleteApiV1EquipmentsByIdImagesByImageIdError,
+            ThrowOnError
+        >({
+            url: "/api/v1/equipments/{id}/images/{imageId}",
+            ...options,
+        });
+    }
+
+    public static patchApiV1EquipmentsByIdImagesByImageId<
+        ThrowOnError extends boolean = false,
+    >(
+        options: Options<
+            PatchApiV1EquipmentsByIdImagesByImageIdData,
+            ThrowOnError
+        >,
+    ) {
+        return (options.client ?? _heyApiClient).patch<
+            PatchApiV1EquipmentsByIdImagesByImageIdResponse,
+            PatchApiV1EquipmentsByIdImagesByImageIdError,
+            ThrowOnError
+        >({
+            url: "/api/v1/equipments/{id}/images/{imageId}",
+            ...options,
+            headers: {
+                "Content-Type": "application/json",
+                ...options?.headers,
+            },
+        });
+    }
+
+    public static deleteApiV1EquipmentsByIdReceipt<
+        ThrowOnError extends boolean = false,
+    >(options: Options<DeleteApiV1EquipmentsByIdReceiptData, ThrowOnError>) {
+        return (options.client ?? _heyApiClient).delete<
+            DeleteApiV1EquipmentsByIdReceiptResponse,
+            DeleteApiV1EquipmentsByIdReceiptError,
+            ThrowOnError
+        >({
+            url: "/api/v1/equipments/{id}/receipt",
+            ...options,
+        });
+    }
+
+    public static postApiV1EquipmentsByIdReceipt<
+        ThrowOnError extends boolean = false,
+    >(options: Options<PostApiV1EquipmentsByIdReceiptData, ThrowOnError>) {
+        return (options.client ?? _heyApiClient).post<
+            PostApiV1EquipmentsByIdReceiptResponse,
+            PostApiV1EquipmentsByIdReceiptError,
+            ThrowOnError
+        >({
+            url: "/api/v1/equipments/{id}/receipt",
             ...options,
             headers: {
                 "Content-Type": "application/json",

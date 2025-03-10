@@ -142,8 +142,8 @@ export type GetApiV1UsersData = {
     body?: never;
     path?: never;
     query: {
-        limit: string | number;
-        offset: string | number;
+        limit: string | (string | number);
+        offset: string | (string | number);
     };
     url: "/api/v1/users/";
 };
@@ -571,8 +571,8 @@ export type GetApiV1CategoriesData = {
     body?: never;
     path?: never;
     query: {
-        limit: string | number;
-        offset: string | number;
+        limit: string | (string | number);
+        offset: string | (string | number);
     };
     url: "/api/v1/categories/";
 };
@@ -788,8 +788,8 @@ export type GetApiV1RoomsData = {
     body?: never;
     path?: never;
     query: {
-        limit: string | number;
-        offset: string | number;
+        limit: string | (string | number);
+        offset: string | (string | number);
     };
     url: "/api/v1/rooms/";
 };
@@ -819,6 +819,8 @@ export type GetApiV1RoomsResponses = {
         data: Array<{
             id: string;
             roomNumber: string;
+            createdAt: unknown | string | number;
+            updatedAt: unknown | string | number;
         }>;
         pagination: {
             total: number;
@@ -865,6 +867,8 @@ export type PostApiV1RoomsResponses = {
     201: {
         id: string;
         roomNumber: string;
+        createdAt: unknown | string | number;
+        updatedAt: unknown | string | number;
     };
 };
 
@@ -944,6 +948,8 @@ export type GetApiV1RoomsByIdResponses = {
     200: {
         id: string;
         roomNumber: string;
+        createdAt: unknown | string | number;
+        updatedAt: unknown | string | number;
     };
 };
 
@@ -986,6 +992,8 @@ export type PatchApiV1RoomsByIdResponses = {
     200: {
         id: string;
         roomNumber: string;
+        createdAt: unknown | string | number;
+        updatedAt: unknown | string | number;
     };
 };
 
@@ -996,8 +1004,8 @@ export type GetApiV1EquipmentsData = {
     body?: never;
     path?: never;
     query: {
-        limit: string | number;
-        offset: string | number;
+        limit: string | (string | number);
+        offset: string | (string | number);
     };
     url: "/api/v1/equipments/";
 };
@@ -1067,6 +1075,15 @@ export type GetApiV1EquipmentsResponses = {
                 createdAt: unknown | string | number;
                 equipmentId: string;
             }>;
+            receiptImage: {
+                id: string;
+                filename: string;
+                filepath: string;
+                filesize: string | number;
+                filetype: string;
+                createdAt: unknown | string | number;
+                equipmentId: string;
+            } | null;
         }>;
         pagination: {
             total: number;
@@ -1164,6 +1181,15 @@ export type PostApiV1EquipmentsResponses = {
             createdAt: unknown | string | number;
             equipmentId: string;
         }>;
+        receiptImage: {
+            id: string;
+            filename: string;
+            filepath: string;
+            filesize: string | number;
+            filetype: string;
+            createdAt: unknown | string | number;
+            equipmentId: string;
+        } | null;
     };
 };
 
@@ -1282,6 +1308,15 @@ export type GetApiV1EquipmentsByIdResponses = {
             createdAt: unknown | string | number;
             equipmentId: string;
         }>;
+        receiptImage: {
+            id: string;
+            filename: string;
+            filepath: string;
+            filesize: string | number;
+            filetype: string;
+            createdAt: unknown | string | number;
+            equipmentId: string;
+        } | null;
     };
 };
 
@@ -1370,6 +1405,15 @@ export type PatchApiV1EquipmentsByIdResponses = {
             createdAt: unknown | string | number;
             equipmentId: string;
         }>;
+        receiptImage: {
+            id: string;
+            filename: string;
+            filepath: string;
+            filesize: string | number;
+            filetype: string;
+            createdAt: unknown | string | number;
+            equipmentId: string;
+        } | null;
     };
 };
 
@@ -1407,6 +1451,324 @@ export type PostApiV1EquipmentsByIdImagesErrors = {
 
 export type PostApiV1EquipmentsByIdImagesError =
     PostApiV1EquipmentsByIdImagesErrors[keyof PostApiV1EquipmentsByIdImagesErrors];
+
+export type PostApiV1EquipmentsByIdImagesResponses = {
+    200: {
+        id: string;
+        name: string;
+        description: string | null;
+        customId: string;
+        price: unknown;
+        lifetime: string | number;
+        status: string | number;
+        notes: string | null;
+        createdAt: unknown | string | number;
+        updatedAt: unknown | string | number;
+        deletedAt: (unknown | string | number) | null;
+        serialNumber: string | null;
+        acquiredDate: unknown | string | number;
+        acquisitionMethod: string;
+        disposalDate: (unknown | string | number) | null;
+        createdBy: string | null;
+        creator?: {
+            id: string;
+            email: string;
+            firstName: string | null;
+            lastName: string | null;
+        } | null;
+        roomId: string | null;
+        room?: {
+            id: string;
+            roomNumber: string;
+        } | null;
+        categoryId: string | null;
+        category?: {
+            id: string;
+            name: string;
+        } | null;
+        images: Array<{
+            id: string;
+            filename: string;
+            filepath: string;
+            filesize: string | number;
+            filetype: string;
+            createdAt: unknown | string | number;
+            equipmentId: string;
+        }>;
+        receiptImage: {
+            id: string;
+            filename: string;
+            filepath: string;
+            filesize: string | number;
+            filetype: string;
+            createdAt: unknown | string | number;
+            equipmentId: string;
+        } | null;
+    };
+};
+
+export type PostApiV1EquipmentsByIdImagesResponse =
+    PostApiV1EquipmentsByIdImagesResponses[keyof PostApiV1EquipmentsByIdImagesResponses];
+
+export type DeleteApiV1EquipmentsByIdImagesByImageIdData = {
+    body?: never;
+    path: {
+        id: string;
+        imageId: string;
+    };
+    query?: never;
+    url: "/api/v1/equipments/{id}/images/{imageId}";
+};
+
+export type DeleteApiV1EquipmentsByIdImagesByImageIdErrors = {
+    400: {
+        message: string;
+    };
+    401: {
+        message: string;
+    };
+    403: {
+        message: string;
+    };
+    404: {
+        message: string;
+    };
+    500: {
+        message: string;
+    };
+};
+
+export type DeleteApiV1EquipmentsByIdImagesByImageIdError =
+    DeleteApiV1EquipmentsByIdImagesByImageIdErrors[keyof DeleteApiV1EquipmentsByIdImagesByImageIdErrors];
+
+export type DeleteApiV1EquipmentsByIdImagesByImageIdResponses = {
+    200: {
+        message: string;
+    };
+};
+
+export type DeleteApiV1EquipmentsByIdImagesByImageIdResponse =
+    DeleteApiV1EquipmentsByIdImagesByImageIdResponses[keyof DeleteApiV1EquipmentsByIdImagesByImageIdResponses];
+
+export type PatchApiV1EquipmentsByIdImagesByImageIdData = {
+    body: {
+        file: Blob | File;
+    };
+    path: {
+        id: string;
+        imageId: string;
+    };
+    query?: never;
+    url: "/api/v1/equipments/{id}/images/{imageId}";
+};
+
+export type PatchApiV1EquipmentsByIdImagesByImageIdErrors = {
+    400: {
+        message: string;
+    };
+    401: {
+        message: string;
+    };
+    403: {
+        message: string;
+    };
+    404: {
+        message: string;
+    };
+    500: {
+        message: string;
+    };
+};
+
+export type PatchApiV1EquipmentsByIdImagesByImageIdError =
+    PatchApiV1EquipmentsByIdImagesByImageIdErrors[keyof PatchApiV1EquipmentsByIdImagesByImageIdErrors];
+
+export type PatchApiV1EquipmentsByIdImagesByImageIdResponses = {
+    200: {
+        id: string;
+        name: string;
+        description: string | null;
+        customId: string;
+        price: unknown;
+        lifetime: string | number;
+        status: string | number;
+        notes: string | null;
+        createdAt: unknown | string | number;
+        updatedAt: unknown | string | number;
+        deletedAt: (unknown | string | number) | null;
+        serialNumber: string | null;
+        acquiredDate: unknown | string | number;
+        acquisitionMethod: string;
+        disposalDate: (unknown | string | number) | null;
+        createdBy: string | null;
+        creator?: {
+            id: string;
+            email: string;
+            firstName: string | null;
+            lastName: string | null;
+        } | null;
+        roomId: string | null;
+        room?: {
+            id: string;
+            roomNumber: string;
+        } | null;
+        categoryId: string | null;
+        category?: {
+            id: string;
+            name: string;
+        } | null;
+        images: Array<{
+            id: string;
+            filename: string;
+            filepath: string;
+            filesize: string | number;
+            filetype: string;
+            createdAt: unknown | string | number;
+            equipmentId: string;
+        }>;
+        receiptImage: {
+            id: string;
+            filename: string;
+            filepath: string;
+            filesize: string | number;
+            filetype: string;
+            createdAt: unknown | string | number;
+            equipmentId: string;
+        } | null;
+    };
+};
+
+export type PatchApiV1EquipmentsByIdImagesByImageIdResponse =
+    PatchApiV1EquipmentsByIdImagesByImageIdResponses[keyof PatchApiV1EquipmentsByIdImagesByImageIdResponses];
+
+export type DeleteApiV1EquipmentsByIdReceiptData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: "/api/v1/equipments/{id}/receipt";
+};
+
+export type DeleteApiV1EquipmentsByIdReceiptErrors = {
+    400: {
+        message: string;
+    };
+    401: {
+        message: string;
+    };
+    403: {
+        message: string;
+    };
+    404: {
+        message: string;
+    };
+    500: {
+        message: string;
+    };
+};
+
+export type DeleteApiV1EquipmentsByIdReceiptError =
+    DeleteApiV1EquipmentsByIdReceiptErrors[keyof DeleteApiV1EquipmentsByIdReceiptErrors];
+
+export type DeleteApiV1EquipmentsByIdReceiptResponses = {
+    200: {
+        message: string;
+    };
+};
+
+export type DeleteApiV1EquipmentsByIdReceiptResponse =
+    DeleteApiV1EquipmentsByIdReceiptResponses[keyof DeleteApiV1EquipmentsByIdReceiptResponses];
+
+export type PostApiV1EquipmentsByIdReceiptData = {
+    body: {
+        file: Blob | File;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: "/api/v1/equipments/{id}/receipt";
+};
+
+export type PostApiV1EquipmentsByIdReceiptErrors = {
+    400: {
+        message: string;
+    };
+    401: {
+        message: string;
+    };
+    403: {
+        message: string;
+    };
+    404: {
+        message: string;
+    };
+    500: {
+        message: string;
+    };
+};
+
+export type PostApiV1EquipmentsByIdReceiptError =
+    PostApiV1EquipmentsByIdReceiptErrors[keyof PostApiV1EquipmentsByIdReceiptErrors];
+
+export type PostApiV1EquipmentsByIdReceiptResponses = {
+    200: {
+        id: string;
+        name: string;
+        description: string | null;
+        customId: string;
+        price: unknown;
+        lifetime: string | number;
+        status: string | number;
+        notes: string | null;
+        createdAt: unknown | string | number;
+        updatedAt: unknown | string | number;
+        deletedAt: (unknown | string | number) | null;
+        serialNumber: string | null;
+        acquiredDate: unknown | string | number;
+        acquisitionMethod: string;
+        disposalDate: (unknown | string | number) | null;
+        createdBy: string | null;
+        creator?: {
+            id: string;
+            email: string;
+            firstName: string | null;
+            lastName: string | null;
+        } | null;
+        roomId: string | null;
+        room?: {
+            id: string;
+            roomNumber: string;
+        } | null;
+        categoryId: string | null;
+        category?: {
+            id: string;
+            name: string;
+        } | null;
+        images: Array<{
+            id: string;
+            filename: string;
+            filepath: string;
+            filesize: string | number;
+            filetype: string;
+            createdAt: unknown | string | number;
+            equipmentId: string;
+        }>;
+        receiptImage: {
+            id: string;
+            filename: string;
+            filepath: string;
+            filesize: string | number;
+            filetype: string;
+            createdAt: unknown | string | number;
+            equipmentId: string;
+        } | null;
+    };
+};
+
+export type PostApiV1EquipmentsByIdReceiptResponse =
+    PostApiV1EquipmentsByIdReceiptResponses[keyof PostApiV1EquipmentsByIdReceiptResponses];
 
 export type ClientOptions = {
     baseUrl: "http://localhost:8000" | (string & {});
