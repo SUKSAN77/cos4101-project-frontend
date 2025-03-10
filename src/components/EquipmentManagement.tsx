@@ -77,6 +77,7 @@ export default function EquipmentManagement() {
     const [searchTerm, setSearchTerm] = useState("");
     const [filterCategory, setFilterCategory] = useState("");
     const [filterStatus, setFilterStatus] = useState("");
+    const [filterRoom, setFilterRoom] = useState("");
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [newEquipment, setNewEquipment] = useState<NewEquipment[]>([
         {
@@ -215,6 +216,35 @@ export default function EquipmentManagement() {
         return room ? `ห้อง ${room.roomNumber}` : roomId;
     };
 
+    // Add filtered equipment logic
+    const filteredEquipments = equipments.filter((item) => {
+        // Filter by search term
+        const matchesSearch =
+            item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            (item.customId &&
+                item.customId.toLowerCase().includes(searchTerm.toLowerCase()));
+
+        // Filter by category
+        const matchesCategory =
+            filterCategory === "" ||
+            filterCategory === "all" ||
+            item.categoryId === filterCategory;
+
+        // Filter by status
+        const matchesStatus =
+            filterStatus === "" ||
+            filterStatus === "all" ||
+            item.status.toString() === filterStatus;
+
+        // Filter by room
+        const matchesRoom =
+            filterRoom === "" ||
+            filterRoom === "all" ||
+            item.roomId === filterRoom;
+
+        return matchesSearch && matchesCategory && matchesStatus && matchesRoom;
+    });
+
     return (
         <div className="space-y-6">
             <div className="mb-6 flex flex-col items-start justify-between sm:flex-row sm:items-center">
@@ -259,6 +289,19 @@ export default function EquipmentManagement() {
                             ))}
                         </SelectContent>
                     </Select>
+                    <Select value={filterRoom} onValueChange={setFilterRoom}>
+                        <SelectTrigger>
+                            <SelectValue placeholder="ห้อง" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">ทั้งหมด</SelectItem>
+                            {rooms.map((room) => (
+                                <SelectItem key={room.id} value={room.id}>
+                                    ห้อง {room.roomNumber}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
                     <Select
                         value={filterStatus}
                         onValueChange={setFilterStatus}
@@ -293,7 +336,7 @@ export default function EquipmentManagement() {
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
-                                        {equipments.map((item) => (
+                                        {filteredEquipments.map((item) => (
                                             <TableRow key={item.id}>
                                                 <TableCell>
                                                     {item.customId || "NULL"}
@@ -358,6 +401,15 @@ export default function EquipmentManagement() {
                             </div>
                         </div>
                     </div>
+
+                    {/* Show message when no equipment matches the filters */}
+                    {filteredEquipments.length === 0 && (
+                        <div className="mt-4 text-center">
+                            <p className="text-gray-500">
+                                ไม่พบครุภัณฑ์ที่ตรงกับเงื่อนไขที่กำหนด
+                            </p>
+                        </div>
+                    )}
 
                     <div className="flex items-center justify-end space-x-2 py-4">
                         <Button
@@ -849,7 +901,7 @@ export default function EquipmentManagement() {
                                     onValueChange={(value) =>
                                         handleEditChange(
                                             "status",
-                                            parseInt(value),
+                                            Number.parseInt(value),
                                         )
                                     }
                                 >
@@ -875,7 +927,7 @@ export default function EquipmentManagement() {
                                     onChange={(e) =>
                                         handleEditChange(
                                             "price",
-                                            parseFloat(e.target.value),
+                                            Number.parseFloat(e.target.value),
                                         )
                                     }
                                 />
@@ -890,7 +942,7 @@ export default function EquipmentManagement() {
                                     onChange={(e) =>
                                         handleEditChange(
                                             "lifetime",
-                                            parseInt(e.target.value),
+                                            Number.parseInt(e.target.value),
                                         )
                                     }
                                 />
