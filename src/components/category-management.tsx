@@ -99,16 +99,20 @@ export default function CategoryManagement() {
 
         setIsLoading(true);
         try {
-            await CategoriesService.postApiV1Categories({
+            const { error } = await CategoriesService.postApiV1Categories({
                 body: { name: newCategoryName },
             });
-            setIsAddModalOpen(false);
-            setNewCategoryName("");
-            toast.success("เพิ่มหมวดหมู่สำเร็จ");
-            await mutate();
-        } catch (error: unknown) {
-            console.error("Error adding category:", error);
-            toast.error("เกิดข้อผิดพลาดในการเพิ่มหมวดหมู่");
+
+            if (!error) {
+                setIsAddModalOpen(false);
+                setNewCategoryName("");
+                toast.success("เพิ่มหมวดหมู่สำเร็จ");
+                await mutate();
+            } else {
+                toast.error(
+                    error.message || "เกิดข้อผิดพลาดในการเพิ่มหมวดหมู่",
+                );
+            }
         } finally {
             setIsLoading(false);
         }
@@ -123,18 +127,22 @@ export default function CategoryManagement() {
 
         setIsLoading(true);
         try {
-            await CategoriesService.patchApiV1CategoriesById({
+            const { error } = await CategoriesService.patchApiV1CategoriesById({
                 path: { id: editingCategory.id },
                 body: { name: newCategoryName },
             });
-            setIsEditModalOpen(false);
-            setEditingCategory(null);
-            setNewCategoryName("");
-            toast.success("แก้ไขหมวดหมู่สำเร็จ");
-            await mutate();
-        } catch (error: unknown) {
-            console.error("Error editing category:", error);
-            toast.error("เกิดข้อผิดพลาดในการแก้ไขหมวดหมู่");
+
+            if (!error) {
+                setIsEditModalOpen(false);
+                setEditingCategory(null);
+                setNewCategoryName("");
+                toast.success("แก้ไขหมวดหมู่สำเร็จ");
+                await mutate();
+            } else {
+                toast.error(
+                    error.message || "เกิดข้อผิดพลาดในการแก้ไขหมวดหมู่",
+                );
+            }
         } finally {
             setIsLoading(false);
         }
@@ -145,16 +153,20 @@ export default function CategoryManagement() {
 
         setIsLoading(true);
         try {
-            await CategoriesService.deleteApiV1CategoriesById({
-                path: { id: categoryToDelete },
-            });
-            setIsDeleteAlertOpen(false);
-            setCategoryToDelete(null);
-            toast.success("ลบหมวดหมู่สำเร็จ");
-            await mutate();
-        } catch (error: unknown) {
-            console.error("Error deleting category:", error);
-            toast.error("เกิดข้อผิดพลาดในการลบหมวดหมู่");
+            const { error } = await CategoriesService.deleteApiV1CategoriesById(
+                {
+                    path: { id: categoryToDelete },
+                },
+            );
+
+            if (!error) {
+                setIsDeleteAlertOpen(false);
+                setCategoryToDelete(null);
+                toast.success("ลบหมวดหมู่สำเร็จ");
+                await mutate();
+            } else {
+                toast.error(error.message || "เกิดข้อผิดพลาดในการลบหมวดหมู่");
+            }
         } finally {
             setIsLoading(false);
         }

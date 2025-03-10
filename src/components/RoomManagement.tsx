@@ -88,16 +88,18 @@ export default function RoomManagement() {
 
         setIsLoading(true);
         try {
-            await RoomsService.postApiV1Rooms({
+            const { error } = await RoomsService.postApiV1Rooms({
                 body: { roomNumber: newRoomNumber },
             });
-            setIsAddModalOpen(false);
-            setNewRoomNumber("");
-            toast.success("เพิ่มห้องสำเร็จ");
-            await mutate();
-        } catch (error: unknown) {
-            console.error("Error adding room:", error);
-            toast.error("เกิดข้อผิดพลาดในการเพิ่มห้อง");
+
+            if (!error) {
+                setIsAddModalOpen(false);
+                setNewRoomNumber("");
+                toast.success("เพิ่มห้องสำเร็จ");
+                await mutate();
+            } else {
+                toast.error(error.message || "เกิดข้อผิดพลาดในการเพิ่มห้อง");
+            }
         } finally {
             setIsLoading(false);
         }
@@ -112,18 +114,20 @@ export default function RoomManagement() {
 
         setIsLoading(true);
         try {
-            await RoomsService.patchApiV1RoomsById({
+            const { error } = await RoomsService.patchApiV1RoomsById({
                 path: { id: editingRoom.id },
                 body: { roomNumber: newRoomNumber },
             });
-            setIsEditModalOpen(false);
-            setEditingRoom(null);
-            setNewRoomNumber("");
-            toast.success("แก้ไขห้องสำเร็จ");
-            await mutate();
-        } catch (error: unknown) {
-            console.error("Error editing room:", error);
-            toast.error("เกิดข้อผิดพลาดในการแก้ไขห้อง");
+
+            if (!error) {
+                setIsEditModalOpen(false);
+                setEditingRoom(null);
+                setNewRoomNumber("");
+                toast.success("แก้ไขห้องสำเร็จ");
+                await mutate();
+            } else {
+                toast.error(error.message || "เกิดข้อผิดพลาดในการแก้ไขห้อง");
+            }
         } finally {
             setIsLoading(false);
         }
@@ -134,16 +138,18 @@ export default function RoomManagement() {
 
         setIsLoading(true);
         try {
-            await RoomsService.deleteApiV1RoomsById({
+            const { error } = await RoomsService.deleteApiV1RoomsById({
                 path: { id: roomToDelete },
             });
-            setIsDeleteAlertOpen(false);
-            setRoomToDelete(null);
-            toast.success("ลบห้องสำเร็จ");
-            await mutate();
-        } catch (error: unknown) {
-            console.error("Error deleting room:", error);
-            toast.error("เกิดข้อผิดพลาดในการลบห้อง");
+
+            if (!error) {
+                setIsDeleteAlertOpen(false);
+                setRoomToDelete(null);
+                toast.success("ลบห้องสำเร็จ");
+                await mutate();
+            } else {
+                toast.error(error.message || "เกิดข้อผิดพลาดในการลบห้อง");
+            }
         } finally {
             setIsLoading(false);
         }
