@@ -354,29 +354,46 @@ export default function EquipmentManagement() {
 
                 // อัพโหลดรูปภาพครุภัณฑ์
                 if (data && equipment.image) {
-                    const { error: imageError } =
-                        await EquipmentsService.postApiV1EquipmentsByIdImages({
-                            path: { id: data.id },
-                            body: { file: equipment.image },
-                        });
-
-                    if (imageError) {
+                    const form = new FormData();
+                    form.append("file", equipment.image);
+                    const response = await fetch(
+                        `http://localhost:8000/api/v1/equipments/${data.id}/images`,
+                        {
+                            method: "POST",
+                            body: form,
+                            credentials: "include",
+                        },
+                    );
+                    const imageError = await response.json();
+                    if (!response.ok) {
                         toast.error("ไม่สามารถอัพโหลดรูปภาพครุภัณฑ์ได้");
-                        console.error("Image upload error:", imageError);
+                        console.error(
+                            "Image upload error:",
+                            imageError?.message,
+                        );
                     }
                 }
 
                 // อัพโหลดรูปภาพใบเสร็จ
                 if (data && equipment.receipt) {
-                    const { error: receiptError } =
-                        await EquipmentsService.postApiV1EquipmentsByIdReceipt({
-                            path: { id: data.id },
-                            body: { file: equipment.receipt },
-                        });
+                    const form = new FormData();
+                    form.append("file", equipment.receipt);
 
-                    if (receiptError) {
+                    const response = await fetch(
+                        `http://localhost:8000/api/v1/equipments/${data.id}/receipt`,
+                        {
+                            method: "POST",
+                            body: form,
+                            credentials: "include",
+                        },
+                    );
+                    const receiptError = await response.json();
+                    if (!response.ok) {
                         toast.error("ไม่สามารถอัพโหลดรูปภาพใบเสร็จได้");
-                        console.error("Receipt upload error:", receiptError);
+                        console.error(
+                            "Receipt upload error:",
+                            receiptError?.message,
+                        );
                     }
                 }
             }
@@ -1477,9 +1494,34 @@ export default function EquipmentManagement() {
                             <div className="grid grid-cols-4 items-center gap-4">
                                 <span className="font-medium">รูปภาพ:</span>
                                 <div className="col-span-3">
-                                    <span className="text-gray-500">
-                                        ไม่มีรูปภาพ
-                                    </span>
+                                    {selectedEquipment.images &&
+                                    selectedEquipment.images.length > 0 ? (
+                                        <div className="flex flex-wrap gap-2">
+                                            {selectedEquipment.images.map(
+                                                (image) => (
+                                                    <a
+                                                        key={image.id}
+                                                        href={`http://localhost:8000/${image.filepath.replace(/\\/g, "/")}`}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="block"
+                                                    >
+                                                        <Image
+                                                            src={`http://localhost:8000/${image.filepath.replace(/\\/g, "/")}`}
+                                                            alt={image.filename}
+                                                            width={96}
+                                                            height={96}
+                                                            className="h-24 w-auto rounded border border-gray-200 object-cover"
+                                                        />
+                                                    </a>
+                                                ),
+                                            )}
+                                        </div>
+                                    ) : (
+                                        <span className="text-gray-500">
+                                            ไม่มีรูปภาพ
+                                        </span>
+                                    )}
                                 </div>
                             </div>
                             <div className="grid grid-cols-4 items-center gap-4">
@@ -1487,9 +1529,29 @@ export default function EquipmentManagement() {
                                     รูปภาพใบเสร็จ:
                                 </span>
                                 <div className="col-span-3">
-                                    <span className="text-gray-500">
-                                        ไม่มีรูปภาพใบเสร็จ
-                                    </span>
+                                    {selectedEquipment.receiptImage ? (
+                                        <a
+                                            href={`http://localhost:8000/${selectedEquipment.receiptImage.filepath.replace(/\\/g, "/")}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="block"
+                                        >
+                                            <Image
+                                                src={`http://localhost:8000/${selectedEquipment.receiptImage.filepath.replace(/\\/g, "/")}`}
+                                                alt={
+                                                    selectedEquipment
+                                                        .receiptImage.filename
+                                                }
+                                                width={96}
+                                                height={96}
+                                                className="h-24 w-auto rounded border border-gray-200 object-cover"
+                                            />
+                                        </a>
+                                    ) : (
+                                        <span className="text-gray-500">
+                                            ไม่มีรูปภาพใบเสร็จ
+                                        </span>
+                                    )}
                                 </div>
                             </div>
                         </div>
