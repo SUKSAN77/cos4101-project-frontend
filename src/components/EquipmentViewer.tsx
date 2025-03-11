@@ -53,8 +53,7 @@ export default function EquipmentViewer() {
     const [filterStatus, setFilterStatus] = useState("");
     const [filterRoom, setFilterRoom] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 10;
-
+    const [itemsPerPage, setItemsPerPage] = useState(10);
     // Helper functions
     const getCategoryName = (categoryId: string | null) => {
         if (!categoryId) return "-";
@@ -352,7 +351,7 @@ export default function EquipmentViewer() {
                                 </Button>
                             </div>
                             <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
-                                <div>
+                                <div className="flex items-center gap-4">
                                     <p className="text-sm text-gray-700">
                                         แสดง{" "}
                                         <span className="font-medium">
@@ -371,6 +370,35 @@ export default function EquipmentViewer() {
                                         </span>{" "}
                                         รายการ
                                     </p>
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-sm text-gray-700">
+                                            แสดง:
+                                        </span>
+                                        <Select
+                                            value={String(itemsPerPage)}
+                                            onValueChange={(value) =>
+                                                setItemsPerPage(Number(value))
+                                            }
+                                        >
+                                            <SelectTrigger className="h-8 w-[70px]">
+                                                <SelectValue />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="10">
+                                                    10
+                                                </SelectItem>
+                                                <SelectItem value="50">
+                                                    50
+                                                </SelectItem>
+                                                <SelectItem value="100">
+                                                    100
+                                                </SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                        <span className="text-sm text-gray-700">
+                                            รายการต่อหน้า
+                                        </span>
+                                    </div>
                                 </div>
                                 <div>
                                     <nav

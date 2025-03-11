@@ -50,9 +50,9 @@ export async function middleware(request: NextRequest) {
 
         return NextResponse.next();
     } catch (error) {
-        // ถ้าเกิดข้อผิดพลาดในการดึงข้อมูล user ให้ redirect ไปหน้า login
+        // ถ้าเกิดข้อผิดพลาดในการดึงข้อมูล user ให้แสดงหน้า Error
         console.error("Error in middleware:", error);
-        return NextResponse.redirect(new URL("/login", request.url));
+        return NextResponse.rewrite(new URL("/not-found", request.url));
     }
 }
 

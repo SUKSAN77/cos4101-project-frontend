@@ -38,7 +38,14 @@ export const useEquipments = () => {
         fetchEquipments();
     }, [fetchEquipments]);
 
-    return { equipments, setPage, setLimit, mutate: fetchEquipments };
+    return {
+        equipments,
+        page,
+        setPage,
+        limit,
+        setLimit,
+        mutate: fetchEquipments,
+    };
 };
 
 export const useUsers = () => {

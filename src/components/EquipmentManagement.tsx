@@ -8,19 +8,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import {
-    ChevronLeft,
-    ChevronRight,
-    Download,
-    Edit,
-    Plus,
-    Search,
-    Trash2,
-    X,
-} from "lucide-react";
+import { Download, Edit, Plus, Search, Trash2, X } from "lucide-react";
 import Image from "next/image";
 import pdfMake from "pdfmake/build/pdfmake";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
@@ -177,6 +168,8 @@ export default function EquipmentManagement() {
             description: "",
         },
     ]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage, setItemsPerPage] = useState(10);
 
     const addForm = useForm<EquipmentCreateValues>({
         resolver: zodResolver(equipmentCreateSchema),
@@ -495,6 +488,19 @@ export default function EquipmentManagement() {
         return matchesSearch && matchesCategory && matchesStatus && matchesRoom;
     });
 
+    // Pagination calculations
+    const totalPages = Math.ceil(filteredEquipments.length / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const paginatedEquipments = filteredEquipments.slice(
+        startIndex,
+        startIndex + itemsPerPage,
+    );
+
+    // Reset to first page when filters change
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchTerm, filterCategory, filterStatus, filterRoom]);
+
     // เพิ่มฟังก์ชันสำหรับสร้าง PDF
     const handlePrintPDF = async () => {
         const doc = new jsPDF({
@@ -526,9 +532,10 @@ export default function EquipmentManagement() {
                         "วันที่ได้มา",
                         "หมวดหมู่",
                         "ห้อง",
+                        "ผู้เพิ่ม",
                     ],
                 ],
-                body: filteredEquipments.map((item) => [
+                body: paginatedEquipments.map((item) => [
                     item.customId || "-",
                     item.name,
                     getRoleLabel(item.status),
@@ -538,6 +545,7 @@ export default function EquipmentManagement() {
                     ),
                     getCategoryName(item.categoryId),
                     getRoomNumber(item.roomId),
+                    item.creator?.firstName || "ไม่ทราบ",
                 ]),
                 styles: {
                     font: "THSarabunNew",
@@ -555,6 +563,7 @@ export default function EquipmentManagement() {
                     4: { cellWidth: 30 }, // วันที่ได้มา
                     5: { cellWidth: 30 }, // หมวดหมู่
                     6: { cellWidth: 30 }, // ห้อง
+                    7: { cellWidth: 30 }, // ผู้เพิ่ม
                 },
             });
 
@@ -692,12 +701,13 @@ export default function EquipmentManagement() {
                                             <TableHead>ราคา</TableHead>
                                             <TableHead>วันที่ได้มา</TableHead>
                                             <TableHead>ห้อง</TableHead>
-                                            <TableHead>ประเภท</TableHead>
+                                            <TableHead>หมวดหมู่</TableHead>
+                                            <TableHead>ผู้เพิ่ม</TableHead>
                                             <TableHead>การจัดการ</TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
-                                        {filteredEquipments.length === 0 ? (
+                                        {paginatedEquipments.length === 0 ? (
                                             <TableRow>
                                                 <TableCell
                                                     colSpan={8}
@@ -709,7 +719,7 @@ export default function EquipmentManagement() {
                                                 </TableCell>
                                             </TableRow>
                                         ) : (
-                                            filteredEquipments.map((item) => (
+                                            paginatedEquipments.map((item) => (
                                                 <TableRow key={item.id}>
                                                     <TableCell>
                                                         {item.customId ||
@@ -757,6 +767,13 @@ export default function EquipmentManagement() {
                                                             item.categoryId,
                                                         )}
                                                     </TableCell>
+                                                    <TableCell
+                                                        key={`creator-${item.id}`}
+                                                    >
+                                                        {item.creator
+                                                            ?.firstName ||
+                                                            "ไม่ทราบ"}
+                                                    </TableCell>
                                                     <TableCell>
                                                         <div className="flex gap-2">
                                                             <Button
@@ -799,28 +816,131 @@ export default function EquipmentManagement() {
                         </div>
                     </div>
 
-                    <div className="flex flex-col items-end justify-between space-y-2 py-4 sm:flex-row sm:items-center sm:space-y-0">
-                        <div className="text-sm text-gray-600">
-                            แสดง 1 ถึง {Math.min(10, filteredEquipments.length)}{" "}
-                            จากทั้งหมด {filteredEquipments.length} รายการ
-                        </div>
-                        <div className="flex items-center space-x-2">
+                    <div className="flex items-center justify-between border-t border-gray-200 px-4 py-3 sm:px-6">
+                        <div className="flex flex-1 justify-between sm:hidden">
                             <Button
                                 variant="outline"
-                                size="sm"
-                                className="w-[100px]"
+                                onClick={() =>
+                                    setCurrentPage((prev) =>
+                                        Math.max(prev - 1, 1),
+                                    )
+                                }
+                                disabled={currentPage === 1}
                             >
-                                <ChevronLeft className="mr-2 h-4 w-4" />
                                 ก่อนหน้า
                             </Button>
                             <Button
                                 variant="outline"
-                                size="sm"
-                                className="w-[100px]"
+                                onClick={() =>
+                                    setCurrentPage((prev) =>
+                                        Math.min(prev + 1, totalPages),
+                                    )
+                                }
+                                disabled={currentPage === totalPages}
                             >
                                 ถัดไป
-                                <ChevronRight className="ml-2 h-4 w-4" />
                             </Button>
+                        </div>
+                        <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+                            <div className="flex items-center gap-4">
+                                <p className="text-sm text-gray-700">
+                                    แสดง{" "}
+                                    <span className="font-medium">
+                                        {startIndex + 1}
+                                    </span>{" "}
+                                    ถึง{" "}
+                                    <span className="font-medium">
+                                        {Math.min(
+                                            startIndex + itemsPerPage,
+                                            filteredEquipments.length,
+                                        )}
+                                    </span>{" "}
+                                    จากทั้งหมด{" "}
+                                    <span className="font-medium">
+                                        {filteredEquipments.length}
+                                    </span>{" "}
+                                    รายการ
+                                </p>
+                                <div className="flex items-center gap-2">
+                                    <span className="text-sm text-gray-700">
+                                        แสดง:
+                                    </span>
+                                    <Select
+                                        value={String(itemsPerPage)}
+                                        onValueChange={(value) =>
+                                            setItemsPerPage(Number(value))
+                                        }
+                                    >
+                                        <SelectTrigger className="h-8 w-[70px]">
+                                            <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="10">
+                                                10
+                                            </SelectItem>
+                                            <SelectItem value="50">
+                                                50
+                                            </SelectItem>
+                                            <SelectItem value="100">
+                                                100
+                                            </SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    <span className="text-sm text-gray-700">
+                                        รายการต่อหน้า
+                                    </span>
+                                </div>
+                            </div>
+                            <div>
+                                <nav
+                                    className="isolate inline-flex -space-x-px rounded-md shadow-sm"
+                                    aria-label="Pagination"
+                                >
+                                    <Button
+                                        variant="outline"
+                                        className="rounded-l-md"
+                                        onClick={() =>
+                                            setCurrentPage((prev) =>
+                                                Math.max(prev - 1, 1),
+                                            )
+                                        }
+                                        disabled={currentPage === 1}
+                                    >
+                                        ก่อนหน้า
+                                    </Button>
+                                    {[...Array(totalPages)].map((_, index) => {
+                                        const pageNumber = index + 1;
+                                        return (
+                                            <Button
+                                                key={pageNumber}
+                                                variant={
+                                                    currentPage === pageNumber
+                                                        ? "default"
+                                                        : "outline"
+                                                }
+                                                onClick={() =>
+                                                    setCurrentPage(pageNumber)
+                                                }
+                                                className={`${currentPage === pageNumber ? "bg-blue-600 text-white hover:bg-blue-700" : "hover:bg-gray-50"} px-4 py-2`}
+                                            >
+                                                {pageNumber}
+                                            </Button>
+                                        );
+                                    })}
+                                    <Button
+                                        variant="outline"
+                                        className="rounded-r-md"
+                                        onClick={() =>
+                                            setCurrentPage((prev) =>
+                                                Math.min(prev + 1, totalPages),
+                                            )
+                                        }
+                                        disabled={currentPage === totalPages}
+                                    >
+                                        ถัดไป
+                                    </Button>
+                                </nav>
+                            </div>
                         </div>
                     </div>
                 </CardContent>
