@@ -865,7 +865,7 @@ export default function UserManagement() {
                                     กำลังลบ...
                                 </>
                             ) : (
-                                "ลบ"
+                                "ยืนยัน"
                             )}
                         </AlertDialogAction>
                     </AlertDialogFooter>
