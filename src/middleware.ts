@@ -18,7 +18,7 @@ export async function middleware(request: NextRequest) {
         let userRole = null;
         if (authCookie) {
             const user = await getUser();
-            userRole = user.role.toString();
+            userRole = user?.role?.toString() || null;
         }
 
         const isAdminRoute = adminRoutes.some((route) =>
