@@ -9,6 +9,7 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { Download, Search } from "lucide-react";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -117,6 +118,7 @@ export default function EquipmentViewer() {
             const base64Font = Buffer.from(fontBuffer).toString("base64");
             doc.addFileToVFS("THSarabunNew.ttf", base64Font);
             doc.addFont("THSarabunNew.ttf", "THSarabunNew", "normal");
+            doc.addFont("THSarabunNew-Bold.ttf", "THSarabunNew", "bold");
             doc.setFont("THSarabunNew");
 
             // Document title
@@ -135,6 +137,7 @@ export default function EquipmentViewer() {
                         "วันที่ได้มา",
                         "หมวดหมู่",
                         "ห้อง",
+                        "ผู้เพิ่ม",
                     ],
                 ],
                 body: paginatedEquipments.map((item) => [
@@ -147,6 +150,7 @@ export default function EquipmentViewer() {
                     ),
                     getCategoryName(item.categoryId),
                     getRoomNumber(item.roomId),
+                    item.creator?.firstName || "ไม่ทราบ",
                 ]),
                 styles: {
                     font: "THSarabunNew",
@@ -164,6 +168,7 @@ export default function EquipmentViewer() {
                     4: { cellWidth: 30 },
                     5: { cellWidth: 30 },
                     6: { cellWidth: 30 },
+                    7: { cellWidth: 30 },
                 },
             });
 
@@ -177,6 +182,7 @@ export default function EquipmentViewer() {
             doc.save(`รายงานครุภัณฑ์_${format(new Date(), "dd-MM-yyyy")}.pdf`);
         } catch (error) {
             console.error("Error loading font:", error);
+            toast.error("เกิดข้อผิดพลาดในการโหลดฟอนต์");
         }
     };
 

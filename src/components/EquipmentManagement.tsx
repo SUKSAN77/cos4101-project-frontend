@@ -324,9 +324,126 @@ export default function EquipmentManagement() {
         setNewEquipment((prev) => prev.filter((_, i) => i !== index));
     };
 
+    // เพิ่มฟังก์ชันตรวจสอบความซ้ำซ้อน
+    const checkDuplicates = (equipments: NewEquipment[]) => {
+        const duplicates = {
+            serialNumbers: new Map<string, number[]>(), // เก็บ index ของรายการที่ซ้ำ
+            customIds: new Map<string, number[]>(), // เก็บ index ของรายการที่ซ้ำ
+            duplicateSerialNumbers: new Set<string>(),
+            duplicateCustomIds: new Set<string>(),
+        };
+
+        // ตรวจสอบและเก็บ index ของรายการที่ซ้ำ
+        equipments.forEach((equipment, index) => {
+            if (equipment.serialNumber) {
+                const indices =
+                    duplicates.serialNumbers.get(equipment.serialNumber) || [];
+                indices.push(index);
+                duplicates.serialNumbers.set(equipment.serialNumber, indices);
+                if (indices.length > 1) {
+                    duplicates.duplicateSerialNumbers.add(
+                        equipment.serialNumber,
+                    );
+                }
+            }
+            if (equipment.customId) {
+                const indices =
+                    duplicates.customIds.get(equipment.customId) || [];
+                indices.push(index);
+                duplicates.customIds.set(equipment.customId, indices);
+                if (indices.length > 1) {
+                    duplicates.duplicateCustomIds.add(equipment.customId);
+                }
+            }
+        });
+
+        return {
+            hasDuplicates:
+                duplicates.duplicateSerialNumbers.size > 0 ||
+                duplicates.duplicateCustomIds.size > 0,
+            duplicateSerialNumbers: Array.from(
+                duplicates.duplicateSerialNumbers,
+            ),
+            duplicateCustomIds: Array.from(duplicates.duplicateCustomIds),
+            // เพิ่มการส่งคืนข้อมูล index ที่ซ้ำ
+            serialNumberIndices: duplicates.serialNumbers,
+            customIdIndices: duplicates.customIds,
+        };
+    };
+
     const handleSaveEquipment = async () => {
         setIsLoading(true);
         try {
+            // ตรวจสอบความซ้ำซ้อนในรายการที่จะเพิ่ม
+            const {
+                hasDuplicates,
+                duplicateSerialNumbers,
+                duplicateCustomIds,
+            } = checkDuplicates(newEquipment);
+
+            if (hasDuplicates) {
+                let errorMessage = "พบข้อมูลซ้ำในรายการที่จะเพิ่ม:\n";
+                if (duplicateSerialNumbers.length > 0) {
+                    errorMessage += `Serial Number ที่ซ้ำ: ${duplicateSerialNumbers.join(", ")}\n`;
+                }
+                if (duplicateCustomIds.length > 0) {
+                    errorMessage += `รหัสครุภัณฑ์ที่ซ้ำ: ${duplicateCustomIds.join(", ")}`;
+                }
+                toast.error(errorMessage);
+                setIsLoading(false);
+                return;
+            }
+
+            // ตรวจสอบความซ้ำซ้อนกับฐานข้อมูลทีละรายการ
+            for (const equipment of newEquipment) {
+                // ตรวจสอบ Serial Number
+                if (equipment.serialNumber) {
+                    const { data: serialCheckResponse } =
+                        await EquipmentsService.getApiV1Equipments({
+                            query: {
+                                limit: 1000,
+                                offset: 0,
+                            },
+                        });
+                    const serialCheck = serialCheckResponse?.data;
+                    if (
+                        serialCheck?.some(
+                            (eq) => eq.serialNumber === equipment.serialNumber,
+                        )
+                    ) {
+                        toast.error(
+                            `Serial Number "${equipment.serialNumber}" มีอยู่ในระบบแล้ว`,
+                        );
+                        setIsLoading(false);
+                        return;
+                    }
+                }
+
+                // ตรวจสอบ Custom ID
+                if (equipment.customId) {
+                    const { data: customIdCheckResponse } =
+                        await EquipmentsService.getApiV1Equipments({
+                            query: {
+                                limit: 1000,
+                                offset: 0,
+                            },
+                        });
+                    const customIdCheck = customIdCheckResponse?.data;
+                    if (
+                        customIdCheck?.some(
+                            (eq) => eq.customId === equipment.customId,
+                        )
+                    ) {
+                        toast.error(
+                            `รหัสครุภัณฑ์ "${equipment.customId}" มีอยู่ในระบบแล้ว`,
+                        );
+                        setIsLoading(false);
+                        return;
+                    }
+                }
+            }
+
+            // ถ้าไม่มีการซ้ำกัน ดำเนินการบันทึก
             for (const equipment of newEquipment) {
                 const requestBody = {
                     name: equipment.name,
