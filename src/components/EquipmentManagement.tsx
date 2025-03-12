@@ -327,47 +327,31 @@ export default function EquipmentManagement() {
     // เพิ่มฟังก์ชันตรวจสอบความซ้ำซ้อน
     const checkDuplicates = (equipments: NewEquipment[]) => {
         const duplicates = {
-            serialNumbers: new Set<string>(),
-            customIds: new Set<string>(),
+            serialNumbers: new Map<string, number[]>(), // เก็บ index ของรายการที่ซ้ำ
+            customIds: new Map<string, number[]>(), // เก็บ index ของรายการที่ซ้ำ
             duplicateSerialNumbers: new Set<string>(),
             duplicateCustomIds: new Set<string>(),
         };
 
-        // เช็คการซ้ำกันในรายการที่กำลังจะเพิ่ม
-        equipments.forEach((equipment) => {
+        // ตรวจสอบและเก็บ index ของรายการที่ซ้ำ
+        equipments.forEach((equipment, index) => {
             if (equipment.serialNumber) {
-                if (duplicates.serialNumbers.has(equipment.serialNumber)) {
-                    duplicates.duplicateSerialNumbers.add(
-                        equipment.serialNumber,
-                    );
-                }
-                duplicates.serialNumbers.add(equipment.serialNumber);
-            }
-            if (equipment.customId) {
-                if (duplicates.customIds.has(equipment.customId)) {
-                    duplicates.duplicateCustomIds.add(equipment.customId);
-                }
-                duplicates.customIds.add(equipment.customId);
-            }
-        });
-
-        // เช็คการซ้ำกับข้อมูลที่มีอยู่ในระบบ
-        equipments.forEach((equipment) => {
-            if (equipment.serialNumber) {
-                const existingWithSerialNumber = equipments.find(
-                    (eq) => eq.serialNumber === equipment.serialNumber,
-                );
-                if (existingWithSerialNumber) {
+                const indices =
+                    duplicates.serialNumbers.get(equipment.serialNumber) || [];
+                indices.push(index);
+                duplicates.serialNumbers.set(equipment.serialNumber, indices);
+                if (indices.length > 1) {
                     duplicates.duplicateSerialNumbers.add(
                         equipment.serialNumber,
                     );
                 }
             }
             if (equipment.customId) {
-                const existingWithCustomId = equipments.find(
-                    (eq) => eq.customId === equipment.customId,
-                );
-                if (existingWithCustomId) {
+                const indices =
+                    duplicates.customIds.get(equipment.customId) || [];
+                indices.push(index);
+                duplicates.customIds.set(equipment.customId, indices);
+                if (indices.length > 1) {
                     duplicates.duplicateCustomIds.add(equipment.customId);
                 }
             }
@@ -381,6 +365,9 @@ export default function EquipmentManagement() {
                 duplicates.duplicateSerialNumbers,
             ),
             duplicateCustomIds: Array.from(duplicates.duplicateCustomIds),
+            // เพิ่มการส่งคืนข้อมูล index ที่ซ้ำ
+            serialNumberIndices: duplicates.serialNumbers,
+            customIdIndices: duplicates.customIds,
         };
     };
 
@@ -407,7 +394,7 @@ export default function EquipmentManagement() {
                 return;
             }
 
-            // ตรวจสอบความซ้ำซ้อนกับฐานข้อมูล
+            // ตรวจสอบความซ้ำซ้อนกับฐานข้อมูลทีละรายการ
             for (const equipment of newEquipment) {
                 // ตรวจสอบ Serial Number
                 if (equipment.serialNumber) {
