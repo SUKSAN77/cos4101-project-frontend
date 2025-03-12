@@ -5,7 +5,7 @@ import { getUser } from "@/lib/actions/users";
 
 const adminRoutes = ["/dashboard/users"]; // เพิ่มเส้นทางที่ต้องการให้เฉพาะแอดมินเข้าถึงได้
 const authRedirectRoutes = ["/login", "/register"]; // เพิ่มเส้นทางที่ต้องการให้ redirect เมื่อ login แล้ว
-const publicRoutes = ["/login", "/register"]; // เส้นทางที่เข้าถึงได้โดยไม่ต้อง login
+const publicRoutes = ["/login", "/register", "/forgetpassword"]; // เส้นทางที่เข้าถึงได้โดยไม่ต้อง login
 const restrictedRoles = ["3", "4"]; // INSTRUCTOR และ STAFF
 const restrictedAllowedPaths = ["/", "/profile"]; // เพิ่มเส้นทางที่ INSTRUCTOR และ STAFF เข้าถึงได้
 
