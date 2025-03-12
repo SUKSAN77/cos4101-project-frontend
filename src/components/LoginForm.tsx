@@ -94,7 +94,7 @@ export function LoginFormHandle() {
                             <div className="flex items-center">
                                 <FormLabel>รหัสผ่าน</FormLabel>
                                 <Link
-                                    href="#"
+                                    href="/forgetpassword"
                                     className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
                                 >
                                     ลืมรหัสผ่าน?
