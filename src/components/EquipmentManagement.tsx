@@ -1629,6 +1629,7 @@ export default function EquipmentManagement() {
                                                             width={96}
                                                             height={96}
                                                             className="h-24 w-auto rounded border border-gray-200 object-cover"
+                                                            crossOrigin="use-credentials"
                                                         />
                                                     </a>
                                                 ),
@@ -1662,6 +1663,7 @@ export default function EquipmentManagement() {
                                                 width={96}
                                                 height={96}
                                                 className="h-24 w-auto rounded border border-gray-200 object-cover"
+                                                crossOrigin="use-credentials"
                                             />
                                         </a>
                                     ) : (
