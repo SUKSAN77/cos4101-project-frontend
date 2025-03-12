@@ -602,7 +602,7 @@ export default function UserManagement() {
                                             กำลังเพิ่ม...
                                         </>
                                     ) : (
-                                        "เพิ่ม"
+                                        "บันทึก"
                                     )}
                                 </Button>
                             </DialogFooter>
