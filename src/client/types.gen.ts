@@ -210,7 +210,7 @@ export type GetApiV1UsersResponses = {
             emailVerified: boolean;
             firstName: string | null;
             lastName: string | null;
-            role: string | number;
+            role: number;
             isActive: boolean;
             createdAt: unknown | string | number;
             updatedAt: unknown | string | number;
@@ -275,7 +275,7 @@ export type PostApiV1UsersResponses = {
         emailVerified: boolean;
         firstName: string | null;
         lastName: string | null;
-        role: string | number;
+        role: number;
         isActive: boolean;
         createdAt: unknown | string | number;
         updatedAt: unknown | string | number;
@@ -372,7 +372,7 @@ export type GetApiV1UsersByIdResponses = {
         emailVerified: boolean;
         firstName: string | null;
         lastName: string | null;
-        role: string | number;
+        role: number;
         isActive: boolean;
         createdAt: unknown | string | number;
         updatedAt: unknown | string | number;
@@ -433,7 +433,7 @@ export type PatchApiV1UsersByIdResponses = {
         emailVerified: boolean;
         firstName: string | null;
         lastName: string | null;
-        role: string | number;
+        role: number;
         isActive: boolean;
         createdAt: unknown | string | number;
         updatedAt: unknown | string | number;
@@ -484,7 +484,7 @@ export type GetApiV1UsersMeResponses = {
         emailVerified: boolean;
         firstName: string | null;
         lastName: string | null;
-        role: string | number;
+        role: number;
         isActive: boolean;
         createdAt: unknown | string | number;
         updatedAt: unknown | string | number;
@@ -538,7 +538,7 @@ export type PatchApiV1UsersMeResponses = {
         emailVerified: boolean;
         firstName: string | null;
         lastName: string | null;
-        role: string | number;
+        role: number;
         isActive: boolean;
         createdAt: unknown | string | number;
         updatedAt: unknown | string | number;
@@ -1168,8 +1168,8 @@ export type GetApiV1EquipmentsResponses = {
             description: string | null;
             customId: string;
             price: unknown;
-            lifetime: string | number;
-            status: string | number;
+            lifetime: number;
+            status: number;
             notes: string | null;
             createdAt: unknown | string | number;
             updatedAt: unknown | string | number;
@@ -1199,7 +1199,7 @@ export type GetApiV1EquipmentsResponses = {
                 id: string;
                 filename: string;
                 filepath: string;
-                filesize: string | number;
+                filesize: number;
                 filetype: string;
                 createdAt: unknown | string | number;
                 equipmentId: string;
@@ -1208,7 +1208,7 @@ export type GetApiV1EquipmentsResponses = {
                 id: string;
                 filename: string;
                 filepath: string;
-                filesize: string | number;
+                filesize: number;
                 filetype: string;
                 createdAt: unknown | string | number;
                 equipmentId: string;
@@ -1229,9 +1229,9 @@ export type PostApiV1EquipmentsData = {
     body: {
         name: string;
         description?: string;
-        lifetime: string | number;
+        lifetime: number;
         price: number;
-        status: string | number;
+        status: number;
         customId: string;
         acquiredDate: unknown | string | number;
         serialNumber?: string;
@@ -1279,8 +1279,8 @@ export type PostApiV1EquipmentsResponses = {
         description: string | null;
         customId: string;
         price: unknown;
-        lifetime: string | number;
-        status: string | number;
+        lifetime: number;
+        status: number;
         notes: string | null;
         createdAt: unknown | string | number;
         updatedAt: unknown | string | number;
@@ -1310,7 +1310,7 @@ export type PostApiV1EquipmentsResponses = {
             id: string;
             filename: string;
             filepath: string;
-            filesize: string | number;
+            filesize: number;
             filetype: string;
             createdAt: unknown | string | number;
             equipmentId: string;
@@ -1319,7 +1319,7 @@ export type PostApiV1EquipmentsResponses = {
             id: string;
             filename: string;
             filepath: string;
-            filesize: string | number;
+            filesize: number;
             filetype: string;
             createdAt: unknown | string | number;
             equipmentId: string;
@@ -1416,8 +1416,8 @@ export type GetApiV1EquipmentsByIdResponses = {
         description: string | null;
         customId: string;
         price: unknown;
-        lifetime: string | number;
-        status: string | number;
+        lifetime: number;
+        status: number;
         notes: string | null;
         createdAt: unknown | string | number;
         updatedAt: unknown | string | number;
@@ -1447,7 +1447,7 @@ export type GetApiV1EquipmentsByIdResponses = {
             id: string;
             filename: string;
             filepath: string;
-            filesize: string | number;
+            filesize: number;
             filetype: string;
             createdAt: unknown | string | number;
             equipmentId: string;
@@ -1456,7 +1456,7 @@ export type GetApiV1EquipmentsByIdResponses = {
             id: string;
             filename: string;
             filepath: string;
-            filesize: string | number;
+            filesize: number;
             filetype: string;
             createdAt: unknown | string | number;
             equipmentId: string;
@@ -1518,8 +1518,8 @@ export type PatchApiV1EquipmentsByIdResponses = {
         description: string | null;
         customId: string;
         price: unknown;
-        lifetime: string | number;
-        status: string | number;
+        lifetime: number;
+        status: number;
         notes: string | null;
         createdAt: unknown | string | number;
         updatedAt: unknown | string | number;
@@ -1549,7 +1549,7 @@ export type PatchApiV1EquipmentsByIdResponses = {
             id: string;
             filename: string;
             filepath: string;
-            filesize: string | number;
+            filesize: number;
             filetype: string;
             createdAt: unknown | string | number;
             equipmentId: string;
@@ -1558,7 +1558,7 @@ export type PatchApiV1EquipmentsByIdResponses = {
             id: string;
             filename: string;
             filepath: string;
-            filesize: string | number;
+            filesize: number;
             filetype: string;
             createdAt: unknown | string | number;
             equipmentId: string;
@@ -1613,8 +1613,8 @@ export type PostApiV1EquipmentsByIdImagesResponses = {
         description: string | null;
         customId: string;
         price: unknown;
-        lifetime: string | number;
-        status: string | number;
+        lifetime: number;
+        status: number;
         notes: string | null;
         createdAt: unknown | string | number;
         updatedAt: unknown | string | number;
@@ -1644,7 +1644,7 @@ export type PostApiV1EquipmentsByIdImagesResponses = {
             id: string;
             filename: string;
             filepath: string;
-            filesize: string | number;
+            filesize: number;
             filetype: string;
             createdAt: unknown | string | number;
             equipmentId: string;
@@ -1653,7 +1653,7 @@ export type PostApiV1EquipmentsByIdImagesResponses = {
             id: string;
             filename: string;
             filepath: string;
-            filesize: string | number;
+            filesize: number;
             filetype: string;
             createdAt: unknown | string | number;
             equipmentId: string;
@@ -1754,8 +1754,8 @@ export type PatchApiV1EquipmentsByIdImagesByImageIdResponses = {
         description: string | null;
         customId: string;
         price: unknown;
-        lifetime: string | number;
-        status: string | number;
+        lifetime: number;
+        status: number;
         notes: string | null;
         createdAt: unknown | string | number;
         updatedAt: unknown | string | number;
@@ -1785,7 +1785,7 @@ export type PatchApiV1EquipmentsByIdImagesByImageIdResponses = {
             id: string;
             filename: string;
             filepath: string;
-            filesize: string | number;
+            filesize: number;
             filetype: string;
             createdAt: unknown | string | number;
             equipmentId: string;
@@ -1794,7 +1794,7 @@ export type PatchApiV1EquipmentsByIdImagesByImageIdResponses = {
             id: string;
             filename: string;
             filepath: string;
-            filesize: string | number;
+            filesize: number;
             filetype: string;
             createdAt: unknown | string | number;
             equipmentId: string;
@@ -1893,8 +1893,8 @@ export type PostApiV1EquipmentsByIdReceiptResponses = {
         description: string | null;
         customId: string;
         price: unknown;
-        lifetime: string | number;
-        status: string | number;
+        lifetime: number;
+        status: number;
         notes: string | null;
         createdAt: unknown | string | number;
         updatedAt: unknown | string | number;
@@ -1924,7 +1924,7 @@ export type PostApiV1EquipmentsByIdReceiptResponses = {
             id: string;
             filename: string;
             filepath: string;
-            filesize: string | number;
+            filesize: number;
             filetype: string;
             createdAt: unknown | string | number;
             equipmentId: string;
@@ -1933,7 +1933,7 @@ export type PostApiV1EquipmentsByIdReceiptResponses = {
             id: string;
             filename: string;
             filepath: string;
-            filesize: string | number;
+            filesize: number;
             filetype: string;
             createdAt: unknown | string | number;
             equipmentId: string;
