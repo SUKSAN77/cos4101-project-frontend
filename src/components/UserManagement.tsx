@@ -68,6 +68,7 @@ const USER_ROLES = {
     [UserRole.INVENTORY_MANAGER]: "ผู้จัดการคลัง",
     [UserRole.INSTRUCTOR]: "อาจารย์",
     [UserRole.STAFF]: "เจ้าหน้าที่",
+    [UserRole.UNKNOWN]: "ไม่ทราบบทบาท",
 } as const;
 
 const userCreateSchema = z.object({
