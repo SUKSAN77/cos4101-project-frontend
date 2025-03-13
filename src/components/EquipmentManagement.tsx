@@ -1744,7 +1744,7 @@ export default function EquipmentManagement() {
                                 <Select
                                     value={String(editingEquipment.status)}
                                     onValueChange={(value) =>
-                                        handleEditChange("status", value)
+                                        handleEditChange("status", Number(value))
                                     }
                                 >
                                     <SelectTrigger>
