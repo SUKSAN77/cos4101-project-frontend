@@ -51,8 +51,8 @@ import {
 import { useCategories, useEquipments, useRooms } from "@/hooks/api";
 import { Equipment, UpdateEquipment } from "@/types/equipments";
 
-const getRoleLabel = (role: string | number) => {
-    const statusNumber = Number(role);
+const getRoleLabel = (role: number) => {
+    const statusNumber = role;
     switch (statusNumber) {
         case 0:
             return "ปกติ";
@@ -449,8 +449,8 @@ export default function EquipmentManagement() {
                     name: equipment.name,
                     description: equipment.description || "",
                     lifetime: "0",
-                    price: Number(equipment.price),
-                    status: Number(equipment.status),
+                    price: equipment.price,
+                    status: equipment.status,
                     customId: equipment.customId,
                     acquiredDate: equipment.acquiredDate,
                     serialNumber: equipment.serialNumber || "",
@@ -1744,10 +1744,7 @@ export default function EquipmentManagement() {
                                 <Select
                                     value={String(editingEquipment.status)}
                                     onValueChange={(value) =>
-                                        handleEditChange(
-                                            "status",
-                                            Number(value),
-                                        )
+                                        handleEditChange("status", value)
                                     }
                                 >
                                     <SelectTrigger>

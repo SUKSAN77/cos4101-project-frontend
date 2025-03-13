@@ -387,7 +387,7 @@ export default function UserManagement() {
                                                                 "string"
                                                                     ? user.createdAt
                                                                     : new Date(
-                                                                          user.createdAt as number,
+                                                                          user.createdAt as string,
                                                                       ).toISOString()
                                                             }
                                                         />

@@ -46,7 +46,7 @@ export function Navbar() {
                                 UserRole.ADMIN,
                                 UserRole.DEPARTMENT_HEAD,
                                 UserRole.INSTRUCTOR,
-                            ].includes(Number(user.role)) && (
+                            ].includes(user.role) && (
                                 <div>
                                     <Link href="/">
                                         <Button variant="link">หน้าแรก</Button>

@@ -30,7 +30,7 @@ export async function middleware(request: NextRequest) {
                 UserRole.ADMIN,
                 UserRole.DEPARTMENT_HEAD,
                 UserRole.INVENTORY_MANAGER,
-            ].includes(Number(user.role)) &&
+            ].includes(user.role) &&
             adminRoutes.includes(pathname)
         ) {
             return NextResponse.redirect(new URL("/", request.url));

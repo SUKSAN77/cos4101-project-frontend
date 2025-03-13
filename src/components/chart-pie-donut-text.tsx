@@ -24,7 +24,7 @@ import { Equipment } from "@/types/equipments";
 const calculateChartData = (equipments: Equipment[] = []) => {
     const statusCount = equipments.reduce(
         (acc, item) => {
-            acc[item.status as number] = (acc[item.status as number] || 0) + 1;
+            acc[item.status] = (acc[item.status] || 0) + 1;
             return acc;
         },
         {} as Record<number, number>,
