@@ -99,8 +99,8 @@ interface NewEquipment {
     name: string;
     customId: string;
     serialNumber: string;
-    status: string;
-    price: string;
+    status: number;
+    price: number;
     acquisitionMethod: string;
     acquiredDate: string;
     notes: string;
@@ -156,8 +156,8 @@ export default function EquipmentManagement() {
             name: "",
             customId: "",
             serialNumber: "",
-            status: "0",
-            price: "",
+            status: 0,
+            price: 0,
             acquisitionMethod: "",
             acquiredDate: new Date().toISOString().split("T")[0],
             notes: "",
@@ -306,8 +306,8 @@ export default function EquipmentManagement() {
                 name: "",
                 customId: "",
                 serialNumber: "",
-                status: "0",
-                price: "",
+                status: 0,
+                price: 0,
                 acquisitionMethod: "",
                 acquiredDate: new Date().toISOString().split("T")[0],
                 notes: "",
@@ -448,9 +448,9 @@ export default function EquipmentManagement() {
                 const requestBody = {
                     name: equipment.name,
                     description: equipment.description || "",
-                    lifetime: "0",
-                    price: equipment.price,
-                    status: equipment.status,
+                    lifetime: 0,
+                    price: Number(equipment.price),
+                    status: Number(equipment.status),
                     customId: equipment.customId,
                     acquiredDate: equipment.acquiredDate,
                     serialNumber: equipment.serialNumber || "",
@@ -521,8 +521,8 @@ export default function EquipmentManagement() {
                     name: "",
                     customId: "",
                     serialNumber: "",
-                    status: "0",
-                    price: "",
+                    status: 0,
+                    price: 0,
                     acquisitionMethod: "",
                     acquiredDate: new Date().toISOString().split("T")[0],
                     notes: "",
@@ -1209,7 +1209,7 @@ export default function EquipmentManagement() {
                                                     สถานะ
                                                 </label>
                                                 <Select
-                                                    value={item.status}
+                                                    value={`${item.status}`}
                                                     onValueChange={(value) =>
                                                         handleNewEquipmentChange(
                                                             index,
