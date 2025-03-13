@@ -17,13 +17,32 @@ import {
     ChartTooltip,
     ChartTooltipContent,
 } from "@/components/ui/chart";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import { useEquipments } from "@/hooks/api";
 import { Equipment } from "@/types/equipments";
 
 // คำนวณข้อมูลรายเดือน
-const calculateMonthlyData = (equipments: Equipment[] = []) => {
-    const monthlyData = new Array(12).fill(null).map((_, index) => ({
-        month: new Date(2023, index).toLocaleString("th-TH", {
+const calculateMonthlyData = (
+    equipments: Equipment[] = [],
+    selectedYear: number,
+) => {
+    // สร้าง Map เพื่อเก็บข้อมูลแยกตามปี
+    type MonthlyData = {
+        month: string;
+        ปกติ: number;
+        ชำรุด: number;
+        จำหน่าย: number;
+    };
+
+    const yearDataMap = new Map<number, MonthlyData[]>();
+    const monthlyTemplate = new Array(12).fill(null).map((_, index) => ({
+        month: new Date(selectedYear, index).toLocaleString("th-TH", {
             month: "short",
         }),
         ปกติ: 0,
@@ -33,15 +52,22 @@ const calculateMonthlyData = (equipments: Equipment[] = []) => {
 
     equipments.forEach((item) => {
         const date = new Date(item.acquiredDate as string);
+        const year = date.getFullYear();
+        if (!yearDataMap.has(year)) {
+            yearDataMap.set(year, JSON.parse(JSON.stringify(monthlyTemplate)));
+        }
+
         const monthIndex = date.getMonth();
         const status = item.status;
+        const yearData = yearDataMap.get(year)!;
 
-        if (status === 0) monthlyData[monthIndex].ปกติ++;
-        else if (status === 1) monthlyData[monthIndex].ชำรุด++;
-        else if (status === 2) monthlyData[monthIndex].จำหน่าย++;
+        if (status === 0) yearData[monthIndex].ปกติ++;
+        else if (status === 1) yearData[monthIndex].ชำรุด++;
+        else if (status === 2) yearData[monthIndex].จำหน่าย++;
     });
 
-    return monthlyData;
+    // ส่งคืนข้อมูลของปีที่เลือก
+    return yearDataMap.get(selectedYear) || monthlyTemplate;
 };
 
 const chartConfig = {
@@ -61,19 +87,49 @@ const chartConfig = {
 
 export function BarChartComponent() {
     const { equipments } = useEquipments();
+    const [selectedYear, setSelectedYear] = React.useState(
+        new Date().getFullYear(),
+    );
+
+    // หาปีที่มีข้อมูลทั้งหมด
+    const availableYears = React.useMemo(() => {
+        const years = new Set<number>();
+        equipments?.forEach((item) => {
+            const date = new Date(item.acquiredDate as string);
+            years.add(date.getFullYear());
+        });
+        return Array.from(years).sort((a, b) => b - a);
+    }, [equipments]);
 
     const chartData = React.useMemo(
-        () => calculateMonthlyData(equipments),
-        [equipments],
+        () => calculateMonthlyData(equipments, selectedYear),
+        [equipments, selectedYear],
     );
 
     return (
         <Card className="mt-6">
-            <CardHeader>
-                <CardTitle>สถิติครุภัณฑ์รายเดือน</CardTitle>
-                <CardDescription>
-                    แสดงจำนวนครุภัณฑ์แยกตามสถานะรายเดือน
-                </CardDescription>
+            <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                    <CardTitle>สถิติครุภัณฑ์รายเดือน</CardTitle>
+                    <CardDescription>
+                        แสดงจำนวนครุภัณฑ์แยกตามสถานะรายเดือน
+                    </CardDescription>
+                </div>
+                <Select
+                    value={selectedYear.toString()}
+                    onValueChange={(value) => setSelectedYear(parseInt(value))}
+                >
+                    <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="เลือกปี" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {availableYears.map((year) => (
+                            <SelectItem key={year} value={year.toString()}>
+                                ปี {year + 543}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
             </CardHeader>
             <CardContent>
                 <ChartContainer config={chartConfig}>
@@ -122,7 +178,7 @@ export function BarChartComponent() {
             <CardFooter className="flex-col items-start gap-2 text-sm">
                 <div className="leading-none text-muted-foreground">
                     แสดงจำนวนครุภัณฑ์ทั้งหมดแยกตามสถานะในแต่ละเดือน ปี{" "}
-                    {new Date().getFullYear() + 543}
+                    {selectedYear + 543}
                 </div>
             </CardFooter>
         </Card>
