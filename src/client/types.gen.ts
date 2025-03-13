@@ -23,6 +23,11 @@ export type PostApiV1AuthLoginErrors = {
     404: {
         message: string;
     };
+    409: {
+        message: string;
+        error: string;
+        field: string;
+    };
     500: {
         message: string;
     };
@@ -30,6 +35,15 @@ export type PostApiV1AuthLoginErrors = {
 
 export type PostApiV1AuthLoginError =
     PostApiV1AuthLoginErrors[keyof PostApiV1AuthLoginErrors];
+
+export type PostApiV1AuthLoginResponses = {
+    200: {
+        message: string;
+    };
+};
+
+export type PostApiV1AuthLoginResponse =
+    PostApiV1AuthLoginResponses[keyof PostApiV1AuthLoginResponses];
 
 export type GetApiV1AuthGoogleData = {
     body?: never;
@@ -50,6 +64,11 @@ export type GetApiV1AuthGoogleErrors = {
     };
     404: {
         message: string;
+    };
+    409: {
+        message: string;
+        error: string;
+        field: string;
     };
     500: {
         message: string;
@@ -80,6 +99,11 @@ export type PostApiV1AuthGoogleCallbackErrors = {
     };
     404: {
         message: string;
+    };
+    409: {
+        message: string;
+        error: string;
+        field: string;
     };
     500: {
         message: string;
@@ -121,6 +145,11 @@ export type PostApiV1AuthLogoutErrors = {
     404: {
         message: string;
     };
+    409: {
+        message: string;
+        error: string;
+        field: string;
+    };
     500: {
         message: string;
     };
@@ -142,8 +171,8 @@ export type GetApiV1UsersData = {
     body?: never;
     path?: never;
     query: {
-        limit: string | (string | number);
-        offset: string | (string | number);
+        limit: number;
+        offset: number;
     };
     url: "/api/v1/users/";
 };
@@ -160,6 +189,11 @@ export type GetApiV1UsersErrors = {
     };
     404: {
         message: string;
+    };
+    409: {
+        message: string;
+        error: string;
+        field: string;
     };
     500: {
         message: string;
@@ -221,6 +255,11 @@ export type PostApiV1UsersErrors = {
     404: {
         message: string;
     };
+    409: {
+        message: string;
+        error: string;
+        field: string;
+    };
     500: {
         message: string;
     };
@@ -269,6 +308,11 @@ export type DeleteApiV1UsersByIdErrors = {
     404: {
         message: string;
     };
+    409: {
+        message: string;
+        error: string;
+        field: string;
+    };
     500: {
         message: string;
     };
@@ -307,6 +351,11 @@ export type GetApiV1UsersByIdErrors = {
     };
     404: {
         message: string;
+    };
+    409: {
+        message: string;
+        error: string;
+        field: string;
     };
     500: {
         message: string;
@@ -364,6 +413,11 @@ export type PatchApiV1UsersByIdErrors = {
     404: {
         message: string;
     };
+    409: {
+        message: string;
+        error: string;
+        field: string;
+    };
     500: {
         message: string;
     };
@@ -409,6 +463,11 @@ export type GetApiV1UsersMeErrors = {
     };
     404: {
         message: string;
+    };
+    409: {
+        message: string;
+        error: string;
+        field: string;
     };
     500: {
         message: string;
@@ -459,6 +518,11 @@ export type PatchApiV1UsersMeErrors = {
     404: {
         message: string;
     };
+    409: {
+        message: string;
+        error: string;
+        field: string;
+    };
     500: {
         message: string;
     };
@@ -508,6 +572,11 @@ export type PatchApiV1UsersMePasswordErrors = {
     404: {
         message: string;
     };
+    409: {
+        message: string;
+        error: string;
+        field: string;
+    };
     500: {
         message: string;
     };
@@ -550,6 +619,11 @@ export type PostApiV1UsersSignupErrors = {
     404: {
         message: string;
     };
+    409: {
+        message: string;
+        error: string;
+        field: string;
+    };
     500: {
         message: string;
     };
@@ -571,8 +645,8 @@ export type GetApiV1CategoriesData = {
     body?: never;
     path?: never;
     query: {
-        limit: string | (string | number);
-        offset: string | (string | number);
+        limit: number;
+        offset: number;
     };
     url: "/api/v1/categories/";
 };
@@ -589,6 +663,11 @@ export type GetApiV1CategoriesErrors = {
     };
     404: {
         message: string;
+    };
+    409: {
+        message: string;
+        error: string;
+        field: string;
     };
     500: {
         message: string;
@@ -639,6 +718,11 @@ export type PostApiV1CategoriesErrors = {
     404: {
         message: string;
     };
+    409: {
+        message: string;
+        error: string;
+        field: string;
+    };
     500: {
         message: string;
     };
@@ -681,6 +765,11 @@ export type DeleteApiV1CategoriesByIdErrors = {
     404: {
         message: string;
     };
+    409: {
+        message: string;
+        error: string;
+        field: string;
+    };
     500: {
         message: string;
     };
@@ -719,6 +808,11 @@ export type GetApiV1CategoriesByIdErrors = {
     };
     404: {
         message: string;
+    };
+    409: {
+        message: string;
+        error: string;
+        field: string;
     };
     500: {
         message: string;
@@ -764,6 +858,11 @@ export type PatchApiV1CategoriesByIdErrors = {
     404: {
         message: string;
     };
+    409: {
+        message: string;
+        error: string;
+        field: string;
+    };
     500: {
         message: string;
     };
@@ -788,8 +887,8 @@ export type GetApiV1RoomsData = {
     body?: never;
     path?: never;
     query: {
-        limit: string | (string | number);
-        offset: string | (string | number);
+        limit: number;
+        offset: number;
     };
     url: "/api/v1/rooms/";
 };
@@ -806,6 +905,11 @@ export type GetApiV1RoomsErrors = {
     };
     404: {
         message: string;
+    };
+    409: {
+        message: string;
+        error: string;
+        field: string;
     };
     500: {
         message: string;
@@ -855,6 +959,11 @@ export type PostApiV1RoomsErrors = {
     404: {
         message: string;
     };
+    409: {
+        message: string;
+        error: string;
+        field: string;
+    };
     500: {
         message: string;
     };
@@ -897,6 +1006,11 @@ export type DeleteApiV1RoomsByIdErrors = {
     404: {
         message: string;
     };
+    409: {
+        message: string;
+        error: string;
+        field: string;
+    };
     500: {
         message: string;
     };
@@ -935,6 +1049,11 @@ export type GetApiV1RoomsByIdErrors = {
     };
     404: {
         message: string;
+    };
+    409: {
+        message: string;
+        error: string;
+        field: string;
     };
     500: {
         message: string;
@@ -980,6 +1099,11 @@ export type PatchApiV1RoomsByIdErrors = {
     404: {
         message: string;
     };
+    409: {
+        message: string;
+        error: string;
+        field: string;
+    };
     500: {
         message: string;
     };
@@ -1004,8 +1128,8 @@ export type GetApiV1EquipmentsData = {
     body?: never;
     path?: never;
     query: {
-        limit: string | (string | number);
-        offset: string | (string | number);
+        limit: number;
+        offset: number;
     };
     url: "/api/v1/equipments/";
 };
@@ -1022,6 +1146,11 @@ export type GetApiV1EquipmentsErrors = {
     };
     404: {
         message: string;
+    };
+    409: {
+        message: string;
+        error: string;
+        field: string;
     };
     500: {
         message: string;
@@ -1130,6 +1259,11 @@ export type PostApiV1EquipmentsErrors = {
     404: {
         message: string;
     };
+    409: {
+        message: string;
+        error: string;
+        field: string;
+    };
     500: {
         message: string;
     };
@@ -1218,6 +1352,11 @@ export type DeleteApiV1EquipmentsByIdErrors = {
     404: {
         message: string;
     };
+    409: {
+        message: string;
+        error: string;
+        field: string;
+    };
     500: {
         message: string;
     };
@@ -1256,6 +1395,11 @@ export type GetApiV1EquipmentsByIdErrors = {
     };
     404: {
         message: string;
+    };
+    409: {
+        message: string;
+        error: string;
+        field: string;
     };
     500: {
         message: string;
@@ -1354,6 +1498,11 @@ export type PatchApiV1EquipmentsByIdErrors = {
     404: {
         message: string;
     };
+    409: {
+        message: string;
+        error: string;
+        field: string;
+    };
     500: {
         message: string;
     };
@@ -1444,6 +1593,11 @@ export type PostApiV1EquipmentsByIdImagesErrors = {
     404: {
         message: string;
     };
+    409: {
+        message: string;
+        error: string;
+        field: string;
+    };
     500: {
         message: string;
     };
@@ -1533,6 +1687,11 @@ export type DeleteApiV1EquipmentsByIdImagesByImageIdErrors = {
     404: {
         message: string;
     };
+    409: {
+        message: string;
+        error: string;
+        field: string;
+    };
     500: {
         message: string;
     };
@@ -1574,6 +1733,11 @@ export type PatchApiV1EquipmentsByIdImagesByImageIdErrors = {
     };
     404: {
         message: string;
+    };
+    409: {
+        message: string;
+        error: string;
+        field: string;
     };
     500: {
         message: string;
@@ -1663,6 +1827,11 @@ export type DeleteApiV1EquipmentsByIdReceiptErrors = {
     404: {
         message: string;
     };
+    409: {
+        message: string;
+        error: string;
+        field: string;
+    };
     500: {
         message: string;
     };
@@ -1703,6 +1872,11 @@ export type PostApiV1EquipmentsByIdReceiptErrors = {
     };
     404: {
         message: string;
+    };
+    409: {
+        message: string;
+        error: string;
+        field: string;
     };
     500: {
         message: string;

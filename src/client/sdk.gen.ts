@@ -81,6 +81,7 @@ import type {
     PostApiV1AuthGoogleCallbackResponse,
     PostApiV1AuthLoginData,
     PostApiV1AuthLoginError,
+    PostApiV1AuthLoginResponse,
     PostApiV1AuthLogoutData,
     PostApiV1AuthLogoutError,
     PostApiV1AuthLogoutResponse,
@@ -129,7 +130,7 @@ export class AuthService {
         options: Options<PostApiV1AuthLoginData, ThrowOnError>,
     ) {
         return (options.client ?? _heyApiClient).post<
-            unknown,
+            PostApiV1AuthLoginResponse,
             PostApiV1AuthLoginError,
             ThrowOnError
         >({
