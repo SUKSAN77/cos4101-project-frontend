@@ -1,6 +1,6 @@
 "use client";
 
-import { Bell, LogOut, User } from "lucide-react";
+import { LogOut, User } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { use, useState } from "react";
@@ -61,15 +61,11 @@ export function Navbar() {
                     </div>
 
                     <div className="ml-auto flex items-center gap-4">
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            className="relative transition-colors duration-200 hover:bg-gray-100"
-                        >
-                            <Bell className="h-5 w-5 text-gray-600" />
-                            <span className="absolute right-0 top-0 h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-white" />
-                        </Button>
-
+                        <div className="hidden md:block">
+                            <p className="text-sm font-medium">
+                                {user?.firstName} {user?.lastName}
+                            </p>
+                        </div>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Button
