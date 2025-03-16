@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
@@ -56,6 +57,20 @@ export function UserProfileDialog({
         },
     });
 
+    const [isDisabled, setIsDisabled] = useState(true);
+
+    const handleDisable = () => {
+        if (!isDisabled) {
+            // Reset form to initial values when canceling
+            form.reset({
+                firstName: user?.firstName || "",
+                lastName: user?.lastName || "",
+                email: user?.email || "",
+            });
+        }
+        setIsDisabled(!isDisabled);
+    };
+
     const onSubmit = async (values: UserProfileValues) => {
         try {
             await UsersService.patchApiV1UsersMe({
@@ -77,7 +92,20 @@ export function UserProfileDialog({
     };
 
     return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
+        <Dialog
+            open={open}
+            onOpenChange={(open) => {
+                if (!open) {
+                    setIsDisabled(true);
+                    form.reset({
+                        firstName: user?.firstName || "",
+                        lastName: user?.lastName || "",
+                        email: user?.email || "",
+                    });
+                }
+                onOpenChange(open);
+            }}
+        >
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
                     <DialogTitle>ข้อมูลส่วนตัว</DialogTitle>
@@ -97,7 +125,11 @@ export function UserProfileDialog({
                                 <FormItem>
                                     <FormLabel>ชื่อ</FormLabel>
                                     <FormControl>
-                                        <Input placeholder="ชื่อ" {...field} />
+                                        <Input
+                                            placeholder="ชื่อ"
+                                            {...field}
+                                            disabled={isDisabled}
+                                        />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -113,6 +145,7 @@ export function UserProfileDialog({
                                         <Input
                                             placeholder="นามสกุล"
                                             {...field}
+                                            disabled={isDisabled}
                                         />
                                     </FormControl>
                                     <FormMessage />
@@ -138,7 +171,27 @@ export function UserProfileDialog({
                             )}
                         />
                         <DialogFooter>
-                            <Button type="submit">บันทึกการเปลี่ยนแปลง</Button>
+                            {isDisabled ? (
+                                <Button type="button" onClick={handleDisable}>
+                                    แก้ไข
+                                </Button>
+                            ) : (
+                                <div className="flex gap-2">
+                                    <Button
+                                        className="bg-red-500 hover:bg-red-600"
+                                        type="reset"
+                                        onClick={handleDisable}
+                                    >
+                                        ยกเลิก
+                                    </Button>
+                                    <Button
+                                        className="bg-blue-600 hover:bg-blue-700"
+                                        type="submit"
+                                    >
+                                        บันทึก
+                                    </Button>
+                                </div>
+                            )}
                         </DialogFooter>
                     </form>
                 </Form>
