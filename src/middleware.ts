@@ -5,7 +5,7 @@ import { getUser } from "@/lib/actions/users";
 import { UserRole } from "@/types/users";
 
 const authRoutes = ["/login", "/register"];
-const adminRoutes = ["/users"];
+const adminRoutes = ["/users", "/home", "/rooms", "/categories", "/equipment"];
 
 export async function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
@@ -21,6 +21,10 @@ export async function middleware(request: NextRequest) {
 
         if (!user) {
             request.cookies.delete("auth");
+        }
+
+        if (user && authRoutes.includes(pathname)) {
+            return NextResponse.redirect(new URL("/", request.url));
         }
 
         // manage user routes

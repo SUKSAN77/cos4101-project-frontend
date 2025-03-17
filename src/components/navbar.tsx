@@ -45,7 +45,7 @@ export function Navbar() {
                             [
                                 UserRole.ADMIN,
                                 UserRole.DEPARTMENT_HEAD,
-                                UserRole.INSTRUCTOR,
+                                UserRole.INVENTORY_MANAGER,
                             ].includes(user.role) && (
                                 <div>
                                     <Link href="/">
