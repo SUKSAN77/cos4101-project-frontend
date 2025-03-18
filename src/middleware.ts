@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 import { getUser } from "@/lib/actions/users";
 import { UserRole } from "@/types/users";
 
-const authRoutes = ["/login", "/register"];
+const authRoutes = ["/login", "/register", "/forgetpassword"];
 const adminRoutes = ["/users", "/home", "/rooms", "/categories", "/equipment"];
 
 export async function middleware(request: NextRequest) {
