@@ -65,7 +65,7 @@ export function PieChartComponent() {
     const totalItems = React.useMemo(() => equipments.length, [equipments]);
 
     return (
-        <Card className="flex flex-col">
+        <Card className="mt-6 flex flex-col gap-16">
             <CardHeader className="items-center pb-0">
                 <CardTitle>สถานะครุภัณฑ์</CardTitle>
                 <CardDescription>

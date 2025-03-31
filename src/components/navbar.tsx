@@ -62,8 +62,25 @@ export function Navbar() {
 
                     <div className="ml-auto flex items-center gap-4">
                         <div className="hidden md:block">
-                            <p className="text-sm font-medium">
-                                {user?.firstName} {user?.lastName}
+                            <p className="flex items-center gap-2 text-sm font-medium">
+                                <span className="text-xs text-muted-foreground">
+                                    {user?.role === UserRole.ADMIN &&
+                                        "ผู้ดูแลระบบ"}
+                                    {user?.role === UserRole.DEPARTMENT_HEAD &&
+                                        "หัวหน้าฝ่าย"}
+                                    {user?.role ===
+                                        UserRole.INVENTORY_MANAGER &&
+                                        "ผู้จัดการคลัง"}
+                                    {user?.role === UserRole.INSTRUCTOR &&
+                                        "อาจารย์"}
+                                    {user?.role === UserRole.STAFF &&
+                                        "เจ้าหน้าที่"}
+                                    {user?.role === UserRole.UNKNOWN &&
+                                        "ไม่ทราบบทบาท"}
+                                </span>
+                                <span>
+                                    {user?.firstName} {user?.lastName}
+                                </span>
                             </p>
                         </div>
                         <DropdownMenu>
