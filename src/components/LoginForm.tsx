@@ -128,7 +128,7 @@ export function LoginFormHandle() {
             <div className="mt-4 text-center text-sm">
                 มีบัญชีแล้วหรือยัง?{" "}
                 <Link href="/register" className="underline underline-offset-4">
-                    สมัครสมาชิก
+                    ลงทะเบียน
                 </Link>
             </div>
         </Form>

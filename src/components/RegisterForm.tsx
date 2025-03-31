@@ -66,9 +66,9 @@ export function RegisterForm({
         <div className={cn("flex flex-col gap-6", className)} {...props}>
             <Card>
                 <CardHeader>
-                    <CardTitle className="text-2xl">สมัครสมาชิก</CardTitle>
+                    <CardTitle className="text-2xl">ลงทะเบียน</CardTitle>
                     <CardDescription>
-                        สร้างบัญชีใหม่โดยกรอกข้อมูลด้านล่างนี้
+                        ลงทะเบียนโดยกรอกข้อมูลด้านล่างนี้
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -128,9 +128,7 @@ export function RegisterForm({
                                 className="w-full"
                                 disabled={isLoading}
                             >
-                                {isLoading
-                                    ? "กำลังดำเนินการ..."
-                                    : "สมัครสมาชิก"}
+                                {isLoading ? "กำลังดำเนินการ..." : "ลงทะเบียน"}
                             </Button>
                         </div>
                         <div className="mt-4 text-center text-sm">
