@@ -65,14 +65,14 @@ export function PieChartComponent() {
     const totalItems = React.useMemo(() => equipments.length, [equipments]);
 
     return (
-        <Card className="mt-6 flex h-[32rem] flex-col gap-16">
+        <Card className="flex flex-1 flex-col justify-between">
             <CardHeader className="items-center pb-0">
                 <CardTitle>สถานะครุภัณฑ์</CardTitle>
                 <CardDescription>
                     แสดงสัดส่วนสถานะของครุภัณฑ์ทั้งหมด
                 </CardDescription>
             </CardHeader>
-            <CardContent className="flex-1 pb-0">
+            <CardContent className="pb-0">
                 <ChartContainer
                     config={chartConfig}
                     className="mx-auto aspect-square max-h-[250px]"

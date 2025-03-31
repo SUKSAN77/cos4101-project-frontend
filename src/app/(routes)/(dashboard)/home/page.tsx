@@ -14,13 +14,13 @@ export default function Page() {
                                 <EquipmentViewer />
                             </div>
                         </div>
-                        <div className="rounded-lg bg-white p-6 shadow-md">
+                        <div className="flex flex-col rounded-lg bg-white p-6 shadow-md">
                             <h2 className="mb-4 text-2xl font-semibold">
                                 สถิติประเภทอุปกรณ์
                             </h2>
                             <PieChartComponent />
                         </div>
-                        <div className="rounded-lg bg-white p-6 shadow-md">
+                        <div className="flex flex-col rounded-lg bg-white p-6 shadow-md">
                             <h2 className="mb-4 text-2xl font-semibold">
                                 สถิติการใช้งาน
                             </h2>
