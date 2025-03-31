@@ -107,7 +107,7 @@ export function BarChartComponent() {
     );
 
     return (
-        <Card className="mt-6">
+        <Card className="mt-6 flex h-[32rem] flex-col">
             <CardHeader className="flex flex-row items-center justify-between">
                 <div>
                     <CardTitle>สถิติครุภัณฑ์รายเดือน</CardTitle>
